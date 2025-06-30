@@ -1,18 +1,18 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SpjController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
+Route::get('/', [HomeController::class, 'index'])->name('home.index');
+
+
+Route::get('/spj', [SpjController::class, 'index'])->name('spj.index');
+
+Route::get('/spj/create', [SpjController::class, 'create'])->name('spj.create');
+Route::post('/spj', [SpjController::class, 'store'])->name('spj.store');
+Route::get('/spj/{id}/edit', [SpjController::class, 'edit'])->name('spj.edit');
+Route::put('/spj/{id}', [SpjController::class, 'update'])->name('spj.update');
+Route::delete('/spj/{id}', [SpjController::class, 'destroy'])->name('spj.destroy');
