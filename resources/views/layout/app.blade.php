@@ -81,6 +81,7 @@
 <!-- Toastr & Handler -->
 <script src="{{ asset('asset/plugins/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('/js/toastr-handler.js') }}"></script>
+<script src="{{ asset('/js/confirm.js') }}"></script>
 
 <script>
 window.Laravel = {
@@ -91,35 +92,8 @@ window.Laravel = {
   }
 }
 </script>
-<script src="{{ asset('/js/toastr-handler.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const deleteButtons = document.querySelectorAll('.btn-delete');
 
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.preventDefault(); // tahan form
-
-            Swal.fire({
-                title: 'Yakin ingin hapus?',
-                text: "Data tidak bisa dikembalikan!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Ya, hapus!',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Kirim form hapus
-                    button.closest('form').submit();
-                }
-            })
-        });
-    });
-});
-</script>
 
 </body>
 </html>

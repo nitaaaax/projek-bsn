@@ -29,11 +29,14 @@
                 <td>{!! nl2br(e($spj->keterangan)) !!}</td>
                 <td>
                     <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                   <form action="{{ route('spj.destroy', $spj->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button onclick="confirmDelete" class="btn btn-sm btn-danger">Hapus</button>
-                    </form>
+                   <form id="delete-form-{{ $spj->id }}" action="{{ route('spj.destroy', $spj->id) }}"
+                                                  method="POST" style="display: none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+                                            <a class="btn btn-danger btn-sm" onclick="confirmDelete({{  $spj->id }})">
+                                             <i class="fas fa-trash"></i>Hapus sweetalert
+                                             </a> 
                 </td>
             </tr>
             @endforeach
