@@ -10,8 +10,8 @@ class SpjController extends Controller
 {
     public function index()
     {
-        $spjs = Spj::all();
-        return view('spj.index', compact('spjs'));
+        $Spj = Spj::all();
+        return view('spj.index', compact('Spj'));
     }
 
     public function create()
