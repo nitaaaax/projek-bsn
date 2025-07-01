@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Spj;
 use Illuminate\Http\Request;
+use App\Models\SpjDetail;
 
 class SpjController extends Controller
 {
@@ -22,46 +23,31 @@ class SpjController extends Controller
     {
         $request->validate([
             'nama_spj' => 'required',
-            'item' => 'required|string',
-            'nominal' => 'required|numeric',
-            'pembayaran' => 'required|in:Sudah,Belum',
-            'keterangan' => 'nullable|string'
+            'pembayaran' => 'required',
+            'item.*' => 'required',
+            'nominal.*' => 'required|numeric'
         ]);
 
-        Spj::create($request->all());
-        return redirect()->route('spj.index')->with('success', 'Data berhasil disimpan!');
+        $spj = Spj::create([
+            'nama_spj' => $request->nama_spj,
+            'pembayaran' => $request->pembayaran,
+            'keterangan' => $request->keterangan,
+        ]);
+
+        foreach ($request->item as $i => $item) {
+            SpjDetail::create([
+                'spj_id' => $spj->id,
+                'item' => $item,
+                'nominal' => $request->nominal[$i],
+            ]);
+        }
+
+        return redirect()->route('spj.index');
     }
-    public function edit($id)
-{
-    $spj = Spj::findOrFail($id);
-    return view('spj.edit', compact('spj'));
+
+    public function show($id)
+    {
+        $spj = Spj::with('details')->findOrFail($id);
+        return view('spj.show', compact('spj'));
+    }
 }
-
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'nama_spj' => 'required',
-        'item' => 'required',
-        'nominal' => 'required|numeric',
-        'pembayaran' => 'required|in:Sudah,Belum',
-        'keterangan' => 'nullable|string',
-    ]);
-
-    $spj = Spj::findOrFail($id);
-    $spj->update($request->all());
-
-    return redirect()->route('spj.index')->with('success', 'Data berhasil diupdate!');
-}
-
-public function destroy($id)
-{
-    $spj = Spj::findOrFail($id);
-    $spj->delete();
-
-    return redirect()->route('spj.index')->with('success', 'Data berhasil dihapus!');
-}
-
-}
-
-
-//fgdgdfgd
