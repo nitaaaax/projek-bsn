@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-       Schema::create('spjs', function (Blueprint $table) {
+       Schema::create('spj', function (Blueprint $table) {
     $table->id();
     $table->string('nama_spj');
     $table->timestamps();
