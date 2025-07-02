@@ -11,8 +11,8 @@ class SpjController extends Controller
     // Menampilkan semua data SPJ
     public function index()
     {
-        $spjs = Spj::with('details')->get();
-        return view('spj.index', compact('spjs'));
+        $spj = Spj::with('details')->get();
+        return view('spj.index', compact('spj'));
     }
 
     // Form tambah SPJ

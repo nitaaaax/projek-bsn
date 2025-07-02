@@ -112,10 +112,17 @@
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
-      <img src="{{ asset ('/asset/dist/img/AdminLTELogo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">SI-UMKM RIAU</span>
-    </a>
+   <a href="{{ route('home.index') }}" class="brand-link d-flex align-items-center">
+    <img src="{{ asset('asset/dist/img/logoumkm.png') }}" 
+         alt="Logo SI-UMKM RIAU" 
+         class="brand-image img-circle elevation-3"
+         style="opacity: .9; width: 40px; height: 40px; object-fit: cover;">
+
+    <span class="brand-text font-weight-bold ml-2 text-white" style="font-size: 16px;">
+        SI-UMKM <span class="text-info">RIAU</span>
+    </span>
+</a>
+
 
     <!-- Sidebar -->
     <div class="sidebar">
@@ -151,7 +158,7 @@
             <a href="{{ route('home.index') }}" class="nav-link">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
-                dashboard
+                Beranda
               </p>
             </a>
           </li>
@@ -177,6 +184,33 @@
             <p>Data SPJ</p>
           </a>
         </li>
+         
+        <li class="nav-item has-treeview">
+        <a href="#" class="nav-link">
+          <i class="nav-icon fas fa-store"></i> {{-- Ganti icon sesuai tema UMKM --}}
+          <p>
+            Data UMKM
+            <i class="right fas fa-angle-left"></i>
+          </p>
+        </a>
+        <ul class="nav nav-treeview">
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              {{-- {{ route('umkm.proses') }} --}}
+              <i class="far fa-circle nav-icon"></i>
+              <p>Data UMKM Proses</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              {{-- {{ route('umkm.sertifikasi') }} --}}
+              <i class="far fa-circle nav-icon"></i>
+              <p>Data UMKM Sertifikasi</p>
+            </a>
+          </li>
+        </ul>
+      </li>
+
 
         </ul>
       </nav>

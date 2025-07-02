@@ -2,80 +2,100 @@
 
 @section('content')
 <div class="container">
-    <h4>Form Input SPJ</h4>
+    <h4 class="mb-4">Form Input SPJ</h4>
 
     <form action="{{ route('spj.store') }}" method="POST">
         @csrf
 
-        {{-- Nama SPJ di atas --}}
-        <div class="mb-3">
-            <label for="nama_spj" class="form-label">Nama SPJ</label>
+        {{-- Nama SPJ --}}
+        <div class="mb-4">
+            <label for="nama_spj" class="form-label"><strong>Nama SPJ</strong></label>
             <input type="text" name="nama_spj" class="form-control" placeholder="Masukkan Nama SPJ" required>
         </div>
 
-        {{-- Daftar Item --}}
-        <h5>Detail Item SPJ</h5>
-        <div id="spj-rows">
-            <div class="row mb-2">
-                <div class="col-md-3">
-                    <input type="text" name="item[]" class="form-control" placeholder="Item" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="number" name="nominal[]" class="form-control" placeholder="Nominal" required>
-                </div>
-                <div class="col-md-2">
-                    <select name="status_pembayaran[]" class="form-control" required>
-                        <option value="belum_dibayar">Belum Dibayar</option>
-                        <option value="sudah_dibayar">Sudah Dibayar</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <textarea name="keterangan[]" class="form-control" placeholder="Keterangan" rows="1"></textarea>
-                </div>
-                <div class="col-md-1">
-                    <button type="button" class="btn btn-danger remove">X</button>
-                </div>
-            </div>
+        {{-- Tabel Item --}}
+        <div class="table-responsive">
+            <table class="table table-bordered text-center align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 20%">Item</th>
+                        <th style="width: 15%">Nominal</th>
+                        <th style="width: 20%">Status Pembayaran</th>
+                        <th style="width: 35%">Keterangan</th>
+                        <th style="width: 10%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="spj-rows">
+                    <tr>
+                        <td><input type="text" name="item[]" class="form-control" required></td>
+                        <td><input type="number" name="nominal[]" class="form-control nominal" required></td>
+                        <td>
+                            <select name="status_pembayaran[]" class="form-control" required>
+                                <option value="belum_dibayar">Belum Dibayar</option>
+                                <option value="sudah_dibayar">Sudah Dibayar</option>
+                            </select>
+                        </td>
+                        <td><textarea name="keterangan[]" class="form-control" rows="1"></textarea></td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove">Hapus</button></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
-        <button type="button" class="btn btn-success mb-3" id="addRow">+ Tambah Baris</button>
+        <div class="mb-3 text-end">
+            <button type="button" class="btn btn-success" id="addRow">+ Tambah Baris</button>
+        </div>
 
-        <br>
+        <div class="mb-3">
+            <h5>Total: <span id="total-rp">Rp 0</span></h5>
+        </div>
+
         <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
 </div>
 
+{{-- SCRIPT --}}
 <script>
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('.nominal').forEach(input => {
+            total += parseInt(input.value) || 0;
+        });
+        document.getElementById('total-rp').textContent = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
     document.getElementById('addRow').addEventListener('click', function () {
-        const container = document.getElementById('spj-rows');
-        const html = `
-        <div class="row mb-2">
-            <div class="col-md-3">
-                <input type="text" name="item[]" class="form-control" placeholder="Item" required>
-            </div>
-            <div class="col-md-2">
-                <input type="number" name="nominal[]" class="form-control" placeholder="Nominal" required>
-            </div>
-            <div class="col-md-2">
-                <select name="status_pembayaran[]" class="form-control" required>
-                    <option value="belum_dibayar">Belum Dibayar</option>
-                    <option value="sudah_dibayar">Sudah Dibayar</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <textarea name="keterangan[]" class="form-control" placeholder="Keterangan" rows="1"></textarea>
-            </div>
-            <div class="col-md-1">
-                <button type="button" class="btn btn-danger remove">X</button>
-            </div>
-        </div>`;
-        container.insertAdjacentHTML('beforeend', html);
+        const newRow = `
+            <tr>
+                <td><input type="text" name="item[]" class="form-control" required></td>
+                <td><input type="number" name="nominal[]" class="form-control nominal" required></td>
+                <td>
+                    <select name="status_pembayaran[]" class="form-control" required>
+                        <option value="belum_dibayar">Belum Dibayar</option>
+                        <option value="sudah_dibayar">Sudah Dibayar</option>
+                    </select>
+                </td>
+                <td><textarea name="keterangan[]" class="form-control" rows="1"></textarea></td>
+                <td><button type="button" class="btn btn-danger btn-sm remove">Hapus</button></td>
+            </tr>
+        `;
+        document.getElementById('spj-rows').insertAdjacentHTML('beforeend', newRow);
+        updateTotal();
+    });
+
+    document.addEventListener('input', function (e) {
+        if (e.target.classList.contains('nominal')) {
+            updateTotal();
+        }
     });
 
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('remove')) {
-            e.target.closest('.row').remove();
+            e.target.closest('tr').remove();
+            updateTotal();
         }
     });
+
+    updateTotal();
 </script>
 @endsection

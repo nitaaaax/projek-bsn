@@ -1,79 +1,90 @@
 @extends('layout.app')
 
 @section('content')
-<div class="container">
-    <h2>Data SPJ</h2>
-    <a href="{{ route('spj.create') }}" class="btn btn-primary mb-3">+ Tambah SPJ</a>
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="font-weight-bold mb-4">Data SPJ</h2>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+      <div class="mb-3">
+        <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
+          <i class="fa fa-plus"></i> Tambah SPJ
+        </a>
+      </div>
 
-    <table class="table table-bordered">
-        <thead>
+      <div class="table-responsive">
+        <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
+          <thead>
             <tr>
-                <th>Nama SPJ</th>
-                <th>Item</th>
-                <th>Nominal</th>
-                <th>Status Pembayaran</th>
-                <th>Keterangan</th>
-                <th>Aksi</th>
+              <th>Nama SPJ</th>
+              <th style="width: 200px;">Aksi</th>
             </tr>
-        </thead>
-        <tbody>
-            @foreach ($spjs as $spj)
-                @foreach ($spj->details as $detail)
-                    <tr>
-                        <td>{{ $spj->nama_spj }}</td>
-                        <td>{{ $detail->item }}</td>
-                        <td>Rp {{ number_format($detail->nominal) }}</td>
-                        <td>{{ ucfirst(str_replace('_', ' ', $detail->status_pembayaran)) }}</td>
-                        <td>{{ $detail->keterangan }}</td>
-                        <td>
-                            <div class="d-grid gap-2">
-                                <!-- Tombol SPJ Detail -->
-                                <a href="{{ route('spj.show', $spj->id) }}" class="btn btn-info btn-sm">SPJ Detail</a>
-
-                                <!-- Tombol Edit -->
-                                <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning btn-sm">Edit</a>
-
-                                <!-- Tombol Hapus -->
-                                <form action="{{ route('spj.destroy', $spj->id) }}" method="POST" class="delete-form">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @endforeach
-            @endforeach
-        </tbody>
-    </table>
+          </thead>
+          <tbody>
+            @forelse ($spj as $spj)
+              <tr>
+                <td>{{ $spj->nama_spj }}</td>
+                <td>
+                  <div class="btn-group">
+                    <a href="{{ route('spj.show', $spj->id) }}" class="btn btn-info btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                    <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning btn-sm">
+                      <i class="fa fa-edit"></i> Edit
+                    </a>
+                    <!-- Hapus dengan confirm biasa -->
+                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ $spj->id }})">
+                      <i class="fas fa-trash"></i> Hapus 
+                    </a>
+                    <form id="delete-form-{{ $spj->id }}" action="{{ route('spj.destroy', $spj->id) }}"
+                      method="POST" style="display:none;">
+                      @csrf
+                      @method('DELETE')
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            @empty
+              <tr>
+                <td colspan="2" class="text-center text-muted">Belum ada data SPJ.</td>
+              </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- SCRIPT UNTUK HAPUS -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const deleteForms = document.querySelectorAll('.delete-form');
-        deleteForms.forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: 'Yakin ingin menghapus?',
-                    text: 'Data tidak bisa dikembalikan!',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonText: 'Ya, hapus!',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
+  function confirmDelete(id) {
+    if (confirm("Yakin ingin menghapus data ini?")) {
+      document.getElementById('delete-form-' + id).submit();
+    }
+  }
+</script>
+
+<!-- CDN JQUERY DAN DATATABLE -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<!-- AKTIFKAN DATATABLE -->
+<script>
+  $(document).ready(function () {
+    $('#tabelSPJ').DataTable({
+      lengthChange: false,
+      language: {
+        search: "Cari:",
+        lengthMenu: "Tampilkan _MENU_ data",
+        info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+        paginate: {
+          previous: "Sebelumnya",
+          next: "Berikutnya"
+        }
+      }
     });
+  });
 </script>
 @endsection
