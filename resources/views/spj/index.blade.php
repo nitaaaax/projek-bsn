@@ -21,22 +21,21 @@
             </tr>
           </thead>
           <tbody>
-            @forelse ($spj as $spj)
+            @forelse ($spj as $item)
               <tr>
-                <td>{{ $spj->nama_spj }}</td>
+                <td>{{ $item->nama_spj }}</td>
                 <td>
                   <div class="btn-group">
-                    <a href="{{ route('spj.show', $spj->id) }}" class="btn btn-info btn-sm">
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">
                       <i class="fa fa-eye"></i> Detail
                     </a>
-                    <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning btn-sm">
+                    <a href="{{ route('spj.edit', $item->id) }}" class="btn btn-warning btn-sm">
                       <i class="fa fa-edit"></i> Edit
                     </a>
-                    <!-- Hapus dengan confirm biasa -->
-                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ $spj->id }})">
-                      <i class="fas fa-trash"></i> Hapus 
+                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
+                      <i class="fa fa-trash"></i> Hapus 
                     </a>
-                    <form id="delete-form-{{ $spj->id }}" action="{{ route('spj.destroy', $spj->id) }}"
+                    <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}"
                       method="POST" style="display:none;">
                       @csrf
                       @method('DELETE')
@@ -55,36 +54,45 @@
     </div>
   </div>
 </div>
-
-<!-- SCRIPT UNTUK HAPUS -->
-<script>
-  function confirmDelete(id) {
-    if (confirm("Yakin ingin menghapus data ini?")) {
-      document.getElementById('delete-form-' + id).submit();
-    }
-  }
-</script>
-
-<!-- CDN JQUERY DAN DATATABLE -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-
-<!-- AKTIFKAN DATATABLE -->
-<script>
-  $(document).ready(function () {
-    $('#tabelSPJ').DataTable({
-      lengthChange: false,
-      language: {
-        search: "Cari:",
-        lengthMenu: "Tampilkan _MENU_ data",
-        info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-        paginate: {
-          previous: "Sebelumnya",
-          next: "Berikutnya"
-        }
-      }
-    });
-  });
-</script>
 @endsection
+
+@push('styles')
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+@endpush
+
+@push('scripts')
+  <!-- jQuery dan DataTables -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <!-- Konfirmasi hapus -->
+  <script>
+    function confirmDelete(id) {
+      if (confirm("Yakin ingin menghapus data ini?")) {
+        document.getElementById('delete-form-' + id).submit();
+      }
+    }
+  </script>
+
+  <!-- Aktifkan DataTable -->
+  <script>
+    $(document).ready(function () {
+      $('#tabelSPJ').DataTable({
+        lengthChange: false,
+        language: {
+          search: "Cari:",
+          lengthMenu: "Tampilkan _MENU_ data",
+          info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+          paginate: {
+            previous: "Sebelumnya",
+            next: "Berikutnya"
+          }
+        }
+      });
+    });
+  </script>
+@endpush

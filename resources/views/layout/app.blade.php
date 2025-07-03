@@ -95,5 +95,47 @@ window.Laravel = {
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
+@push('styles')
+    <!-- Bootstrap 5 + DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+        /* Sorot baris saat hover */
+        #tabelSPJ tbody tr:hover {
+            background-color:#f0f6ff !important;
+            cursor:pointer;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <!-- jQuery sudah ada di view -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+      $(function () {
+        $('#tabelSPJ').DataTable({
+          responsive: true,
+          lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+          dom: '<"row mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' + // length + search
+               'rt' +                                                       // table
+               '<"row mt-2"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>', // info + pagination
+          language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ data per halaman",
+            info: "Menampilkan _START_–_END_ dari total _TOTAL_ data",
+            infoEmpty: "Menampilkan 0 data",
+            infoFiltered: "(difilter dari _MAX_ total data)",
+            paginate: { previous: "‹", next: "›" },
+            zeroRecords: "Tidak ada data yang cocok"
+          }
+        });
+      });
+    </script>
+
+    
+@endpush
+
+
 </body>
 </html>
