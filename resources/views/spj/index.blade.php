@@ -25,23 +25,29 @@
               <tr>
                 <td>{{ $item->nama_spj }}</td>
                 <td>
-                  <div class="btn-group">
-                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">
-                      <i class="fa fa-eye"></i> Detail
-                    </a>
-                    <a href="{{ route('spj.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                      <i class="fa fa-edit"></i> Edit
-                    </a>
-                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
-                      <i class="fa fa-trash"></i> Hapus 
-                    </a>
-                    <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}"
-                      method="POST" style="display:none;">
-                      @csrf
-                      @method('DELETE')
-                    </form>
-                  </div>
-                </td>
+                <div class="row gx-2">
+              <div class="col-auto">
+                <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">
+                  <i class="fa fa-eye"></i> Detail
+                </a>
+              </div>
+              <div class="col-auto">
+                <a href="{{ route('spj.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                  <i class="fa fa-edit"></i> Edit
+                </a>
+              </div>
+              <div class="col-auto">
+                <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
+                  <i class="fa fa-trash"></i> Hapus
+                </button>
+              </div>
+
+              <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}" method="POST" style="display: none;">
+                @csrf
+                @method('DELETE')
+              </form>
+            </div>
+
               </tr>
             @empty
               <tr>
@@ -98,4 +104,26 @@
       });
     });
   </script>
+@endpush
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmDelete(id) {
+    Swal.fire({
+      title: 'Yakin ingin menghapus?',
+      text: "Data yang dihapus tidak bisa dikembalikan!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        document.getElementById('delete-form-' + id).submit();
+      }
+    });
+  }
+</script>
 @endpush

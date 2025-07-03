@@ -5,25 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Si-UMKM Riau</title> 
 
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+  <!-- DataTables (Bootstrap) -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
   <!-- Font Awesome -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/fontawesome-free/css/all.min.css') }}">
+
   <!-- Ionicons -->
   <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
-  <!-- Theme style -->
+
+  <!-- AdminLTE -->
   <link rel="stylesheet" href="{{ asset('asset/dist/css/adminlte.min.css') }}">
+
   <!-- OverlayScrollbars -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/overlayScrollbars/css/OverlayScrollbars.min.css') }}">
+
   <!-- Summernote -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/summernote/summernote-bs4.min.css') }}">
-  <!-- DataTables -->
+
+  <!-- DataTables (AdminLTE plugins) -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
+
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/toastr/toastr.min.css') }}">
+
+  {{-- Styles dari halaman lain --}}
+  @stack('styles')
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -47,7 +59,7 @@
 
 </div>
 
-<!-- JS Scripts -->
+<!-- Scripts -->
 <script src="{{ asset('asset/plugins/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 <script> $.widget.bridge('uibutton', $.ui.button) </script>
@@ -62,8 +74,6 @@
 <script src="{{ asset('asset/plugins/summernote/summernote-bs4.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <script src="{{ asset('asset/dist/js/adminlte.js') }}"></script>
-<script src="{{ asset('asset/dist/js/demo.js') }}"></script>
-<script src="{{ asset('asset/dist/js/pages/dashboard.js') }}"></script>
 
 <!-- DataTables -->
 <script src="{{ asset('asset/plugins/datatables/jquery.dataTables.min.js') }}"></script>
@@ -79,72 +89,24 @@
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-<!-- Toastr & Handler -->
+<!-- Toastr & Custom JS -->
 <script src="{{ asset('asset/plugins/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('/js/toastr-handler.js') }}"></script>
 <script src="{{ asset('/js/confirm.js') }}"></script>
-
-<script>
-window.Laravel = {
-  sessionMessages: {
-    success: @json(session('success')),
-    error: @json(session('error')),
-    errors: @json($errors->all()),
-  }
-}
-</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-@push('styles')
-    <!-- Bootstrap 5 + DataTables -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <style>
-        /* Sorot baris saat hover */
-        #tabelSPJ tbody tr:hover {
-            background-color:#f0f6ff !important;
-            cursor:pointer;
-        }
-    </style>
-@endpush
-
-@push('scripts')
-    <!-- jQuery sudah ada di view -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-      $(function () {
-        $('#tabelSPJ').DataTable({
-          responsive: true,
-          lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
-          dom: '<"row mb-2"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' + // length + search
-               'rt' +                                                       // table
-               '<"row mt-2"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>', // info + pagination
-          language: {
-            search: "Cari:",
-            lengthMenu: "Tampilkan _MENU_ data per halaman",
-            info: "Menampilkan _START_–_END_ dari total _TOTAL_ data",
-            infoEmpty: "Menampilkan 0 data",
-            infoFiltered: "(difilter dari _MAX_ total data)",
-            paginate: { previous: "‹", next: "›" },
-            zeroRecords: "Tidak ada data yang cocok"
-          }
-        });
-      });
-    </script>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#spj-detail-table').DataTable();
-    });
+  window.Laravel = {
+    sessionMessages: {
+      success: @json(session('success')),
+      error: @json(session('error')),
+      errors: @json($errors->all()),
+    }
+  };
 </script>
 
-    
-@endpush
-
+{{-- Script dari halaman lain --}}
+@stack('scripts')
 
 </body>
 </html>
