@@ -59,7 +59,6 @@
 @push('styles')
   <!-- Font Awesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush
@@ -83,13 +82,17 @@
     $(document).ready(function () {
       $('#tabelSPJ').DataTable({
         lengthChange: false,
+        order: [[0, 'asc']], // Urutkan default berdasarkan kolom pertama
         language: {
           search: "Cari:",
-          lengthMenu: "Tampilkan _MENU_ data",
-          info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+          searchPlaceholder: "Ketik untuk mencari...",
+          zeroRecords: "Data tidak ditemukan.",
+          info: "Menampilkan START - END dari TOTAL data",
+          infoEmpty: "Menampilkan 0 dari 0 data",
+          emptyTable: "Tidak ada data yang tersedia",
           paginate: {
-            previous: "Sebelumnya",
-            next: "Berikutnya"
+            previous: "← Sebelumnya",
+            next: "Berikutnya →"
           }
         }
       });
