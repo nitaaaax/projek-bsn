@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h2>Detail SPJ</h2>
+    <h2>Detail SPJJJJJ</h2>
 
     <div class="mb-3">
         <p><strong>Nama SPJ:</strong> {{ $spj->nama_spj }}</p>
