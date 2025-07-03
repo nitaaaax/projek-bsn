@@ -137,7 +137,7 @@
       </div>
 
       <!-- SidebarSearch Form -->
-      {{-- <div class="form-inline">
+     <div class="form-inline">
         <div class="input-group" data-widget="sidebar-search">
           <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
           <div class="input-group-append">
@@ -146,7 +146,7 @@
             </button>
           </div>
         </div>
-      </div> --}}
+      </div> 
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -162,21 +162,6 @@
               </p>
             </a>
           </li>
-        
-          {{-- <li class="nav-header">MULTI LEVEL EXAMPLE</li>
-          <li class="nav-item">
-          <a href="{{ route('menu.index') }}" class="nav-link"> 
-          <i class="fas fa-circle nav-icon"></i>
-          <p>Menu</p>
-        </a>
-
-          </li> --}}
-         {{-- <li class="nav-item">
-          <a href="{{ route('transaksi.index') }}" class="nav-link">
-            <i class="fas fa-circle nav-icon"></i>
-            <p>Transaksi</p>
-          </a>
-        </li> --}}
 
          <li class="nav-item">
           <a href="{{ route('spj.index') }}" class="nav-link">
@@ -195,7 +180,7 @@
         </a>
         <ul class="nav nav-treeview">
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="{{ route('umkm.index') }}" class="nav-link">
               {{-- {{ route('umkm.proses') }} --}}
               <i class="far fa-circle nav-icon"></i>
               <p>Data UMKM Proses</p>

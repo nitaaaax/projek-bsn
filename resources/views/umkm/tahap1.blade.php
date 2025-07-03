@@ -4,62 +4,43 @@
 <div class="container mt-4">
   <div class="card">
     <div class="card-body">
-      <h2 class="font-weight-bold mb-4">Data SPJ</h2>
+      <h2 class="font-weight-bold mb-4">Data UMKM</h2>
 
       <div class="mb-3">
         <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
-          <i class="fa fa-plus"></i> Tambah SPJ
+          <i class="fa fa-plus"></i> Tambah UMKM
         </a>
       </div>
 
       <div class="table-responsive">
         <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
-         <thead>
+          <thead>
           <tr>
-            <th>No</th>
-            <th>Nama SPJ</th>
-            <th>Total</th>
+            <th>Nama Pelaku</th>
+            <th>Produk</th>
             <th style="width: 200px;">Aksi</th>
           </tr>
         </thead>
 
-
           <tbody>
-           @forelse ($spj as $item)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $item->nama_spj }}</td>
-              
+            @forelse ($tahap1 as $t1)
+             <tr>
+            <td>{{ $t1->nama_pelaku }}</td>
 
-
-            <td class="text-end fw-bold">
-              Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
-            </td>
+            <td>{{ $t1->produk }}</td>
 
             <td>
               <div class="row gx-2">
                 <div class="col-auto">
-                  <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">
+                  <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
                     <i class="fa fa-eye"></i> Detail
                   </a>
                 </div>
-                <div class="col-auto">
-                  <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
-                    <i class="fa fa-trash"></i> Hapus
-                  </button>
-                </div>
-
-                <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}" method="POST" style="display: none;">
-                  @csrf
-                  @method('DELETE')
-                </form>
-              </div>
-            </td>
           </tr>
 
             @empty
               <tr>
-                <td colspan="2" class="text-center text-muted">Belum ada data SPJ.</td>
+                <td colspan="2" class="text-center text-muted">Belum ada data UMKM.</td>
               </tr>
             @endforelse
           </tbody>

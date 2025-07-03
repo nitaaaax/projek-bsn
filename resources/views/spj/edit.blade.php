@@ -1,66 +1,70 @@
 @extends('layout.app')
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">Edit SPJ</h2>
+<div class="container mt-4">
+  <div class="card">
+    <div class="card-body">
+      <h2 class="mb-4">Edit SPJ</h2>
 
-    <form action="{{ route('spj.update', $spj->id) }}" method="POST">
-        @csrf
-        @method('PUT')
+      <form action="{{ route('spj.update', $spj->id) }}" method="POST">
+          @csrf
+          @method('PUT')
 
-        <div class="form-group mb-4">
-            <label for="nama_spj"><strong>Nama SPJ</strong></label>
-            <input type="text" name="nama_spj" class="form-control" value="{{ $spj->nama_spj }}" required>
-        </div>
+          <div class="form-group mb-4">
+              <label for="nama_spj"><strong>Nama SPJ</strong></label>
+              <input type="text" name="nama_spj" class="form-control" value="{{ $spj->nama_spj }}" required>
+          </div>
 
-        <div class="table-responsive">
-            <table class="table table-bordered align-middle text-center">
-                <thead class="thead-light">
-                    <tr>
-                        <th style="width: 20%">Item</th>
-                        <th style="width: 15%">Nominal (Rp)</th>
-                        <th style="width: 20%">Status Pembayaran</th>
-                        <th style="width: 30%">Keterangan</th>
-                        <th style="width: 10%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="items">
-                    @foreach ($spj->details as $detail)
-                        <tr>
-                            <td>
-                                <input type="text" name="item[]" class="form-control" value="{{ $detail->item }}" required>
-                            </td>
-                            <td>
-                                <input type="number" name="nominal[]" class="form-control nominal" value="{{ $detail->nominal }}" required>
-                            </td>
-                            <td>
-                                <select name="pembayaran[]" class="form-control" required>
-                                    <option value="belum_dibayar" {{ $detail->status_pembayaran == 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
-                                    <option value="sudah_dibayar" {{ $detail->status_pembayaran == 'sudah_dibayar' ? 'selected' : '' }}>Sudah Dibayar</option>
-                                </select>
-                            </td>
-                            <td>
-                                <textarea name="keterangan[]" class="form-control" rows="1">{{ $detail->keterangan }}</textarea>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+          <div class="table-responsive">
+              <table class="table table-bordered align-middle text-center">
+                  <thead class="thead-light">
+                      <tr>
+                          <th style="width: 20%">Item</th>
+                          <th style="width: 15%">Nominal (Rp)</th>
+                          <th style="width: 20%">Status Pembayaran</th>
+                          <th style="width: 30%">Keterangan</th>
+                          <th style="width: 10%">Aksi</th>
+                      </tr>
+                  </thead>
+                  <tbody id="items">
+                      @foreach ($spj->details as $detail)
+                          <tr>
+                              <td>
+                                  <input type="text" name="item[]" class="form-control" value="{{ $detail->item }}" required>
+                              </td>
+                              <td>
+                                  <input type="number" name="nominal[]" class="form-control nominal" value="{{ $detail->nominal }}" required>
+                              </td>
+                              <td>
+                                  <select name="pembayaran[]" class="form-control" required>
+                                      <option value="belum_dibayar" {{ $detail->status_pembayaran == 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
+                                      <option value="sudah_dibayar" {{ $detail->status_pembayaran == 'sudah_dibayar' ? 'selected' : '' }}>Sudah Dibayar</option>
+                                  </select>
+                              </td>
+                              <td>
+                                  <textarea name="keterangan[]" class="form-control" rows="1">{{ $detail->keterangan }}</textarea>
+                              </td>
+                              <td>
+                                  <button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button>
+                              </td>
+                          </tr>
+                      @endforeach
+                  </tbody>
+              </table>
+          </div>
 
-        <div class="mb-3 text-end">
-            <button type="button" class="btn btn-success" id="add-item">+ Tambah Item</button>
-        </div>
+          <div class="mb-3 text-end">
+              <button type="button" class="btn btn-success" id="add-item">+ Tambah Item</button>
+          </div>
 
-        <div class="mb-4">
-            <h5>Total: <span id="total-rp">Rp 0</span></h5>
-        </div>
+          <div class="mb-4">
+              <h5>Total: <span id="total-rp">Rp 0</span></h5>
+          </div>
 
-        <button type="submit" class="btn btn-primary">Update SPJ</button>
-    </form>
+          <button type="submit" class="btn btn-primary">Update SPJ</button>
+      </form>
+    </div>
+  </div>
 </div>
 
 {{-- SCRIPT --}}
