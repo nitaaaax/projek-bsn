@@ -18,7 +18,7 @@
           {{-- Tabel Item --}}
           <div class="table-responsive">
               <table class="table table-bordered text-center align-middle">
-                  <thead class="table-light text-center"> {{-- ✅ diubah di sini --}}
+                  <thead class="table-light text-center"> 
                       <tr>
                           <th style="width: 20%">Item</th>
                           <th style="width: 15%">Nominal</th>
