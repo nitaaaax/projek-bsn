@@ -18,16 +18,15 @@
 
       <div class="table-responsive">
         <table id="tabelSPJDetail" class="table table-bordered table-hover table-striped">
-         <thead class="bg-secondary text-white text-center">
-          <tr>
-              <th style="width: 20%">Item</th>
-              <th style="width: 15%">Nominal</th>
-              <th style="width: 20%">Status Pembayaran</th>
-              <th style="width: 35%">Keterangan</th>
-              <th style="width: 10%">Aksi</th>
-          </tr>
-        </thead>
-
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Item</th>
+              <th>Nominal</th>
+              <th>Status Pembayaran</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
           <tbody>
             @foreach ($spj->details as $index => $detail)
               <tr>

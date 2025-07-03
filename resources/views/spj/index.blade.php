@@ -29,7 +29,7 @@
           <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $item->nama_spj }}</td>
-              
+
 
 
             <td class="text-end fw-bold">
@@ -61,8 +61,21 @@
               <tr>
                 <td colspan="2" class="text-center text-muted">Belum ada data SPJ.</td>
               </tr>
-            @endforelse
-          </tbody>
+           @endforelse
+</tbody>
+
+<tfoot>
+  <tr>
+    <th colspan="2" class="text-end">Total Keseluruhan:</th>
+    <th class="text-end fw-bold">
+      Rp{{ number_format($spj->sum(fn($item) => $item->details->sum('nominal')), 0, ',', '.') }}
+    </th>
+    <th></th>
+  </tr>
+</tfoot>
+
+</table>
+
         </table>
       </div>
     </div>
