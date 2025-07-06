@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration {
+    public function up(): void
+    {
+        Schema::create('legalitas_usaha', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pelaku_usaha_id')
+                  ->constrained('pelaku_usaha')
+                  ->cascadeOnDelete();
+            $table->string('jenis_usaha', 50)->nullable();
+            $table->string('nama_merek', 100)->nullable();
+            $table->string('legalitas', 100)->nullable();
+            $table->year('tahun_pendirian')->nullable();
+            $table->string('sni', 100)->nullable();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('legalitas_usaha');
+    }
+};

@@ -2,27 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Tahap1;
-
-use App\Models\Tahap2;
-
-use App\Models\Tahap3;
-
-use App\Models\Tahap4;
-
-use App\Models\Tahap5;
-
-use App\Models\Tahap6;
-
+use Illuminate\Http\Request;
 
 class ContdataUmkm extends Controller
 {
-     public function index()
+    /** Daftar semua pelaku (tahap 1) */
+    public function index()
     {
         $tahap1 = Tahap1::all();
-        
-        return view('tahap1.index', compact('tahap1'));
+        return view('umkm.index', compact('tahap1'));
     }
 
+    /** Detail satu UMKM + relasi (opsional) */
+    public function show($id)
+    {
+        $tahap = Tahap1::with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])
+                      ->findOrFail($id);
+
+        return view('umkm.show', compact('tahap'));
+    }
 }
