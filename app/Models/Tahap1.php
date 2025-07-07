@@ -38,7 +38,7 @@ class Tahap1 extends Model
             Tahap5::class,   // model target
             Tahap4::class,   // model perantara
             'pelaku_usaha_id', // FK di Tahap4
-            'riwayat_pembinaan_id',    // FK di Tahap5
+            'pembinaan_id',    // FK di Tahap5
             'id',              // PK di Tahap1
             'id'               // PK di Tahap4
         );
