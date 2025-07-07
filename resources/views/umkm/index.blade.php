@@ -7,7 +7,7 @@
       <h2 class="font-weight-bold mb-4">Data UMKM</h2>
 
       <div class="mb-3">
-        <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
+        <a href="{{ route('umkm.create') }}" class="btn btn-primary btn-sm">
           <i class="fa fa-plus"></i> Tambah UMKM
         </a>
       </div>
@@ -18,31 +18,31 @@
           <tr>
             <th>Nama Pelaku</th>
             <th>Produk</th>
-            <th style="width: 200px;">Aksi</th>
+            <th>Aksi</th>
           </tr>
         </thead>
 
           <tbody>
-            @forelse ($tahap1 as $t1)
-             <tr>
-            <td>{{ $t1->nama_pelaku }}</td>
-
-            <td>{{ $t1->produk }}</td>
-
-            <td>
-              <div class="row gx-2">
-                <div class="col-auto">
-                  <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
-                    <i class="fa fa-eye"></i> Detail
-                  </a>
+                      @forelse ($tahap1 as $t1)
+            <tr>
+              <td>{{ $t1->nama_pelaku }}</td>
+              <td>{{ $t1->produk }}</td>
+              <td>
+                <div class="row gx-2">
+                  <div class="col-auto">
+                    <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                  </div>
                 </div>
-          </tr>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td>
+            </tr>
+          @endforelse
 
-            @empty
-              <tr>
-                <td colspan="2" class="text-center text-muted">Belum ada data UMKM.</td>
-              </tr>
-            @endforelse
           </tbody>
         </table>
       </div>

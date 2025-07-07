@@ -22,7 +22,7 @@ class ContdataUmkm extends Controller
     {
         $tahap1 = Tahap1::all();
         
-        return view('tahap1.index', compact('tahap1'));
+        return view('umkm.index', compact('tahap1'));
     }
-
+        
 }

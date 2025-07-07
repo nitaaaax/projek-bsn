@@ -9,21 +9,31 @@
       <form action="{{ route('spj.store') }}" method="POST">
           @csrf
 
-          {{-- Nama SPJ --}}
+          {{-- Nama SPJ, No UKD, Keterangan --}}
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="nama_spj" class="form-label"><strong>Nama SPJ</strong></label>
+                  <input type="text" name="nama_spj" class="form-control" placeholder="Masukkan Nama SPJ" required>
+              </div>
+              <div class="col-md-6">
+                  <label for="no_ukd" class="form-label"><strong>No UKD</strong></label>
+                  <input type="text" name="no_ukd" class="form-control" placeholder="Masukkan No UKD" required>
+              </div>
+          </div>
+
           <div class="mb-4">
-              <label for="nama_spj" class="form-label"><strong>Nama SPJ</strong></label>
-              <input type="text" name="nama_spj" class="form-control" placeholder="Masukkan Nama SPJ" required>
+              <label for="keterangan" class="form-label"><strong>Keterangan</strong></label>
+              <textarea name="keterangan" class="form-control" rows="2" placeholder="Tambahkan keterangan umum (jika ada)"></textarea>
           </div>
 
           {{-- Tabel Item --}}
-          <div class="table-responsive">
+          <div class="table-responsive mb-3">
               <table class="table table-bordered text-center align-middle">
-                  <thead class="table-light text-center"> 
+                  <thead class="table-light">
                       <tr>
-                          <th style="width: 20%">Item</th>
-                          <th style="width: 15%">Nominal</th>
-                          <th style="width: 20%">Status Pembayaran</th>
-                          <th style="width: 35%">Keterangan</th>
+                          <th style="width: 35%">Item</th>
+                          <th style="width: 25%">Nominal</th>
+                          <th style="width: 30%">Status Pembayaran</th>
                           <th style="width: 10%">Aksi</th>
                       </tr>
                   </thead>
@@ -37,7 +47,6 @@
                                   <option value="sudah_dibayar">Sudah Dibayar</option>
                               </select>
                           </td>
-                          <td><textarea name="keterangan[]" class="form-control" rows="1"></textarea></td>
                           <td><button type="button" class="btn btn-danger btn-sm remove">Hapus</button></td>
                       </tr>
                   </tbody>
@@ -79,7 +88,6 @@
                         <option value="sudah_dibayar">Sudah Dibayar</option>
                     </select>
                 </td>
-                <td><textarea name="keterangan[]" class="form-control" rows="1"></textarea></td>
                 <td><button type="button" class="btn btn-danger btn-sm remove">Hapus</button></td>
             </tr>
         `;

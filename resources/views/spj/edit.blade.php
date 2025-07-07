@@ -10,19 +10,29 @@
           @csrf
           @method('PUT')
 
-          <div class="form-group mb-4">
-              <label for="nama_spj"><strong>Nama SPJ</strong></label>
-              <input type="text" name="nama_spj" class="form-control" value="{{ $spj->nama_spj }}" required>
+          <div class="row mb-3">
+              <div class="col-md-6">
+                  <label for="nama_spj"><strong>Nama SPJ</strong></label>
+                  <input type="text" name="nama_spj" class="form-control" value="{{ $spj->nama_spj }}" required>
+              </div>
+              <div class="col-md-6">
+                  <label for="no_ukd"><strong>No UKD</strong></label>
+                  <input type="text" name="no_ukd" class="form-control" value="{{ $spj->no_ukd }}" required>
+              </div>
+          </div>
+
+          <div class="mb-4">
+              <label for="keterangan"><strong>Keterangan</strong></label>
+              <textarea name="keterangan" class="form-control" rows="2">{{ $spj->keterangan }}</textarea>
           </div>
 
           <div class="table-responsive">
               <table class="table table-bordered align-middle text-center">
                   <thead class="thead-light">
                       <tr>
-                          <th style="width: 20%">Item</th>
-                          <th style="width: 15%">Nominal (Rp)</th>
+                          <th style="width: 40%">Item</th>
+                          <th style="width: 30%">Nominal (Rp)</th>
                           <th style="width: 20%">Status Pembayaran</th>
-                          <th style="width: 30%">Keterangan</th>
                           <th style="width: 10%">Aksi</th>
                       </tr>
                   </thead>
@@ -40,9 +50,6 @@
                                       <option value="belum_dibayar" {{ $detail->status_pembayaran == 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
                                       <option value="sudah_dibayar" {{ $detail->status_pembayaran == 'sudah_dibayar' ? 'selected' : '' }}>Sudah Dibayar</option>
                                   </select>
-                              </td>
-                              <td>
-                                  <textarea name="keterangan[]" class="form-control" rows="1">{{ $detail->keterangan }}</textarea>
                               </td>
                               <td>
                                   <button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button>
@@ -88,7 +95,6 @@
                     <option value="sudah_dibayar">Sudah Dibayar</option>
                 </select>
             </td>
-            <td><textarea name="keterangan[]" class="form-control" rows="1"></textarea></td>
             <td><button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button></td>
         `;
         document.getElementById('items').appendChild(row);

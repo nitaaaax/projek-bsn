@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Spj extends Model
 {
-    protected $fillable = ['nama_spj'];
+    protected $table = 'spjs'; 
+    protected $fillable = ['nama_spj', 'keterangan'];
 
     public function details()
-{
-    return $this->hasMany(SpjDetail::class, 'spj_id'); // sesuaikan jika nama foreign key berbeda
-}
-
+    {
+        return $this->hasMany(SpjDetail::class, 'spj_id');
+    }
 }
