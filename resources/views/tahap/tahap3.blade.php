@@ -1,4 +1,4 @@
-<div class="row">
+
     {{-- Jenis Usaha --}}
     <div class="mb-3 col-md-6">
         <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
@@ -41,4 +41,3 @@
             <label class="form-check-label" for="sni_no">Tidak</label>
         </div>
     </div>
-</div>

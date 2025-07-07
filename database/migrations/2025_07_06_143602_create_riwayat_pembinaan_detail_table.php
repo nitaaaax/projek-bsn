@@ -15,6 +15,7 @@ return new class extends Migration
         $table->id();
         $table->foreignId('pembinaan_id')->constrained('pelaku_usaha')->onDelete('cascade');
         $table->string('kegiatan');
+        $table->string('gruping');
         $table->date('tanggal')->nullable();
         $table->text('catatan')->nullable();
         $table->timestamps();

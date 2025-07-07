@@ -13,7 +13,7 @@
       </div>
 
       <div class="table-responsive">
-        <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
+        <table id="tabelSPJS" class="table table-bordered table-hover table-striped">
          <thead>
           <tr>
             <th>No</th>
@@ -107,7 +107,7 @@
   <!-- Aktifkan DataTable -->
  <script>
   $(document).ready(function () {
-    $('#tabelSPJ').DataTable({
+    $('#tabelSPJS').DataTable({
       lengthChange: false,
       order: [[0, 'asc']], // Urutkan default berdasarkan kolom pertama
       language: {
