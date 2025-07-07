@@ -37,7 +37,11 @@
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" name="sni" id="sni_no" value="0"
-                {{ old('sni', $data->sni ?? '') === 0 ? 'checked' : '' }}>
+                {{ old('sni', $data->sni ?? '') == 0 ? 'checked' : '' }}>
             <label class="form-check-label" for="sni_no">Tidak</label>
         </div>
     </div>
+<<<<<<< HEAD
+=======
+</div> <!-- penutup row -->
+>>>>>>> 080cefb0e338e3f987d868045d5f7973600564b7

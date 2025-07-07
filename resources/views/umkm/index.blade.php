@@ -18,11 +18,30 @@
           <tr>
             <th>Nama Pelaku</th>
             <th>Produk</th>
-            <th style="width: 200px;">Aksi</th>
+            <th>Aksi</th>
           </tr>
         </thead>
 
           <tbody>
+                      @forelse ($tahap1 as $t1)
+            <tr>
+              <td>{{ $t1->nama_pelaku }}</td>
+              <td>{{ $t1->produk }}</td>
+              <td>
+                <div class="row gx-2">
+                  <div class="col-auto">
+                    <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td>
+            </tr>
+          @endforelse
         @forelse ($tahap1 as $t1)
   <tr>
     <td>{{ $t1->nama_pelaku }}</td>

@@ -1,3 +1,6 @@
+
+
+
 @extends('layout.app')
 
 @section('content')
@@ -13,6 +16,7 @@
       </div>
 
       <div class="table-responsive">
+<<<<<<< HEAD
         <table id="tabelSPJS" class="table table-bordered table-hover table-striped">
          <thead>
           <tr>
@@ -24,6 +28,17 @@
         </thead>
 
 
+=======
+        <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
+        <thead class="bg-secondary text-white text-center">
+        <tr>
+          <th>No</th>
+          <th>Nama SPJ</th>
+          <th>Total</th>
+          <th style="width: 200px;">Aksi</th>
+        </tr>
+      </thead>
+>>>>>>> 080cefb0e338e3f987d868045d5f7973600564b7
           <tbody>
            @forelse ($spj as $item)
           <tr>

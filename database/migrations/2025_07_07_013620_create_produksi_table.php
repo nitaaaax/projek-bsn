@@ -9,9 +9,7 @@ return new class extends Migration {
     {
         Schema::create('produksi', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pelaku_usaha_id')
-                  ->constrained('pelaku_usaha')
-                  ->cascadeOnDelete();
+            $table->foreignId('pelaku_usaha_id')->constrained('pelaku_usaha')->onDelete('cascade');
             $table->decimal('omzet_per_tahun', 15, 2)->nullable();
             $table->string('volume_produksi', 50)->nullable();
             $table->integer('tenaga_kerja')->nullable();

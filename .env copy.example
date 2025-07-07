@@ -2,7 +2,7 @@ APP_NAME=Laravel
 APP_ENV=local
 APP_KEY=base64:hKopJ9jcS6zFwlho66Izt7pvi2AIDBF+U9os66tCIZE=
 APP_DEBUG=true
-APP_URL=http://192.168.100.69/projek-bsn/spj
+APP_URL=http://192.168.100.69/projek-bsn/
 
 LOG_CHANNEL=stack
 LOG_DEPRECATIONS_CHANNEL=null
