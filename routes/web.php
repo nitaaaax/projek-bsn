@@ -9,32 +9,31 @@ use App\Http\Controllers\SpjController;
 /* ---------- Beranda ---------- */
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
-/* ---------- UMKM ---------- */
-
-/* 1. Halaman daftar UMKM */
+/* ---------- Halaman Data UMKM ---------- */
 Route::get('/umkm', [ContdataUmkm::class, 'index'])->name('umkm.index');
+Route::get('/umkm/{id}', [ContdataUmkm::class, 'show'])->name('umkm.show');
 
-/* 2. Wizard multi‑tahap */
-Route::prefix('umkm')
-      ->name('umkm.')
-      ->controller(ContcreateUmkm::class)
-      ->group(function () {
+/* ---------- Wizard Tahapan UMKM ---------- */
+Route::prefix('tahap')
+    ->name('tahap.')
+    ->controller(ContcreateUmkm::class)
+    ->group(function () {
 
-    // Entry point → langsung tahap 1
+    // Mulai create → langsung redirect ke tahap 1
     Route::get('/create', 'create')->name('create');
 
     // Tampilkan form per tahap
-    Route::get('/create/tahap/{tahap}/{id?}', 'showTahap')->name('create.tahap');
+    Route::get('/create/{tahap}/{id?}', 'showTahap')->name('create.tahap');
 
-    // Simpan data (satu method dinamis)
+    // Simpan data per tahap (satu store dinamis)
     Route::post('/store/{tahap}/{id?}', 'store')->name('store.tahap');
 });
 
 /* ---------- SPJ ---------- */
-Route::get   ('/spj',          [SpjController::class, 'index' ])->name('spj.index');
-Route::get   ('/spj/create',   [SpjController::class, 'create'])->name('spj.create');
-Route::post  ('/spj',          [SpjController::class, 'store' ])->name('spj.store');
-Route::get   ('/spj/{id}/edit',[SpjController::class, 'edit'  ])->name('spj.edit');
-Route::put   ('/spj/{id}',     [SpjController::class, 'update'])->name('spj.update');
-Route::delete('/spj/{id}',     [SpjController::class, 'destroy'])->name('spj.destroy');
-Route::get   ('/spj/{id}',     [SpjController::class, 'show'  ])->name('spj.show');
+Route::get   ('/spj',           [SpjController::class, 'index' ])->name('spj.index');
+Route::get   ('/spj/create',    [SpjController::class, 'create'])->name('spj.create');
+Route::post  ('/spj',           [SpjController::class, 'store' ])->name('spj.store');
+Route::get   ('/spj/{id}/edit', [SpjController::class, 'edit'  ])->name('spj.edit');
+Route::put   ('/spj/{id}',      [SpjController::class, 'update'])->name('spj.update');
+Route::delete('/spj/{id}',      [SpjController::class, 'destroy'])->name('spj.destroy');
+Route::get   ('/spj/{id}',      [SpjController::class, 'show'  ])->name('spj.show');

@@ -9,8 +9,7 @@
             </div>
 
             <div class="card-body">
-               <form action="{{ route('umkm.store.tahap', [$tahap, $id ?? '']) }}" method="POST">
-
+                <form action="{{ route('tahap.store.tahap', [$tahap, $id ?? null]) }}" method="POST">
                     @csrf
 
                     {{-- Form Tahap Dinamis --}}
@@ -19,7 +18,7 @@
                     {{-- Tombol Navigasi --}}
                     <div class="mt-4">
                         @if ($tahap > 1)
-                            <a href="{{ route('umkm.create.tahap', ['tahap' => $tahap - 1, 'id' => $id ?? '']) }}"
+                            <a href="{{ route('tahap.create.tahap', ['tahap' => $tahap - 1, 'id' => $id ?? null]) }}"
                                class="btn btn-secondary">
                                 ← Kembali
                             </a>
