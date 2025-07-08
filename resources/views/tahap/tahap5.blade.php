@@ -1,28 +1,23 @@
-<div class="row">
-    {{-- Kegiatan --}}
-    <div class="mb-3 col-md-6">
-        <label for="kegiatan" class="form-label fw-bold">Kegiatan</label>
-        <input type="text" name="kegiatan" id="kegiatan" class="form-control"
-            value="{{ old('kegiatan', $data->kegiatan ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="tahun_berdiri" class="form-label fw-bold">Tahun Pendirian Usaha</label>
+    <input type="number" name="tahun_berdiri" id="tahun_berdiri" class="form-control"
+        value="{{ old('tahun_berdiri', $data->tahun_berdiri ?? '') }}">
+</div>
 
-    {{-- Gruping --}}
-    <div class="mb-3 col-md-6">
-        <label for="gruping" class="form-label fw-bold">Gruping</label>
-        <input type="text" name="gruping" id="gruping" class="form-control"
-            value="{{ old('gruping', $data->gruping ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
+    <input type="text" name="jenis_usaha" id="jenis_usaha" class="form-control"
+        value="{{ old('jenis_usaha', $data->jenis_usaha ?? '') }}">
+</div>
 
-    {{-- Tanggal --}}
-    <div class="mb-3 col-md-6">
-        <label for="tanggal" class="form-label fw-bold">Tanggal</label>
-        <input type="date" name="tanggal" id="tanggal" class="form-control"
-            value="{{ old('tanggal', $data->tanggal ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="nama_merek" class="form-label fw-bold">Nama Merek</label>
+    <input type="text" name="nama_merek" id="nama_merek" class="form-control"
+        value="{{ old('nama_merek', $data->nama_merek ?? '') }}">
+</div>
 
-    {{-- Catatan --}}
-    <div class="mb-3 col-md-6">
-        <label for="catatan" class="form-label fw-bold">Catatan</label>
-        <textarea name="catatan" id="catatan" class="form-control" rows="3">{{ old('catatan', $data->catatan ?? '') }}</textarea>
-    </div>
+<div class="mb-3">
+    <label for="sni" class="form-label fw-bold">SNI yang akan dibina</label>
+    <input type="text" name="sni" id="sni" class="form-control"
+        value="{{ old('sni', $data->sni ?? '') }}">
 </div>

@@ -22,47 +22,36 @@
           </tr>
         </thead>
 
-          <tbody>
-                      @forelse ($tahap1 as $t1)
-            <tr>
-              <td>{{ $t1->nama_pelaku }}</td>
-              <td>{{ $t1->produk }}</td>
-              <td>
-                <div class="row gx-2">
-                  <div class="col-auto">
-                    <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
-                      <i class="fa fa-eye"></i> Detail
-                    </a>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          @empty
-            <tr>
-              <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td>
-            </tr>
-          @endforelse
-        @forelse ($tahap1 as $t1)
-  <tr>
-    <td>{{ $t1->nama_pelaku }}</td>
-    <td>{{ $t1->produk }}</td>
-    <td>
-      <div class="row gx-2">
-        <div class="col-auto">
+         <tbody>
+  @forelse ($tahap1 as $t1)
+    <tr>
+      <td>{{ $t1->nama_pelaku }}</td>
+      <td>{{ $t1->produk }}</td>
+      <td>
+        <div class="d-flex gap-1">
           <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
             <i class="fa fa-eye"></i> Detail
           </a>
-        </div>
-      </div>
-    </td> <!-- ✅ Ditutup dengan benar -->
-  </tr>
-        @empty
-        <tr>
-            <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td> <!-- ✅ colspan disesuaikan -->
-        </tr>
-        @endforelse
+         <form action="{{ route('umkm.destroy', $t1->id) }}" method="POST" id="delete-form-{{ $t1->id }}">
+    @csrf
+    @method('DELETE')
+    <button type="button" class="btn btn-danger" onclick="confirmDelete({{ $t1->id }})">
+        <i class="fa fa-trash"></i> Hapus
+    </button>
+</form>
 
-          </tbody>
+
+         
+        </div>
+      </td>
+    </tr>
+  @empty
+    <tr>
+      <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td>
+    </tr>
+  @endforelse
+</tbody>
+
         </table>
       </div>
     </div>

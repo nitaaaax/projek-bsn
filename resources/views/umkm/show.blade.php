@@ -104,10 +104,40 @@
                 @endif
             </dl>
 
+            {{-- Tombol Aksi --}}
             <div class="text-end mt-4">
+                <a href="{{ route('tahap.create.tahap', ['tahap' => 1, 'id' => $tahap->id]) }}" class="btn btn-warning">
+                    <i class="fa fa-edit"></i> Edit
+                </a>
+
+                
+
                 <a href="{{ route('umkm.index') }}" class="btn btn-secondary">← Kembali</a>
             </div>
+
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: "Data yang dihapus tidak bisa dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        });
+    }
+</script>
+@endpush

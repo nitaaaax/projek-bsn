@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tahap5 extends Model
 {
-    protected $table = 'riwayat_pembinaan_detail';
+    protected $table = 'legalitas_usaha';
     public $timestamps = false;
 
     protected $fillable = [

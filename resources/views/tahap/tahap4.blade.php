@@ -1,29 +1,22 @@
-<div class="row">
-    {{-- Bulan Pertama Dibina --}}
-    <div class="mb-3 col-md-6">
-        <label for="bulan_pertama" class="form-label fw-bold">Bulan Pertama Dibina</label>
-        <input type="text" name="bulan_pertama" id="bulan_pertama" class="form-control"
-            value="{{ old('bulan_pertama', $data->bulan_pertama ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="alamat" class="form-label fw-bold">Alamat Pemilik/Usaha</label>
+    <textarea name="alamat" id="alamat" class="form-control" rows="3">{{ old('alamat', $data->alamat ?? '') }}</textarea>
+</div>
 
-    {{-- Tahun Dibina --}}
-    <div class="mb-3 col-md-6">
-        <label for="tahun_bina" class="form-label fw-bold">Tahun Dibina</label>
-        <input type="number" name="tahun_bina" id="tahun_bina" class="form-control"
-            value="{{ old('tahun_bina', $data->tahun_bina ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="provinsi" class="form-label fw-bold">Provinsi</label>
+    <input type="text" name="provinsi" id="provinsi" class="form-control"
+        value="{{ old('provinsi', $data->provinsi ?? '') }}">
+</div>
 
-    {{-- Kegiatan --}}
-    <div class="mb-3 col-md-6">
-        <label for="kegiatan" class="form-label fw-bold">Kegiatan</label>
-        <input type="text" name="kegiatan" id="kegiatan" class="form-control"
-            value="{{ old('kegiatan', $data->kegiatan ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="kota" class="form-label fw-bold">Kota/Kabupaten</label>
+    <input type="text" name="kota" id="kota" class="form-control"
+        value="{{ old('kota', $data->kota ?? '') }}">
+</div>
 
-    {{-- Gruping --}}
-    <div class="mb-3 col-md-6">
-        <label for="gruping" class="form-label fw-bold">Gruping</label>
-        <input type="text" name="gruping" id="gruping" class="form-control"
-            value="{{ old('gruping', $data->gruping ?? '') }}">
-    </div>
+<div class="mb-3">
+    <label for="legalitas" class="form-label fw-bold">Legalitas Usaha</label>
+    <input type="text" name="legalitas" id="legalitas" class="form-control"
+        value="{{ old('legalitas', $data->legalitas ?? '') }}">
 </div>

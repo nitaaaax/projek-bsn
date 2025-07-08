@@ -12,10 +12,12 @@ class Tahap2 extends Model
 
     protected $fillable = [
         'pelaku_usaha_id',
+        'pembina_2',
+        'sinergi',
         'nama_kontak',
         'no_hp',
         'email',
-        'media_sosial'
+        'media_sosial',
     ];
 
     public function pelaku(): BelongsTo

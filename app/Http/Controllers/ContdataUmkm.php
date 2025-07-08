@@ -22,4 +22,12 @@ class ContdataUmkm extends Controller
 
         return view('umkm.show', compact('tahap'));
     }
+    public function destroy($id)
+{
+    $umkm = Tahap1::findOrFail($id);
+    $umkm->delete();
+
+    return redirect()->route('umkm.index')->with('success', 'Data UMKM berhasil dihapus.');
+}
+
 }

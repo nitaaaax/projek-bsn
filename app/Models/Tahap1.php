@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tahap1 extends Model
 {
-    protected $table = 'pelaku_usaha';          // ganti jika tabelmu bernama lain
+    protected $table = 'pelaku_usaha';
+
     protected $fillable = [
         'nama_pelaku',
         'produk',
@@ -15,36 +17,27 @@ class Tahap1 extends Model
         'provinsi',
     ];
 
-    /* ---------- RELASI ---------- */
-    public function tahap2()
+    public function tahap2(): HasOne
     {
         return $this->hasOne(Tahap2::class, 'pelaku_usaha_id');
     }
 
-    public function tahap3()
+    public function tahap3(): HasOne
     {
         return $this->hasOne(Tahap3::class, 'pelaku_usaha_id');
     }
 
-    public function tahap4()
+    public function tahap4(): HasOne
     {
-        return $this->hasOne(Tahap4::class, 'pelaku_usaha_id');
+        return $this->hasOne(LegalitasUsaha::class, 'pelaku_usaha_id');
     }
 
-    public function tahap5()
+    public function tahap5(): HasOne
     {
-        // Tahap5 pakai FK pembinaan_id → ambil relasi via tahap4
-        return $this->hasOneThrough(
-            Tahap5::class,   // model target
-            Tahap4::class,   // model perantara
-            'pelaku_usaha_id', // FK di Tahap4
-            'pembinaan_id',    // FK di Tahap5
-            'id',              // PK di Tahap1
-            'id'               // PK di Tahap4
-        );
+        return $this->hasOne(Tahap5::class, 'pelaku_usaha_id');
     }
 
-    public function tahap6()
+    public function tahap6(): HasOne
     {
         return $this->hasOne(Tahap6::class, 'pelaku_usaha_id');
     }

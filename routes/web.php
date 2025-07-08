@@ -13,6 +13,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/umkm', [ContdataUmkm::class, 'index'])->name('umkm.index');
 Route::get('/umkm/{id}', [ContdataUmkm::class, 'show'])->name('umkm.show');
 
+Route::delete('/umkm/{id}', [ContdataUmkm::class, 'destroy'])->name('umkm.destroy');
+
+
+
 /* ---------- Wizard Tahapan UMKM ---------- */
 Route::prefix('tahap')
     ->name('tahap.')

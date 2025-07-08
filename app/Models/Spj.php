@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Spj extends Model
 {
     protected $table = 'spjs'; 
-    protected $fillable = ['nama_spj', 'keterangan'];
+    protected $fillable = ['nama_spj', 'no_ukd','keterangan'];
 
     public function details()
     {
