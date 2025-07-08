@@ -1,20 +1,16 @@
-
-
-
 @extends('layout.app')
 
 @section('content')
 <div class="container mt-4">
   <div class="card">
     <div class="card-body">
-      <h2 class="font-weight-bold mb-4">Data SPJ</h2>
+      <h2 class="fw-bold mb-4">Data SPJ</h2>
 
-      <div class="mb-3">
-        <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
-          <i class="fa fa-plus"></i> Tambah SPJ
-        </a>
-      </div>
+      <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm mb-3">
+        <i class="fa fa-plus"></i> Tambah SPJ
+      </a>
 
+<<<<<<< HEAD
       <div class="table-responsive">
 <<<<<<< HEAD
         <table id="tabelSPJS" class="table table-bordered table-hover table-striped">
@@ -44,54 +40,155 @@
           <tr>
             <td>{{ $loop->iteration }}</td>
             <td>{{ $item->nama_spj }}</td>
+=======
+      <!-- Tab Navigasi -->
+      <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active" id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button" role="tab">
+            Semua SPJ
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="sudah-tab" data-bs-toggle="tab" data-bs-target="#sudah" type="button" role="tab">
+            Sudah Dibayar
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="belum-tab" data-bs-toggle="tab" data-bs-target="#belum" type="button" role="tab">
+            Belum Dibayar
+          </button>
+        </li>
+      </ul>
+>>>>>>> 324d13095e799b5a635ecc141330705a3c112729
 
+      <!-- Isi Tab -->
+      <div class="tab-content" id="spjTabContent">
 
+        <!-- Tab SEMUA SPJ -->
+        <div class="tab-pane fade show active" id="semua" role="tabpanel">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="tabelSemua">
+              <thead class="table-secondary text-center">
+                <tr>
+                  <th>No</th>
+                  <th>Nama SPJ</th>
+                  <th>Total</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($spj as $item)
+                  <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->nama_spj }}</td>
+                    <td class="text-end fw-bold">
+                      Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
+                    </td>
+                    <td>
+                      <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
+                      <form action="{{ route('spj.destroy', $item->id) }}" method="POST" class="d-inline">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</button>
+                      </form>
+                    </td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="4" class="text-center text-muted">Belum ada data.</td>
+                  </tr>
+                @endforelse
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="2" class="text-end">Total Keseluruhan:</th>
+                  <th class="text-end fw-bold">
+                    Rp{{ number_format($spj->sum(fn($s) => $s->details->sum('nominal')), 0, ',', '.') }}
+                  </th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
 
-            <td class="text-end fw-bold">
-              Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
-            </td>
+        <!-- Tab SUDAH DIBAYAR -->
+        <div class="tab-pane fade" id="sudah" role="tabpanel">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="tabelSudah">
+              <thead class="table-success text-center">
+                <tr>
+                  <th>No</th>
+                  <th>Nama SPJ</th>
+                  <th>Item</th>
+                  <th>Nominal</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($sudahBayar as $item)
+                  <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->spj->nama_spj }}</td>
+                    <td>{{ $item->item }}</td>
+                    <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
+                    <td>{{ $item->keterangan }}</td>
+                  </tr>
+                @empty
+                  <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
+                @endforelse
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="text-end">Total:</th>
+                  <th class="text-end fw-bold">
+                    Rp{{ number_format($sudahBayar->sum('nominal'), 0, ',', '.') }}
+                  </th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
 
-            <td>
-              <div class="row gx-2">
-                <div class="col-auto">
-                  <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">
-                    <i class="fa fa-eye"></i> Detail
-                  </a>
-                </div>
-                <div class="col-auto">
-                  <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
-                    <i class="fa fa-trash"></i> Hapus
-                  </button>
-                </div>
+        <!-- Tab BELUM DIBAYAR -->
+        <div class="tab-pane fade" id="belum" role="tabpanel">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="tabelBelum">
+              <thead class="table-warning text-center">
+                <tr>
+                  <th>No</th>
+                  <th>Nama SPJ</th>
+                  <th>Item</th>
+                  <th>Nominal</th>
+                  <th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody>
+                @forelse($belumBayar as $item)
+                  <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $item->spj->nama_spj }}</td>
+                    <td>{{ $item->item }}</td>
+                    <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
+                    <td>{{ $item->keterangan }}</td>
+                  </tr>
+                @empty
+                  <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
+                @endforelse
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th colspan="3" class="text-end">Total:</th>
+                  <th class="text-end fw-bold">
+                    Rp{{ number_format($belumBayar->sum('nominal'), 0, ',', '.') }}
+                  </th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
 
-                <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}" method="POST" style="display: none;">
-                  @csrf
-                  @method('DELETE')
-                </form>
-              </div>
-            </td>
-          </tr>
-
-            @empty
-              <tr>
-                <td colspan="2" class="text-center text-muted">Belum ada data SPJ.</td>
-              </tr>
-           @endforelse
-</tbody>
-
-<tfoot>
-  <tr>
-    <th colspan="2" class="text-end">Total Keseluruhan:</th>
-    <th class="text-end fw-bold">
-      Rp{{ number_format($spj->sum(fn($item) => $item->details->sum('nominal')), 0, ',', '.') }}
-    </th>
-    <th></th>
-  </tr>
-</tfoot>
-
-</table>
-
-        </table>
       </div>
     </div>
   </div>
@@ -99,17 +196,18 @@
 @endsection
 
 @push('styles')
-  <!-- Font Awesome CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  <!-- DataTables CSS -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<!-- Bootstrap CSS (penting untuk tab aktif) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush
 
 @push('scripts')
-  <!-- jQuery dan DataTables -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<!-- jQuery dan Bootstrap Bundle (untuk tab dan komponen js Bootstrap) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
+<<<<<<< HEAD
   <!-- Konfirmasi hapus -->
   <script>
     function confirmDelete(id) {
@@ -141,29 +239,13 @@
         return 'Menampilkan ' + start + ' - ' + end + ' dari ' + total + ' data';
       }
     });
-  });
-</script>
-
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+=======
 <script>
-  function confirmDelete(id) {
-    Swal.fire({
-      title: 'Yakin ingin menghapus?',
-      text: "Data yang dihapus tidak bisa dikembalikan!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById('delete-form-' + id).submit();
-      }
-    });
-  }
+  $(function () {
+    $('#tabelSemua').DataTable();
+    $('#tabelSudah').DataTable();
+    $('#tabelBelum').DataTable();
+>>>>>>> 324d13095e799b5a635ecc141330705a3c112729
+  });
 </script>
 @endpush

@@ -13,20 +13,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home.index');
 Route::get('/umkm', [ContdataUmkm::class, 'index'])->name('umkm.index');
 Route::get('/umkm/{id}', [ContdataUmkm::class, 'show'])->name('umkm.show');
 
-/* ---------- Wizard Tahapan UMKM ---------- */
-Route::prefix('tahap')
-    ->name('tahap.')
-    ->controller(ContcreateUmkm::class)
-    ->group(function () {
+Route::delete('/umkm/{id}', [ContdataUmkm::class, 'destroy'])->name('umkm.destroy');
 
-    // Mulai create → langsung redirect ke tahap 1
+Route::prefix('umkm')->name('tahap.')->controller(ContcreateUmkm::class)->group(function () {
     Route::get('/create', 'create')->name('create');
-
-    // Tampilkan form per tahap
-    Route::get('/create/{tahap}/{id?}', 'showTahap')->name('create.tahap');
-
-    // Simpan data per tahap (satu store dinamis)
-    Route::post('/store/{tahap}/{id?}', 'store')->name('store.tahap');
+    Route::get('/create/tahap/{tahap}/{id?}', 'showTahap')->name('create.tahap');
+    Route::post('/create/tahap/{tahap}/{id?}', 'store')->name('store');
 });
 
 /* ---------- SPJ ---------- */

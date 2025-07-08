@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('riwayat_pembinaan_detail', function (Blueprint $table) {
+       Schema::create('riwayat', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pembinaan_id')->constrained('pembinaan')->onDelete('cascade'); // fix relasi
-            $table->string('kegiatan');
+            $table->foreignId('pelaku_usaha_id')->constrained('pelaku_usaha')->onDelete('cascade');
+            $table->string('tahun_dibina')->nullable();
+            $table->text('riwayat_pembinaan')->nullable();
             $table->string('gruping')->nullable();
-            $table->date('tanggal')->nullable();
-            $table->text('catatan')->nullable();
+            $table->string('email')->nullable();
+            $table->string('media_sosial')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('riwayat_pembinaan_detail');
+        Schema::dropIfExists('riwayat');
     }
 };

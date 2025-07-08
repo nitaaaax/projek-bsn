@@ -8,17 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Tahap6 extends Model
 {
     protected $table = 'produksi';
-    public $timestamps = false;
 
     protected $fillable = [
         'pelaku_usaha_id',
-        'omzet_per_tahun',
-        'volume_produksi',
-        'tenaga_kerja',
-        'jangkauan_pasar'
+        'omzet',
+        'volume_per_tahun',
+        'jumlah_tenaga_kerja',
+        'jangkauan_pemasaran',
+        'link_dokumen',
     ];
 
-    public function pelaku(): BelongsTo
+    public function tahap1(): BelongsTo
     {
         return $this->belongsTo(Tahap1::class, 'pelaku_usaha_id');
     }

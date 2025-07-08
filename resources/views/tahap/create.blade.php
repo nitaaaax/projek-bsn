@@ -9,7 +9,7 @@
             </div>
 
             <div class="card-body">
-                <form action="{{ route('tahap.store.tahap', [$tahap, $id ?? null]) }}" method="POST">
+            <form action="{{ route('tahap.store', [$tahap, $id ?? null]) }}" method="POST">
                     @csrf
 
                     {{-- Form Tahap Dinamis --}}

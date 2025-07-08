@@ -1,29 +1,38 @@
+<input type="hidden" name="id" value="{{ $id }}">
+
+
 <div class="row">
-    {{-- Bulan Pertama Dibina --}}
+    {{-- Alamat --}}
     <div class="mb-3 col-md-6">
-        <label for="bulan_pertama" class="form-label fw-bold">Bulan Pertama Dibina</label>
-        <input type="text" name="bulan_pertama" id="bulan_pertama" class="form-control"
-            value="{{ old('bulan_pertama', $data->bulan_pertama ?? '') }}">
+        <label for="alamat" class="form-label fw-bold">Alamat</label>
+        <textarea name="alamat" id="alamat" class="form-control">{{ old('alamat', $data->alamat ?? '') }}</textarea>
     </div>
 
-    {{-- Tahun Dibina --}}
+    {{-- Provinsi --}}
     <div class="mb-3 col-md-6">
-        <label for="tahun_bina" class="form-label fw-bold">Tahun Dibina</label>
-        <input type="number" name="tahun_bina" id="tahun_bina" class="form-control"
-            value="{{ old('tahun_bina', $data->tahun_bina ?? '') }}">
+        <label for="provinsi" class="form-label fw-bold">Provinsi</label>
+        <input type="text" name="provinsi" id="provinsi" class="form-control"
+            value="{{ old('provinsi', $data->provinsi ?? '') }}">
     </div>
 
-    {{-- Kegiatan --}}
+    {{-- Kota --}}
     <div class="mb-3 col-md-6">
-        <label for="kegiatan" class="form-label fw-bold">Kegiatan</label>
-        <input type="text" name="kegiatan" id="kegiatan" class="form-control"
-            value="{{ old('kegiatan', $data->kegiatan ?? '') }}">
+        <label for="kota" class="form-label fw-bold">Kota/Kabupaten</label>
+        <input type="text" name="kota" id="kota" class="form-control"
+            value="{{ old('kota', $data->kota ?? '') }}">
     </div>
 
-    {{-- Gruping --}}
+    {{-- Legalitas Usaha --}}
     <div class="mb-3 col-md-6">
-        <label for="gruping" class="form-label fw-bold">Gruping</label>
-        <input type="text" name="gruping" id="gruping" class="form-control"
-            value="{{ old('gruping', $data->gruping ?? '') }}">
+        <label for="legalitas_usaha" class="form-label fw-bold">Legalitas Usaha</label>
+        <input type="text" name="legalitas_usaha" id="legalitas_usaha" class="form-control"
+            value="{{ old('legalitas_usaha', $data->legalitas_usaha ?? '') }}">
+    </div>
+
+    {{-- Tahun Pendirian --}}
+    <div class="mb-3 col-md-6">
+        <label for="tahun_pendirian" class="form-label fw-bold">Tahun Pendirian</label>
+        <input type="number" name="tahun_pendirian" id="tahun_pendirian" class="form-control"
+            value="{{ old('tahun_pendirian', $data->tahun_pendirian ?? '') }}">
     </div>
 </div>

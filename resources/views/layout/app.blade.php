@@ -3,13 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Si-UMKM Riau</title> 
-
-  <!-- Bootstrap 5 CDN -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- DataTables (Bootstrap) -->
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+  <title>Si-UMKM Riau</title>
 
   <!-- Google Font: Source Sans Pro -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -29,7 +23,10 @@
   <!-- Summernote -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/summernote/summernote-bs4.min.css') }}">
 
-  <!-- DataTables (AdminLTE plugins) -->
+  <!-- WYSIHTML5 -->
+  <link rel="stylesheet" href="{{ asset('asset/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}">
+
+  <!-- DataTables -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-buttons/css/buttons.bootstrap4.min.css') }}">
@@ -37,7 +34,7 @@
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/toastr/toastr.min.css') }}">
 
-  {{-- Styles dari halaman lain --}}
+  {{-- Tambahan style dari view --}}
   @stack('styles')
 </head>
 
@@ -62,11 +59,21 @@
 
 </div>
 
-<!-- Scripts -->
+<!-- jQuery & jQuery UI -->
 <script src="{{ asset('asset/plugins/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
 <script> $.widget.bridge('uibutton', $.ui.button) </script>
+
+<!-- Bootstrap Bundle -->
 <script src="{{ asset('asset/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+<!-- AdminLTE -->
+<script src="{{ asset('asset/dist/js/adminlte.js') }}"></script>
+
+<!-- OverlayScrollbars -->
+<script src="{{ asset('asset/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
+
+<!-- Plugins -->
 <script src="{{ asset('asset/plugins/chart.js/Chart.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/sparklines/sparkline.js') }}"></script>
 <script src="{{ asset('asset/plugins/jqvmap/jquery.vmap.min.js') }}"></script>
@@ -75,8 +82,6 @@
 <script src="{{ asset('asset/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/daterangepicker/daterangepicker.js') }}"></script>
 <script src="{{ asset('asset/plugins/summernote/summernote-bs4.min.js') }}"></script>
-<script src="{{ asset('asset/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
-<script src="{{ asset('asset/dist/js/adminlte.js') }}"></script>
 
 <!-- DataTables -->
 <script src="{{ asset('asset/plugins/datatables/jquery.dataTables.min.js') }}"></script>
@@ -92,15 +97,23 @@
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
 
-<!-- Toastr & Custom JS -->
+<!-- WYSIHTML5 -->
+<script src="{{ asset('asset/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
+
+<!-- Toastr & Alert -->
 <script src="{{ asset('asset/plugins/toastr/toastr.min.js') }}"></script>
-<script src="{{ asset('/js/toastr-handler.js') }}"></script>
-<script src="{{ asset('/js/confirm.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+<!-- Custom JS -->
+<script src="{{ asset('js/toastr-handler.js') }}"></script>
+<script src="{{ asset('js/confirm.js') }}"></script>
 
+<!-- Inisialisasi -->
 <script>
+  $(function () {
+    $('.textarea').wysihtml5();
+  });
+
   window.Laravel = {
     sessionMessages: {
       success: @json(session('success')),
@@ -110,8 +123,10 @@
   };
 </script>
 
-{{-- Script dari halaman lain --}}
+
 @stack('scripts')
+  
+
 
 </body>
 </html>

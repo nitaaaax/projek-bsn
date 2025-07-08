@@ -7,22 +7,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tahap3 extends Model
 {
-    protected $table = 'legalitas_usaha';
-    public $timestamps = false;
-    protected $primaryKey = 'pelaku_usaha_id';   // one‑to‑one
-
-    public $incrementing = false;                // PK bukan AUTO_INCREMENT
+    protected $table = 'riwayat';
 
     protected $fillable = [
         'pelaku_usaha_id',
-        'jenis_usaha',
-        'nama_merek',
-        'legalitas',
-        'tahun_pendirian',
-        'sni'
+        'tahun_dibina',
+        'riwayat_pembinaan',
+        'gruping',
+        'email',
+        'media_sosial',
     ];
 
-    public function pelaku(): BelongsTo
+    public function pelaku_usaha(): BelongsTo
     {
         return $this->belongsTo(Tahap1::class, 'pelaku_usaha_id');
     }

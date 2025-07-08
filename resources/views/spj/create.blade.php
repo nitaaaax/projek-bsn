@@ -9,7 +9,7 @@
       <form action="{{ route('spj.store') }}" method="POST">
           @csrf
 
-          {{-- Nama SPJ, No UKD, Keterangan --}}
+          {{-- Nama SPJ, No UKD --}}
           <div class="row mb-3">
               <div class="col-md-6">
                   <label for="nama_spj" class="form-label"><strong>Nama SPJ</strong></label>
@@ -17,13 +17,22 @@
               </div>
               <div class="col-md-6">
                   <label for="no_ukd" class="form-label"><strong>No UKD</strong></label>
-                  <input type="text" name="no_ukd" class="form-control" placeholder="Masukkan No UKD" required>
+                <input type="text" name="no_ukd" class="form-control">
               </div>
           </div>
 
+          {{-- Keterangan --}}
           <div class="mb-4">
               <label for="keterangan" class="form-label"><strong>Keterangan</strong></label>
-              <textarea name="keterangan" class="form-control" rows="2" placeholder="Tambahkan keterangan umum (jika ada)"></textarea>
+              <textarea name="keterangan" id="editor1" class="form-control" rows="5" placeholder="Tambahkan keterangan "></textarea>
+          </div>
+
+          {{-- Link Dokumen --}}
+          <div class="form-group mb-4">
+              <label for="dokumen">Link atau Upload Dokumen</label>
+              <input type="text" name="dokumen" class="form-control" placeholder="https://docs.google.com/...">
+              {{-- atau untuk upload file: --}}
+              {{-- <input type="file" name="dokumen" class="form-control"> --}}
           </div>
 
           {{-- Tabel Item --}}
@@ -31,10 +40,10 @@
               <table class="table table-bordered text-center align-middle">
                   <thead class="table-light">
                       <tr>
-                          <th style="width: 35%">Item</th>
-                          <th style="width: 25%">Nominal</th>
-                          <th style="width: 30%">Status Pembayaran</th>
-                          <th style="width: 10%">Aksi</th>
+                          <th>Item</th>
+                          <th>Nominal</th>
+                          <th>Status Pembayaran</th>
+                          <th>Aksi</th>
                       </tr>
                   </thead>
                   <tbody id="spj-rows">
@@ -111,3 +120,11 @@
     updateTotal();
 </script>
 @endsection
+
+@push('scripts')
+  <script src="https://cdn.ckeditor.com/4.4.3/standard/ckeditor.js"></script>
+  <script>
+    CKEDITOR.replace('editor1');
+  </script>
+@endpush
+

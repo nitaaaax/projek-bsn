@@ -8,11 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('spjs', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_spj');
-            $table->text('keterangan')->nullable(); // sesuai model
-            $table->timestamps();
-        });
+    $table->id();
+    $table->string('nama_spj');
+    $table->string('no_ukd'); // <-- tambahkan baris ini
+    $table->text('keterangan')->nullable();
+    $table->timestamps();
+});
+    
     }
 
     public function down(): void

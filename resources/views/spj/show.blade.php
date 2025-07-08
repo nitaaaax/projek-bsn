@@ -19,7 +19,17 @@
           </tr>
           <tr>
             <th>Keterangan</th>
-            <td>: {{ $spj->keterangan ?? '-' }}</td>
+          <td>: {!! $spj->keterangan ?? '-' !!}</td>
+          </tr>
+          <tr>
+            <th>Dokumen</th>
+            <td>: 
+              @if ($spj->dokumen)
+                <a href="{{ $spj->dokumen }}" target="_blank">{{ $spj->dokumen }}</a>
+              @else
+                -
+              @endif
+            </td>
           </tr>
         </table>
       </div>
@@ -48,21 +58,20 @@
           <tfoot>
             <tr>
               <th colspan="2" class="text-end">Total</th>
-              <th colspan="3">Rp {{ number_format($spj->details->sum('nominal'), 0, ',', '.') }}</th>
+              <th colspan="2">Rp {{ number_format($spj->details->sum('nominal'), 0, ',', '.') }}</th>
             </tr>
           </tfoot>
         </table>
       </div>
 
-      {{-- Tombol Navigasi --}}
-      <div class="d-flex gap-2 mt-4">
-        <a href="{{ route('spj.index') }}" class="btn btn-secondary">
-          <i class="fas fa-arrow-left"></i> Kembali ke daftar SPJ
-        </a>
-        <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning">
-          <i class="fa fa-edit"></i> Edit SPJ
-        </a>
-      </div>
+        <div class="d-flex mt-4">
+      <a href="{{ route('spj.index') }}" class="btn btn-secondary mr-2">
+        <i class="fas fa-arrow-left"></i> Kembali ke daftar SPJ
+      </a>
+      <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning">
+        <i class="fa fa-edit"></i> Edit SPJ
+      </a>
+    </div>
     </div>
   </div>
 </div>

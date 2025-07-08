@@ -7,18 +7,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tahap2 extends Model
 {
-    protected $table = 'kontak';
-    public $timestamps = false;
+    protected $table = 'pembinaan';
 
     protected $fillable = [
         'pelaku_usaha_id',
-        'nama_kontak',
-        'no_hp',
-        'email',
-        'media_sosial'
+        'pembina_2',
+        'sinergi',
+        'nama_kontak_person',
+        'No_Hp',
+        'bulan__pertama_pembinaan',
     ];
 
-    public function pelaku(): BelongsTo
+
+
+    public function tahap1(): BelongsTo
     {
         return $this->belongsTo(Tahap1::class, 'pelaku_usaha_id');
     }

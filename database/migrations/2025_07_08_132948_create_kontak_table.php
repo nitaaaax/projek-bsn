@@ -4,11 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('kontak', function (Blueprint $table) {
             $table->id();
+            $table->string('pembina_2')->nullable();
+            $table->string('sinergi')->nullable();
             $table->foreignId('pelaku_usaha_id')->constrained('pelaku_usaha')->onDelete('cascade');
             $table->string('nama_kontak', 100);
             $table->string('no_hp', 20);
@@ -18,6 +24,9 @@ return new class extends Migration {
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('kontak');

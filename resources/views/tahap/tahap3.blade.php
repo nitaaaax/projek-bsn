@@ -1,47 +1,40 @@
+<input type="hidden" name="id" value="{{ $id }}">
 
-    {{-- Jenis Usaha --}}
+
+<div class="row">
+
+    {{-- Tahun Dibina --}}
     <div class="mb-3 col-md-6">
-        <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
-        <input type="text" name="jenis_usaha" id="jenis_usaha" class="form-control"
-            value="{{ old('jenis_usaha', $data->jenis_usaha ?? '') }}">
+        <label for="tahun_dibina" class="form-label fw-bold">Tahun Dibina</label>
+        <input type="number" name="tahun_dibina" id="tahun_dibina" class="form-control"
+            value="{{ old('tahun_dibina', $data->tahun_dibina ?? '') }}">
     </div>
 
-    {{-- Nama Merek --}}
+    {{-- Riwayat Pembinaan --}}
     <div class="mb-3 col-md-6">
-        <label for="nama_merek" class="form-label fw-bold">Nama Merek</label>
-        <input type="text" name="nama_merek" id="nama_merek" class="form-control"
-            value="{{ old('nama_merek', $data->nama_merek ?? '') }}">
+        <label for="riwayat_pembinaan" class="form-label fw-bold">Riwayat Pembinaan</label>
+        <input type="text" name="riwayat_pembinaan" id="riwayat_pembinaan" class="form-control"
+            value="{{ old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') }}">
     </div>
 
-    {{-- Legalitas --}}
+    {{-- Gruping --}}
     <div class="mb-3 col-md-6">
-        <label for="legalitas" class="form-label fw-bold">Legalitas</label>
-        <input type="text" name="legalitas" id="legalitas" class="form-control"
-            value="{{ old('legalitas', $data->legalitas ?? '') }}">
+        <label for="gruping" class="form-label fw-bold">Gruping</label>
+        <input type="text" name="gruping" id="gruping" class="form-control"
+            value="{{ old('gruping', $data->gruping ?? '') }}">
     </div>
 
-    {{-- Tahun Pendirian --}}
+    {{-- Email --}}
     <div class="mb-3 col-md-6">
-        <label for="tahun_pendirian" class="form-label fw-bold">Tahun Pendirian</label>
-        <input type="number" name="tahun_pendirian" id="tahun_pendirian" class="form-control"
-            value="{{ old('tahun_pendirian', $data->tahun_pendirian ?? '') }}">
+        <label for="email" class="form-label fw-bold">Email</label>
+        <input type="email" name="email" id="email" class="form-control"
+            value="{{ old('email', $data->email ?? '') }}">
     </div>
 
-    {{-- SNI --}}
+    {{-- Media Sosial --}}
     <div class="mb-3 col-md-6">
-        <label class="form-label fw-bold d-block">Apakah sudah SNI?</label>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sni" id="sni_yes" value="1"
-                {{ old('sni', $data->sni ?? '') == 1 ? 'checked' : '' }}>
-            <label class="form-check-label" for="sni_yes">Ya</label>
-        </div>
-        <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="sni" id="sni_no" value="0"
-                {{ old('sni', $data->sni ?? '') == 0 ? 'checked' : '' }}>
-            <label class="form-check-label" for="sni_no">Tidak</label>
-        </div>
+        <label for="media_sosial" class="form-label fw-bold">Media Sosial</label>
+        <input type="text" name="media_sosial" id="media_sosial" class="form-control"
+            value="{{ old('media_sosial', $data->media_sosial ?? '') }}">
     </div>
-<<<<<<< HEAD
-=======
-</div> <!-- penutup row -->
->>>>>>> 080cefb0e338e3f987d868045d5f7973600564b7
+</div>
