@@ -13,48 +13,44 @@
     </div>
 
 
-      <div class="table-responsive">
-        <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
-          <thead>
+    <div class="table-responsive">
+      <table id="tabelUmkm" class="table table-bordered table-striped">
+        <thead class="table-secondary text-center">
           <tr>
+            <th>No</th>
             <th>Nama Pelaku</th>
             <th>Produk</th>
             <th>Aksi</th>
           </tr>
         </thead>
+        <tbody>
+          @forelse ($tahap1 as $index => $t1)
+            <tr>
+              <td>{{ $index + 1 }}</td>
+              <td>{{ $t1->nama_pelaku }}</td>
+              <td>{{ $t1->produk }}</td>
+              <td class="text-center">
+                <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
+                  <i class="fa fa-eye"></i> Detail
+                </a>
+                <form action="{{ route('umkm.destroy', $t1->id) }}" method="POST" class="d-inline" id="delete-form-{{ $t1->id }}">
+                  @csrf
+                  @method('DELETE')
+                  <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $t1->id }})">
+                    <i class="fa fa-trash"></i> Hapus
+                  </button>
+                </form>
+              </td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="4" class="text-center text-muted">Belum ada data UMKM.</td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
 
-         <tbody>
-  @forelse ($tahap1 as $t1)
-    <tr>
-      <td>{{ $t1->nama_pelaku }}</td>
-      <td>{{ $t1->produk }}</td>
-      <td>
-        <div class="d-flex gap-1">
-          <a href="{{ route('umkm.show', $t1->id) }}" class="btn btn-info btn-sm">
-            <i class="fa fa-eye"></i> Detail
-          </a>
-         <form action="{{ route('umkm.destroy', $t1->id) }}" method="POST" id="delete-form-{{ $t1->id }}">
-    @csrf
-    @method('DELETE')
-    <button type="button" class="btn btn-danger" onclick="confirmDelete({{ $t1->id }})">
-        <i class="fa fa-trash"></i> Hapus
-    </button>
-</form>
-
-
-         
-        </div>
-      </td>
-    </tr>
-  @empty
-    <tr>
-      <td colspan="3" class="text-center text-muted">Belum ada data UMKM.</td>
-    </tr>
-  @endforelse
-</tbody>
-
-        </table>
-      </div>
     </div>
   </div>
 </div>
@@ -128,4 +124,11 @@
     });
   }
 </script>
+
+<script>
+  $(document).ready(function () {
+    $('#tabelUmkm').DataTable();
+  });
+</script>
+
 @endpush

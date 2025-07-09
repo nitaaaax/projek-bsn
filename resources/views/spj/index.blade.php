@@ -10,37 +10,6 @@
         <i class="fa fa-plus"></i> Tambah SPJ
       </a>
 
-<<<<<<< HEAD
-      <div class="table-responsive">
-<<<<<<< HEAD
-        <table id="tabelSPJS" class="table table-bordered table-hover table-striped">
-         <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama SPJ</th>
-            <th>Total</th>
-            <th style="width: 200px;">Aksi</th>
-          </tr>
-        </thead>
-
-
-=======
-        <table id="tabelSPJ" class="table table-bordered table-hover table-striped">
-        <thead class="bg-secondary text-white text-center">
-        <tr>
-          <th>No</th>
-          <th>Nama SPJ</th>
-          <th>Total</th>
-          <th style="width: 200px;">Aksi</th>
-        </tr>
-      </thead>
->>>>>>> 080cefb0e338e3f987d868045d5f7973600564b7
-          <tbody>
-           @forelse ($spj as $item)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>{{ $item->nama_spj }}</td>
-=======
       <!-- Tab Navigasi -->
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
         <li class="nav-item">
@@ -59,11 +28,9 @@
           </button>
         </li>
       </ul>
->>>>>>> 324d13095e799b5a635ecc141330705a3c112729
 
       <!-- Isi Tab -->
       <div class="tab-content" id="spjTabContent">
-
         <!-- Tab SEMUA SPJ -->
         <div class="tab-pane fade show active" id="semua" role="tabpanel">
           <div class="table-responsive">
@@ -78,24 +45,24 @@
               </thead>
               <tbody>
                 @forelse($spj as $item)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->nama_spj }}</td>
-                    <td class="text-end fw-bold">
-                      Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
-                    </td>
-                    <td>
-                      <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
-                      <form action="{{ route('spj.destroy', $item->id) }}" method="POST" class="d-inline">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin hapus?')">Hapus</button>
-                      </form>
-                    </td>
-                  </tr>
+                <tr>
+                  <td>{{ $loop->iteration }}</td>
+                  <td>{{ $item->nama_spj }}</td>
+                  <td class="text-end fw-bold">
+                    Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
+                  </td>
+                  <td>
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
+                    <form action="{{ route('spj.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
+                      @csrf @method('DELETE')
+                      <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">Hapus</button>
+                    </form>
+                  </td>
+                </tr>
                 @empty
-                  <tr>
-                    <td colspan="4" class="text-center text-muted">Belum ada data.</td>
-                  </tr>
+                <tr>
+                  <td colspan="4" class="text-center text-muted">Belum ada data.</td>
+                </tr>
                 @endforelse
               </tbody>
               <tfoot>
@@ -126,15 +93,17 @@
               </thead>
               <tbody>
                 @forelse($sudahBayar as $item)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->spj->nama_spj }}</td>
-                    <td>{{ $item->item }}</td>
-                    <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
-                    <td>{{ $item->keterangan }}</td>
-                  </tr>
+                <tr>
+                  <td>{{ $loop->iteration }}</td>
+                  <td>{{ $item->spj->nama_spj }}</td>
+                  <td>{{ $item->item }}</td>
+                  <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
+                  <td>{{ $item->keterangan }}</td>
+                </tr>
                 @empty
-                  <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
+                <tr>
+                  <td colspan="5" class="text-center text-muted">Tidak ada data.</td>
+                </tr>
                 @endforelse
               </tbody>
               <tfoot>
@@ -165,15 +134,17 @@
               </thead>
               <tbody>
                 @forelse($belumBayar as $item)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->spj->nama_spj }}</td>
-                    <td>{{ $item->item }}</td>
-                    <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
-                    <td>{{ $item->keterangan }}</td>
-                  </tr>
+                <tr>
+                  <td>{{ $loop->iteration }}</td>
+                  <td>{{ $item->spj->nama_spj }}</td>
+                  <td>{{ $item->item }}</td>
+                  <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
+                  <td>{{ $item->keterangan }}</td>
+                </tr>
                 @empty
-                  <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
+                <tr>
+                  <td colspan="5" class="text-center text-muted">Tidak ada data.</td>
+                </tr>
                 @endforelse
               </tbody>
               <tfoot>
@@ -196,56 +167,26 @@
 @endsection
 
 @push('styles')
-<!-- Bootstrap CSS (penting untuk tab aktif) -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush
 
 @push('scripts')
-<!-- jQuery dan Bootstrap Bundle (untuk tab dan komponen js Bootstrap) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
-<<<<<<< HEAD
-  <!-- Konfirmasi hapus -->
-  <script>
-    function confirmDelete(id) {
-      if (confirm("Yakin ingin menghapus data ini?")) {
-        document.getElementById('delete-form-' + id).submit();
-      }
-    }
-  </script>
-
-  <!-- Aktifkan DataTable -->
- <script>
-  $(document).ready(function () {
-    $('#tabelSPJS').DataTable({
-      lengthChange: false,
-      order: [[0, 'asc']], // Urutkan default berdasarkan kolom pertama
-      language: {
-        search: "Cari:",
-        searchPlaceholder: "Ketik untuk mencari...",
-        zeroRecords: "Data tidak ditemukan.",
-        infoEmpty: "Menampilkan 0 dari 0 data",
-        emptyTable: "Tidak ada data yang tersedia",
-        paginate: {
-          previous: "← Sebelumnya",
-          next: "Berikutnya →"
-        },
-        info: "", // Kosongkan karena akan kita ganti dengan infoCallback
-      },
-      infoCallback: function(settings, start, end, max, total, pre) {
-        return 'Menampilkan ' + start + ' - ' + end + ' dari ' + total + ' data';
-      }
-    });
-=======
 <script>
-  $(function () {
+  function confirmDelete(id) {
+    if (confirm("Yakin ingin menghapus data ini?")) {
+      document.getElementById('delete-form-' + id).submit();
+    }
+  }
+
+  $(document).ready(function () {
     $('#tabelSemua').DataTable();
     $('#tabelSudah').DataTable();
     $('#tabelBelum').DataTable();
->>>>>>> 324d13095e799b5a635ecc141330705a3c112729
   });
 </script>
 @endpush

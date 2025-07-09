@@ -18,66 +18,43 @@
   </div>
 </div>
 
-<!-- Main content -->
-<section class="content">
-  <div class="container-fluid">
-    <div class="row">
-      <!-- Box 1 -->
-      <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
-          <div class="inner">
-            <h3>30</h3>
-            <p>New Orders</p>
+  <!-- Main content -->
+  <section class="content">
+    <div class="container-fluid">
+        <div class="row">
+          <!-- Box 1 - SPJ -->
+          <div class="col-lg-6 col-12">
+            <div class="small-box bg-info">
+              <div class="inner">
+                <h3>{{ $jumlahSpj }}</h3>
+                <p>Jumlah SPJ</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <a href="{{ route('spj.index') }}" class="small-box-footer">
+                Lihat Semua <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
           </div>
-          <div class="icon">
-            <i class="fas fa-shopping-bag"></i>
-          </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
 
-      <!-- Box 2 -->
-      <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
-          <div class="inner">
-            <h3>12</h3>
-            <p>Bounce Rate</p>
+          <!-- Box 2 - UMKM -->
+          <div class="col-lg-6 col-12">
+            <div class="small-box bg-success">
+              <div class="inner">
+                <h3>{{ $jumlahUmkm }}</h3>
+                <p>Jumlah UMKM</p>
+              </div>
+              <div class="icon">
+                <i class="fas fa-users"></i>
+              </div>
+              <a href="{{ route('umkm.index') }}" class="small-box-footer">
+                Lihat Semua <i class="fas fa-arrow-circle-right"></i>
+              </a>
+            </div>
           </div>
-          <div class="icon">
-            <i class="fas fa-chart-bar"></i>
-          </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
-      </div>
 
-      <!-- Box 3 -->
-      <div class="col-lg-3 col-6">
-        <div class="small-box bg-warning">
-          <div class="inner">
-            <h3>44</h3>
-            <p>User Registrations</p>
-          </div>
-          <div class="icon">
-            <i class="fas fa-user-plus"></i>
-          </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-
-      <!-- Box 4 -->
-      <div class="col-lg-3 col-6">
-        <div class="small-box bg-danger">
-          <div class="inner">
-            <h3>65</h3>
-            <p>Unique Visitors</p>
-          </div>
-          <div class="icon">
-            <i class="fas fa-chart-pie"></i>
-          </div>
-          <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
-        </div>
-      </div>
-    </div>
   </div>
 </section>
 @endsection
