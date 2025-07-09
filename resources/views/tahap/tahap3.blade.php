@@ -1,7 +1,6 @@
-<input type="hidden" name="id" value="{{ $id }}">
-
-
 <div class="row">
+
+    <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id ?? $id }}">
 
     {{-- Tahun Dibina --}}
     <div class="mb-3 col-md-6">

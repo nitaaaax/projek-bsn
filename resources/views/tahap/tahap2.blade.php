@@ -1,8 +1,8 @@
-<input type="hidden" name="id" value="{{ $id }}">
-
-
 
 <div class="row">
+
+<input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id ?? $id }}">
+
     {{-- Pembina II --}}
     <div class="mb-3 col-md-6">
         <label for="pembina_2" class="form-label fw-bold">Pembina II</label>
@@ -34,14 +34,16 @@
     {{-- Bulan Pertama Pembinaan --}}
        <div class="mb-3 col-md-6">
         <label for="bulan_pembinaan" class="form-label fw-bold">Bulan Pembinaan</label>
-        <select name="bulan_pembinaan" id="bulan_pembinaan" class="form-control" required>
+        <select name="bulan_pertama_pembinaan" id="bulan_pembinaan" class="form-control" required>
             <option value="">-- Pilih Bulan --</option>
-            @foreach([
+            @foreach(
+                [
                 1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
                 5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
                 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-            ] as $num => $nama)
-                <option value="{{ $num }}" {{ old('bulan_pembinaan', $data->bulan_pembinaan ?? '') == $num ? 'selected' : '' }}>
+                ] 
+                as $num => $nama)
+                <option value="{{ $num }}" {{ old('bulan__pertama_pembinaan', $data->bulan__pertama_pembinaan ?? '') == $num ? 'selected' : '' }}>
                     {{ $nama }}
                 </option>
             @endforeach

@@ -1,6 +1,3 @@
-<input type="hidden" name="id" value="{{ $id }}">
-
-
 {{-- Form Tahap 1 --}}
 
 <div class="mb-3">

@@ -2,13 +2,13 @@
 
 <div class="mb-3">
     <label for="omzet" class="form-label fw-bold">Jumlah Omzet per Tahun</label>
-    <input type="text" name="omzet" id="omzet" class="form-control"
+    <input type="number" name="omzet" id="omzet" class="form-control"
         value="{{ old('omzet', $data->omzet ?? '') }}">
 </div>
 
 <div class="mb-3">
     <label for="volume_per_tahun" class="form-label fw-bold">Volume Produksi per Tahun</label>
-    <input type="text" name="volume_per_tahun" id="volume_per_tahun" class="form-control"
+    <input type="number" name="volume_per_tahun" id="volume_per_tahun" class="form-control"
         value="{{ old('volume_per_tahun', $data->volume_per_tahun ?? '') }}">
 </div>
 

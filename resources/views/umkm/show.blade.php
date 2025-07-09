@@ -8,6 +8,17 @@
         </div>
         <div class="card-body">
 
+        {{-- untuk bulan pertama pembinaan tahap 2 --}}
+        @php
+        $bulanMap = [
+        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
+        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
+        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+        ];
+            $angkaBulan = (int) $tahap->tahap2->bulan_pertama_pembinaan;
+        @endphp
+
+        
             <dl class="row">
                 {{-- Tahap 1: Data Pelaku Usaha --}}
                 <dt class="col-sm-4">Nama Pelaku</dt>
@@ -37,7 +48,7 @@
                     <dd class="col-sm-8">{{ $tahap->tahap2->No_Hp }}</dd>
 
                     <dt class="col-sm-4">Bulan Pertama Pembinaan</dt>
-                    <dd class="col-sm-8">{{ $tahap->tahap2->bulan__pertama_pembinaan }}</dd>
+                    <dd class="col-sm-8">{{ $bulanMap[$angkaBulan] ?? '-' }}</dd>
                 @endif
 
                 {{-- Tahap 3: Riwayat Pembinaan --}}

@@ -11,7 +11,7 @@
             <div class="card-body">
             <form action="{{ route('tahap.store', [$tahap, $id ?? null]) }}" method="POST">
                     @csrf
-
+                    <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id }}">
                     {{-- Form Tahap Dinamis --}}
                     @includeIf('tahap.tahap' . $tahap, ['data' => $data ?? null])
 

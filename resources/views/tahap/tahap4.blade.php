@@ -1,7 +1,8 @@
-<input type="hidden" name="id" value="{{ $id }}">
-
-
 <div class="row">
+
+<input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id ?? $id }}">
+
+
     {{-- Alamat --}}
     <div class="mb-3 col-md-6">
         <label for="alamat" class="form-label fw-bold">Alamat</label>

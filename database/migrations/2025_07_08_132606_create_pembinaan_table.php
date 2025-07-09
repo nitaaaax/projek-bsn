@@ -18,10 +18,9 @@ return new class extends Migration
             $table->string('sinergi')->nullable();
             $table->string('nama_kontak_person');
             $table->string('No_Hp');
-            $table->string('bulan__pertama_pembinaan')->nullable();
+            $table->string('bulan_pertama_pembinaan')->nullable(); 
             $table->timestamps();
         });
-
     }
 
     /**

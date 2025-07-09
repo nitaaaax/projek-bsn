@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Tahap1, Tahap2, Tahap3, Tahap4, Tahap5, Tahap6,};
+use App\Models\{Tahap1, Tahap2, Tahap3, Tahap4, Tahap5, Tahap6};
 
 class ContcreateUmkm extends Controller
 {
@@ -36,7 +36,7 @@ class ContcreateUmkm extends Controller
                 $data = Tahap4::where('pelaku_usaha_id', $id)->first();
                 break;
             case 5:
-                $data = Tahap5::where('pelaku_usaha_id', $id)->first(); // tetap pakai LegalitasUsaha
+                $data = Tahap5::where('pelaku_usaha_id', $id)->first();
                 break;
             case 6:
                 $data = Tahap6::where('pelaku_usaha_id', $id)->first();
@@ -45,23 +45,16 @@ class ContcreateUmkm extends Controller
                 abort(404, 'Tahap tidak valid.');
         }
 
-       return view('tahap.create', [
+        return view('tahap.create', [
             'tahap' => $tahap,
             'data' => $data,
+            'id' => $id,
             'pelaku_usaha_id' => $id
         ]);
-
     }
 
- public function store(Request $request, int $tahap, $id = null)
+    public function store(Request $request, int $tahap, $id = null)
     {
-        if (!$id && $request->has('pelaku_usaha_id')) {
-            $id = $request->input('pelaku_usaha_id');
-        }
-
-        if (!$id && $tahap != 1) {
-            abort(400, 'ID kosong!');
-        }
 
         $rules = [
             1 => [
@@ -76,9 +69,8 @@ class ContcreateUmkm extends Controller
                 'sinergi'                    => 'nullable|string|max:100',
                 'nama_kontak_person'        => 'required|string|max:100',
                 'No_Hp'                      => 'required|string|max:25',
-                'bulan__pertama_pembinaan'  => 'nullable|string|max:50',
+                'bulan_pertama_pembinaan'  => 'nullable|string|max:50',
             ],
-
             3 => [
                 'bulan_pembinaan'     => 'nullable|string',
                 'tahun_dibina'        => 'nullable|digits:4',
@@ -94,7 +86,6 @@ class ContcreateUmkm extends Controller
                 'legalitas_usaha'   => 'nullable|string|max:100',
                 'tahun_pendirian'   => 'nullable|digits:4',
             ],
-
             5 => [
                 'jenis_usaha' => 'nullable|string|max:100',
                 'nama_merek'  => 'nullable|string|max:100',
@@ -102,13 +93,12 @@ class ContcreateUmkm extends Controller
                 'lspro'       => 'nullable|string|max:100',
             ],
             6 => [
-                'omzet' => 'nullable|numeric',
-                'volume_per_tahun' => 'nullable|string|max:100',
-                'jumlah_tenaga_kerja' => 'nullable|integer',
-                'jangkauan_pemasaran' => 'nullable|string|max:100',
-                'link_dokumen' => 'nullable|string|max:255',
+                'omzet'               => 'required|numeric',
+                'volume_per_tahun'    => 'required|string|max:100',
+                'jumlah_tenaga_kerja' => 'required|integer',
+                'jangkauan_pemasaran' => 'required|string|max:100',
+                'link_dokumen'        => 'required|string|max:255',
             ],
-
         ];
 
         $validated = $request->validate($rules[$tahap] ?? []);
@@ -126,13 +116,11 @@ class ContcreateUmkm extends Controller
                 $nextId = $t2->pelaku_usaha_id;
                 break;
 
-
             case 3:
                 $validated['pelaku_usaha_id'] = $id;
                 $t3 = Tahap3::create($validated);
                 $nextId = $t3->pelaku_usaha_id;
                 break;
-
 
             case 4:
                 $validated['pelaku_usaha_id'] = $id;
@@ -151,19 +139,21 @@ class ContcreateUmkm extends Controller
                 $nextId = $t5->pelaku_usaha_id;
                 break;
 
-          case 6:
-                $validated['pelaku_usaha_id'] = $id;
+           case 6:
+                $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
+
+                if (!$validated['pelaku_usaha_id']) {
+                    abort(400, 'pelaku_usaha_id wajib diisi di tahap 6!');
+                }
 
                 $t6 = Tahap6::updateOrCreate(
-                    ['pelaku_usaha_id' => $id],
+                    ['pelaku_usaha_id' => $validated['pelaku_usaha_id']],
                     $validated
                 );
 
                 $nextId = $t6->pelaku_usaha_id;
 
                 return redirect()->route('umkm.index')->with('success', 'Data UMKM berhasil disimpan!');
-
-
 
             default:
                 abort(404, 'Tahap tidak valid.');
