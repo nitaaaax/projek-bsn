@@ -18,8 +18,13 @@
             <td>: {{ $spj->no_ukd }}</td>
           </tr>
           <tr>
-            <th>Keterangan</th>
-          <td>: {!! $spj->keterangan ?? '-' !!}</td>
+          <th style="vertical-align: top;">Keterangan</th>
+          <td>
+            <div style="display: inline;">:</div>
+            <div style="display: inline-block; max-width: 1000px;">
+              {!! $spj->keterangan ? $spj->keterangan : '-' !!}
+            </div>
+          </td>
           </tr>
           <tr>
             <th>Dokumen</th>
@@ -64,14 +69,14 @@
         </table>
       </div>
 
-        <div class="d-flex mt-4">
-      <a href="{{ route('spj.index') }}" class="btn btn-secondary mr-2">
-        <i class="fas fa-arrow-left"></i> Kembali ke daftar SPJ
-      </a>
-      <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning">
-        <i class="fa fa-edit"></i> Edit SPJ
-      </a>
-    </div>
+      <div class="d-flex mt-4">
+        <a href="{{ route('spj.index') }}" class="btn btn-secondary mr-2">
+          <i class="fas fa-arrow-left"></i> Kembali ke daftar SPJ
+        </a>
+        <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning">
+          <i class="fa fa-edit"></i> Edit SPJ
+        </a>
+      </div>
     </div>
   </div>
 </div>

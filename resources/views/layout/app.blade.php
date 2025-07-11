@@ -23,9 +23,6 @@
   <!-- Summernote -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/summernote/summernote-bs4.min.css') }}">
 
-  <!-- WYSIHTML5 -->
-  <link rel="stylesheet" href="{{ asset('asset/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css') }}">
-
   <!-- DataTables -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css') }}">
   <link rel="stylesheet" href="{{ asset('asset/plugins/datatables-responsive/css/responsive.bootstrap4.min.css') }}">
@@ -96,10 +93,6 @@
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-
-<!-- WYSIHTML5 -->
-<script src="{{ asset('asset/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.all.min.js') }}"></script>
-
 <!-- Toastr & Alert -->
 <script src="{{ asset('asset/plugins/toastr/toastr.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -108,12 +101,7 @@
 <script src="{{ asset('js/toastr-handler.js') }}"></script>
 <script src="{{ asset('js/confirm.js') }}"></script>
 
-<!-- Inisialisasi -->
 <script>
-  $(function () {
-    $('.textarea').wysihtml5();
-  });
-
   window.Laravel = {
     sessionMessages: {
       success: @json(session('success')),
@@ -124,6 +112,7 @@
 </script>
 
 
+@stack('styles')
 @stack('scripts')
   
 

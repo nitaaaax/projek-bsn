@@ -180,21 +180,21 @@
         </a>
         <ul class="nav nav-treeview">
           <li class="nav-item">
-            <a href="{{ route('umkm.index') }}" class="nav-link">
-              {{-- {{ route('umkm.proses') }} --}}
-              <i class="far fa-circle nav-icon"></i>
-              <p>Data UMKM Proses</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              {{-- {{ route('umkm.sertifikasi') }} --}}
-              <i class="far fa-circle nav-icon"></i>
-              <p>Data UMKM Sertifikasi</p>
-            </a>
-          </li>
+          <a href="{{ route('umkm.proses.index') }}" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Data UMKM Proses</p>
+        </a>
+      </li>
+      <li class="nav-item">
+          <a href="{{ route('umkm.sertifikasi.index') }}" class="nav-link">
+          <i class="far fa-circle nav-icon"></i>
+          <p>Data UMKM Sertifikasi</p>
+        </a>
+      </li>
+
         </ul>
       </li>
+      
 
 
         </ul>

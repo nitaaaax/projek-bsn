@@ -16,12 +16,28 @@
             value="{{ old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') }}">
     </div>
 
-    {{-- Gruping --}}
-    <div class="mb-3 col-md-6">
-        <label for="gruping" class="form-label fw-bold">Gruping</label>
-        <input type="text" name="gruping" id="gruping" class="form-control"
-            value="{{ old('gruping', $data->gruping ?? '') }}">
-    </div>
+    {{-- Status Pmebinaan --}}
+   <div class="mb-3 col-md-6">
+    <label for="status_pembinaan" class="form-label fw-bold">Status Pembinaan</label>
+    <select name="status_pembinaan" id="status_pembinaan" class="form-control">
+        <option value="">-- Pilih Status --</option>
+        <option value="1. Identifikasi awal dan Gap" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '1. Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
+        <option value="2. Set up Sistem" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '2. Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
+        <option value="3. Implementasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '3. Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
+        <option value="4. Review Sistem & Audit Internal" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '4. Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
+        <option value="5. Pengajuan Sertifikasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '5. Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
+        <option value="6. Perbaikan Temuan Audit" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '6. Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
+        <option value="7. Perbaikan Lokasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '7. Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
+<option value="8. SPPT SNI"
+  style="font-weight:bold; color:green;"
+  {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '8. SPPT SNI' ? 'selected' : '' }}>
+  8. SPPT SNI (Tersertifikasi)
+</option>
+    </select>
+</div>
+
+
+
 
     {{-- Email --}}
     <div class="mb-3 col-md-6">

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('pelaku_usaha_id')->constrained('pelaku_usaha')->onDelete('cascade');
             $table->string('tahun_dibina')->nullable();
             $table->text('riwayat_pembinaan')->nullable();
-            $table->string('gruping')->nullable();
+            $table->string('status_pembinaan')->nullable();
             $table->string('email')->nullable();
             $table->string('media_sosial')->nullable();
             $table->timestamps();

@@ -13,7 +13,7 @@ class Tahap3 extends Model
         'pelaku_usaha_id',
         'tahun_dibina',
         'riwayat_pembinaan',
-        'gruping',
+        'status_pembinaan',
         'email',
         'media_sosial',
     ];
