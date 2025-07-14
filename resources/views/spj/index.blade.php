@@ -4,34 +4,41 @@
 <div class="container mt-4">
   <div class="card">
     <div class="card-body">
-      <h2 class="fw-bold mb-4">Data SPJ</h2>
 
-      <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm mb-3">
-        <i class="fa fa-plus"></i> Tambah SPJ
-      </a>
+      {{-- Judul dan Tombol Aksi --}}
+      <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+          <h2 class="fw-bold">Data SPJ</h2>
+          <div class="d-flex gap-2 mt-2">
+            <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
+              <i class="fa fa-plus"></i> Tambah SPJ
+            </a>
+            <a href="{{ route('spj.export') }}" class="btn btn-success btn-sm">
+              <i class="fa fa-file-export"></i> Export
+            </a>
+            <button type="button" class="btn btn-warning btn-sm text-white" data-bs-toggle="modal" data-bs-target="#importModal">
+              <i class="fa fa-file-import"></i> Import
+            </button>
+          </div>
+        </div>
+      </div>
 
-      <!-- Tab Navigasi -->
+      {{-- Tab Navigasi --}}
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
         <li class="nav-item">
-          <button class="nav-link active" id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button" role="tab">
-            Semua SPJ
-          </button>
+          <button class="nav-link active" id="semua-tab" data-bs-toggle="tab" data-bs-target="#semua" type="button" role="tab">Semua SPJ</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" id="sudah-tab" data-bs-toggle="tab" data-bs-target="#sudah" type="button" role="tab">
-            Sudah Dibayar
-          </button>
+          <button class="nav-link" id="sudah-tab" data-bs-toggle="tab" data-bs-target="#sudah" type="button" role="tab">Sudah Dibayar</button>
         </li>
         <li class="nav-item">
-          <button class="nav-link" id="belum-tab" data-bs-toggle="tab" data-bs-target="#belum" type="button" role="tab">
-            Belum Dibayar
-          </button>
+          <button class="nav-link" id="belum-tab" data-bs-toggle="tab" data-bs-target="#belum" type="button" role="tab">Belum Dibayar</button>
         </li>
       </ul>
 
-      <!-- Isi Tab -->
+      {{-- Isi Tab --}}
       <div class="tab-content" id="spjTabContent">
-        <!-- Tab SEMUA SPJ -->
+        {{-- TAB SEMUA --}}
         <div class="tab-pane fade show active" id="semua" role="tabpanel">
           <div class="table-responsive">
             <table class="table table-bordered table-striped" id="tabelSemua">
@@ -60,9 +67,7 @@
                   </td>
                 </tr>
                 @empty
-                <tr>
-                  <td colspan="4" class="text-center text-muted">Belum ada data.</td>
-                </tr>
+                <tr><td colspan="4" class="text-center text-muted">Belum ada data.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
@@ -78,7 +83,7 @@
           </div>
         </div>
 
-        <!-- Tab SUDAH DIBAYAR -->
+        {{-- TAB SUDAH --}}
         <div class="tab-pane fade" id="sudah" role="tabpanel">
           <div class="table-responsive">
             <table class="table table-bordered table-striped" id="tabelSudah">
@@ -101,17 +106,13 @@
                   <td>{{ $item->keterangan }}</td>
                 </tr>
                 @empty
-                <tr>
-                  <td colspan="5" class="text-center text-muted">Tidak ada data.</td>
-                </tr>
+                <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
                 <tr>
                   <th colspan="3" class="text-end">Total:</th>
-                  <th class="text-end fw-bold">
-                    Rp{{ number_format($sudahBayar->sum('nominal'), 0, ',', '.') }}
-                  </th>
+                  <th class="text-end fw-bold">Rp{{ number_format($sudahBayar->sum('nominal'), 0, ',', '.') }}</th>
                   <th></th>
                 </tr>
               </tfoot>
@@ -119,7 +120,7 @@
           </div>
         </div>
 
-        <!-- Tab BELUM DIBAYAR -->
+        {{-- TAB BELUM --}}
         <div class="tab-pane fade" id="belum" role="tabpanel">
           <div class="table-responsive">
             <table class="table table-bordered table-striped" id="tabelBelum">
@@ -142,25 +143,45 @@
                   <td>{{ $item->keterangan }}</td>
                 </tr>
                 @empty
-                <tr>
-                  <td colspan="5" class="text-center text-muted">Tidak ada data.</td>
-                </tr>
+                <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
                 @endforelse
               </tbody>
               <tfoot>
                 <tr>
                   <th colspan="3" class="text-end">Total:</th>
-                  <th class="text-end fw-bold">
-                    Rp{{ number_format($belumBayar->sum('nominal'), 0, ',', '.') }}
-                  </th>
+                  <th class="text-end fw-bold">Rp{{ number_format($belumBayar->sum('nominal'), 0, ',', '.') }}</th>
                   <th></th>
                 </tr>
               </tfoot>
             </table>
           </div>
         </div>
-
       </div>
+    </div>
+  </div>
+</div>
+
+{{-- Modal Import --}}
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title" id="importModalLabel">Import Data SPJ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="file" class="form-label">Pilih file Excel (.xlsx / .xls / .csv)</label>
+            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Import Sekarang</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
