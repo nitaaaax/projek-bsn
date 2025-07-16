@@ -14,7 +14,7 @@ class Tahap2 extends Model
         'pembina_2',
         'sinergi',
         'nama_kontak_person',
-        'No_Hp',
+        'no_hp',
         'bulan_pertama_pembinaan',
     ];
 

@@ -39,6 +39,9 @@ Route::get('/spj/{id}/edit', [SpjController::class, 'edit'])->name('spj.edit');
 Route::put('/spj/{id}', [SpjController::class, 'update'])->name('spj.update');
 Route::delete('/spj/{id}', [SpjController::class, 'destroy'])->name('spj.destroy');
 Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
-Route::get('/exportspj', [SpjController::class, 'spjexport'])->name('spj.export');
-Route::post('/importspj', [SpjController::class, 'spjimportexcel'])->name('spj.import');
+Route::get('projek-bsn/spj/export-word', [SpjController::class, 'exportWord'])->name('spj.exportWord');
+Route::post('/spj/import-word', [SpjController::class, 'importWord'])->name('spj.importWord');
+
+
+Route::get('/umkm-proses/export-word', [UMKMProsesController::class, 'exportWord'])->name('umkm.proses.exportWord');
 

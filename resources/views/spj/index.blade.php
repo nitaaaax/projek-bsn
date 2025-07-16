@@ -13,11 +13,11 @@
             <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
-            <a href="{{ route('spj.export') }}" class="btn btn-success btn-sm">
-              <i class="fa fa-file-export"></i> Export
+            <a href="{{ route('spj.exportWord') }}" class="btn btn-info btn-sm">
+              <i class="fa fa-file-word"></i> Export Word
             </a>
-            <button type="button" class="btn btn-warning btn-sm text-white" data-bs-toggle="modal" data-bs-target="#importModal">
-              <i class="fa fa-file-import"></i> Import
+            <button type="button" class="btn btn-warning btn-sm text-white" data-bs-toggle="modal" data-bs-target="#importWordModal">
+              <i class="fa fa-file-import"></i> Import Word
             </button>
           </div>
         </div>
@@ -60,10 +60,13 @@
                   </td>
                   <td>
                     <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
-                    <form action="{{ route('spj.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
-                      @csrf @method('DELETE')
-                      <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">Hapus</button>
-                    </form>
+                   <a class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id }})">
+                    <i class="fa fa-trash"></i> Hapus
+                  </a>
+                  <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}" method="POST" style="display: none;">
+                    @csrf
+                    @method('DELETE')
+                  </form>
                   </td>
                 </tr>
                 @empty
@@ -157,24 +160,25 @@
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-{{-- Modal Import --}}
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+{{-- Modal Import Word --}}
+<div class="modal fade" id="importWordModal" tabindex="-1" aria-labelledby="importWordModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('spj.importWord') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-header">
-          <h5 class="modal-title" id="importModalLabel">Import Data SPJ</h5>
+          <h5 class="modal-title" id="importWordModalLabel">Import SPJ dari Word</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="file" class="form-label">Pilih file Excel (.xlsx / .xls / .csv)</label>
-            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+            <label for="file" class="form-label">Pilih file Word (.docx)</label>
+            <input type="file" name="file" class="form-control" accept=".docx" required>
           </div>
         </div>
         <div class="modal-footer">
@@ -198,11 +202,6 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
-  function confirmDelete(id) {
-    if (confirm("Yakin ingin menghapus data ini?")) {
-      document.getElementById('delete-form-' + id).submit();
-    }
-  }
 
   $(document).ready(function () {
     $('#tabelSemua').DataTable();

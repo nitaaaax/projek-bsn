@@ -1,13 +1,34 @@
 @extends('layout.app')
 
 @section('content')
-<div class="container mt-4">
+<style>
+.card {
+    background-color: #f0f4f8; /* biru abu muda */
+    border: 1px solid #dce3ea;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+.card-header {
+    background-color: #e4edf5; /* header sedikit lebih gelap */
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    border-bottom: 1px solid #dce3ea;
+    display: flex;
+    align-items: center;
+}
+.card-header i {
+    margin-right: 8px;
+    color: #6c757d;
+}
+</style>
 
+<div class="container mt-4">
     <h3 class="mb-4 text-primary">Detail UMKM - {{ $tahap->nama_pelaku }}</h3>
 
     {{-- Tahap 1 --}}
     <div class="card mb-3">
-        <div class="card-header bg-info text-white"> Data Pelaku Usaha</div>
+        <div class="card-header"><i class="fa fa-user-circle"></i> Data Pelaku Usaha</div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Nama Pelaku:</dt>
@@ -29,10 +50,10 @@
         $angkaBulan = (int) $tahap->tahap2->bulan_pertama_pembinaan;
     @endphp
     <div class="card mb-3">
-        <div class="card-header bg-success text-white"> Kontak & Pembina</div>
+        <div class="card-header"><i class="fa fa-phone"></i> Kontak & Pembina</div>
         <div class="card-body">
             <dl class="row">
-                <dt class="col-sm-4">Pembina II</dt>
+                <dt class="col-sm-4">Pembina II:</dt>
                 <dd class="col-sm-8">{{ $tahap->tahap2->pembina_2 }}</dd>
                 <dt class="col-sm-4">Sinergi:</dt>
                 <dd class="col-sm-8">{{ $tahap->tahap2->sinergi }}</dd>
@@ -50,7 +71,7 @@
     {{-- Tahap 3 --}}
     @if ($tahap->tahap3)
     <div class="card mb-3">
-        <div class="card-header bg-warning text-dark">Riwayat Pembinaan</div>
+        <div class="card-header"><i class="fa fa-history"></i> Riwayat Pembinaan</div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Tahun Dibina:</dt>
@@ -71,7 +92,7 @@
     {{-- Tahap 4 --}}
     @if ($tahap->tahap4)
     <div class="card mb-3">
-        <div class="card-header bg-danger text-white">Alamat dan Legalitas</div>
+        <div class="card-header"><i class="fa fa-map-marker-alt"></i> Alamat dan Legalitas</div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Alamat:</dt>
@@ -92,7 +113,7 @@
     {{-- Tahap 5 --}}
     @if ($tahap->tahap5)
     <div class="card mb-3">
-        <div class="card-header bg-secondary text-white"> Produk & Sertifikasi</div>
+        <div class="card-header"><i class="fa fa-box"></i> Produk & Sertifikasi</div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Jenis Usaha:</dt>
@@ -111,7 +132,7 @@
     {{-- Tahap 6 --}}
     @if ($tahap->tahap6)
     <div class="card mb-3">
-        <div class="card-header bg-dark text-white"> Produksi</div>
+        <div class="card-header"><i class="fa fa-industry"></i> Produksi</div>
         <div class="card-body">
             <dl class="row">
                 <dt class="col-sm-4">Omzet:</dt>
@@ -125,7 +146,7 @@
                 <dt class="col-sm-4">Link Dokumen:</dt>
                 <dd class="col-sm-8">
                     @if($tahap->tahap6->link_dokumen)
-                        <a href="{{ $tahap->tahap6->link_dokumen }}" target="_blank">Lihat Dokumen:</a>
+                        <a href="{{ $tahap->tahap6->link_dokumen }}" target="_blank">Lihat Dokumen</a>
                     @else
                         -
                     @endif
@@ -142,6 +163,5 @@
         </a>
         <a href="{{ route('umkm.proses.index') }}" class="btn btn-secondary">&larr; Kembali</a>
     </div>
-
 </div>
 @endsection

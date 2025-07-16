@@ -27,7 +27,7 @@
     {{-- No HP --}}
     <div class="mb-3 col-md-6">
         <label for="No_Hp" class="form-label fw-bold">No HP/Telp</label>
-        <input type="text" name="No_Hp" id="No_Hp" class="form-control"
+        <input type="text" name="No_Hp" id="no_hp" class="form-control"
             value="{{ old('No_Hp', $data->No_Hp ?? '') }}">
     </div>
 
