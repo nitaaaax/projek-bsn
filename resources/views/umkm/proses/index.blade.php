@@ -32,10 +32,10 @@
                 <td>{{ $t->status }}</td>
                 <td>
                   <a href="{{ route('umkm.show', $t->id) }}" class="btn btn-info btn-sm">Detail</a>
-                  <form action="{{ route('umkm.sertifikasi', $t->id) }}" method="POST" class="d-inline">
+                  {{-- <form action="{{ route('umkm.sertifikasi', $t->id) }}" method="POST" class="d-inline">
                     @csrf
                     <button class="btn btn-success btn-sm" onclick="return confirm('Pindahkan ke sertifikasi?')">Sertifikasi</button>
-                  </form>
+                  </form> --}}
                 </td>
               </tr>
             @endforeach

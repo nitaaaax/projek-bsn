@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('spjs', function (Blueprint $table) {
     $table->id();
     $table->string('nama_spj');
-    $table->string('no_ukd'); // <-- tambahkan baris ini
+    $table->string('no_ukd')->nullable(); // tambahkan ->nullable()
     $table->text('keterangan')->nullable();
     $table->timestamps();
 });
