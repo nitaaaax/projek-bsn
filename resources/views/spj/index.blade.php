@@ -13,15 +13,28 @@
             <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
-            <a href="{{ route('spj.exportWord') }}" class="btn btn-info btn-sm">
-              <i class="fa fa-file-word"></i> Export Word
+
+            {{-- Tombol Export ke Excel --}}
+            <a href="{{ route('spj.export') }}" class="btn btn-success btn-sm">
+              <i class="fa fa-file-excel"></i> Export Excel
             </a>
-            <button type="button" class="btn btn-warning btn-sm text-white" data-bs-toggle="modal" data-bs-target="#importWordModal">
-              <i class="fa fa-file-import"></i> Import Word
-            </button>
+
+            {{-- Tombol Import Excel (opsional, aktifkan nanti kalau sudah jadi) --}}
+            {{-- 
+            <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+              @csrf
+              <label class="btn btn-secondary btn-sm mb-0">
+                <i class="fa fa-upload"></i> Import Excel
+                <input type="file" name="file" hidden onchange="this.form.submit()">
+              </label>
+            </form>
+            --}}
           </div>
         </div>
       </div>
+
+
+
 
       {{-- Tab Navigasi --}}
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
@@ -164,32 +177,6 @@
     </div>
   </div>
 </div>
-
-{{-- Modal Import Word --}}
-<div class="modal fade" id="importWordModal" tabindex="-1" aria-labelledby="importWordModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <form action="{{ route('spj.importWord') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="modal-header">
-          <h5 class="modal-title" id="importWordModalLabel">Import SPJ dari Word</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="file" class="form-label">Pilih file Word (.docx)</label>
-            <input type="file" name="file" class="form-control" accept=".docx" required>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary">Import Sekarang</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endsection
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

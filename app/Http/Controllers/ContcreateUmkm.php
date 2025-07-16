@@ -20,30 +20,15 @@ class ContcreateUmkm extends Controller
 
     public function showTahap(int $tahap, $id = null)
     {
-        $data = null;
-
-        switch ($tahap) {
-            case 1:
-                $data = Tahap1::find($id);
-                break;
-            case 2:
-                $data = Tahap2::where('pelaku_usaha_id', $id)->first();
-                break;
-            case 3:
-                $data = Tahap3::where('pelaku_usaha_id', $id)->first();
-                break;
-            case 4:
-                $data = Tahap4::where('pelaku_usaha_id', $id)->first();
-                break;
-            case 5:
-                $data = Tahap5::where('pelaku_usaha_id', $id)->first();
-                break;
-            case 6:
-                $data = Tahap6::where('pelaku_usaha_id', $id)->first();
-                break;
-            default:
-                abort(404, 'Tahap tidak valid.');
-        }
+        $data = match ($tahap) {
+            1 => Tahap1::find($id),
+            2 => Tahap2::where('pelaku_usaha_id', $id)->first(),
+            3 => Tahap3::where('pelaku_usaha_id', $id)->first(),
+            4 => Tahap4::where('pelaku_usaha_id', $id)->first(),
+            5 => Tahap5::where('pelaku_usaha_id', $id)->first(),
+            6 => Tahap6::where('pelaku_usaha_id', $id)->first(),
+            default => abort(404, 'Tahap tidak valid.')
+        };
 
         return view('tahap.create', [
             'tahap' => $tahap,
@@ -76,10 +61,9 @@ class ContcreateUmkm extends Controller
                 'bulan_pembinaan'    => 'nullable|string',
                 'tahun_dibina'       => 'nullable|digits:4',
                 'riwayat_pembinaan'  => 'nullable|string',
-                'status_pembinaan'   => 'nullable|string',
+                'status_pembinaan'   => 'required|string',
                 'email'              => 'nullable|email',
                 'media_sosial'       => 'nullable|string|max:100',
-
             ],
             4 => [
                 'alamat'           => 'nullable|string|max:255',
@@ -119,48 +103,34 @@ class ContcreateUmkm extends Controller
 
             case 2:
                 $validated['pelaku_usaha_id'] = $id;
-                $t2 = Tahap2::updateOrCreate(
-                    ['pelaku_usaha_id' => $id],
-                    $validated
-                );
+                $t2 = Tahap2::updateOrCreate([
+                    'pelaku_usaha_id' => $id
+                ], $validated);
                 $nextId = $t2->pelaku_usaha_id;
                 break;
 
             case 3:
-                $validated = $request->validate([
-                    'status_pembinaan' => 'required|string',
-                    // tambahkan field lain kalau ada (misal 'catatan', dll)
-                ]);
-
                 $validated['pelaku_usaha_id'] = $id;
-
-                $t3 = Tahap3::updateOrCreate(
-                    ['pelaku_usaha_id' => $id],
-                    $validated
-                );
-
+                $t3 = Tahap3::updateOrCreate([
+                    'pelaku_usaha_id' => $id
+                ], $validated);
                 $nextId = $t3->pelaku_usaha_id;
                 break;
 
-
-
             case 4:
                 $validated['pelaku_usaha_id'] = $id;
-                $validated['sni'] = $request->has('sni');
-                $t4 = Tahap4::updateOrCreate(
-                    ['pelaku_usaha_id' => $id],
-                    $validated
-                );
+                $t4 = Tahap4::updateOrCreate([
+                    'pelaku_usaha_id' => $id
+                ], $validated);
                 $nextId = $t4->pelaku_usaha_id;
                 break;
 
             case 5:
                 $validated['pelaku_usaha_id'] = $id;
                 $validated['sni'] = $request->has('sni');
-                $t5 = Tahap5::updateOrCreate(
-                    ['pelaku_usaha_id' => $id],
-                    $validated
-                );
+                $t5 = Tahap5::updateOrCreate([
+                    'pelaku_usaha_id' => $id
+                ], $validated);
                 $nextId = $t5->pelaku_usaha_id;
                 break;
 
@@ -171,19 +141,16 @@ class ContcreateUmkm extends Controller
                     abort(400, 'pelaku_usaha_id wajib diisi di tahap 6!');
                 }
 
-                $t6 = Tahap6::updateOrCreate(
-                    ['pelaku_usaha_id' => $validated['pelaku_usaha_id']],
-                    $validated
-                );
-                // Ambil status pembinaan dari tahap 3
+                $t6 = Tahap6::updateOrCreate([
+                    'pelaku_usaha_id' => $validated['pelaku_usaha_id']
+                ], $validated);
+
                 $pelakuUsahaId = $validated['pelaku_usaha_id'];
                 $status = Tahap3::where('pelaku_usaha_id', $pelakuUsahaId)->value('status_pembinaan');
 
                 if ($status === '8. SPPT SNI') {
                     Tahap1::where('id', $pelakuUsahaId)->update(['status' => 'Tersertifikasi']);
                 }
-
-                $nextId = $t6->pelaku_usaha_id;
 
                 return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil disimpan!');
 

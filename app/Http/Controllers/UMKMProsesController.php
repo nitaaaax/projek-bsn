@@ -53,7 +53,7 @@ class UMKMProsesController extends Controller
     $fontCell = ['size' => 8];
     $cellCenter = ['alignment' => Jc::CENTER];
     $cellLeft = ['alignment' => Jc::START];
-    $cellRight = ['alignment' => Jc::END]; // ✅ FIX DITAMBAHIN INI
+    $cellRight = ['alignment' => Jc::END]; 
 
     // HEADER
     $table->addRow(600);
