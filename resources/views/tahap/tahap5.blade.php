@@ -40,3 +40,20 @@
             value="{{ old('lspro', $data->lspro ?? '') }}">
     </div>
 </div>
+
+<div class="mb-3">
+    <label class="form-label d-block">Tanda Daftar Merek</label>
+
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="terdaftar" value="1"
+            {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 1 ? 'checked' : '' }}>
+        <label class="form-check-label" for="terdaftar">Terdaftar di Kemenkumham</label>
+    </div>
+
+    <div class="form-check form-check-inline">
+        <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="belum_terdaftar" value="0"
+            {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 0 ? 'checked' : '' }}>
+        <label class="form-check-label" for="belum_terdaftar">Belum Terdaftar</label>
+    </div>
+</div>
+

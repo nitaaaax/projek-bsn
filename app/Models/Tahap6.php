@@ -16,6 +16,7 @@ class Tahap6 extends Model
         'jumlah_tenaga_kerja',
         'jangkauan_pemasaran',
         'link_dokumen',
+        'foto_produk_dan_tempat_produksi',
     ];
 
     public function tahap1(): BelongsTo

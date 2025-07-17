@@ -7,24 +7,7 @@
       <h3 class="mb-4 text-primary">
         <i class="fa fa-certificate"></i> Data UMKM Tersertifikasi
       </h3>
-
-      {{-- Notifikasi berhasil --}}
-      @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
-          {{ session('success') }}
-        </div>
-
-        <script>
-          setTimeout(function () {
-            let alert = document.getElementById('success-alert');
-            if (alert) {
-              alert.classList.remove('show');
-              setTimeout(() => alert.remove(), 500);
-            }
-          }, 3000);
-        </script>
-      @endif
-
+      
       {{-- Tabel --}}
       <div class="table-responsive">
         <table class="table table-hover table-bordered align-middle text-center">
@@ -51,13 +34,14 @@
                   @endif
                 </td>
                 <td>
-                  <form action="{{ route('umkm.sertifikasi.destroy', $t->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin mau hapus data ini?')">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-outline-danger btn-sm">
-                      <i class="fa fa-trash"></i> Hapus
-                    </button>
-                  </form>
+                 <form action="{{ route('umkm.sertifikasi.destroy', $t->id) }}" method="POST" class="d-inline" id="delete-form-{{ $t->id }}">
+
+                  @csrf
+                  @method('DELETE')
+                  <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $t->id }})">
+                    <i class="fa fa-trash"></i> Hapus
+                  </button>
+                </form>
                 </td>
               </tr>
             @empty
@@ -73,3 +57,24 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  function confirmDelete(id) {
+  Swal.fire({
+    title: 'Yakin ingin menghapus?',
+    text: "Data yang dihapus tidak bisa dikembalikan!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Ya, hapus!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      document.getElementById('delete-form-' + id).submit();
+    }
+  });
+}
+</script>
+@endpush 

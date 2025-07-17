@@ -81,6 +81,7 @@
 <script src="{{ asset('asset/plugins/summernote/summernote-bs4.min.js') }}"></script>
 
 <!-- DataTables -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('asset/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>

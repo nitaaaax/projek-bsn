@@ -29,3 +29,19 @@
     <input type="url" name="link_dokumen" id="link_dokumen" class="form-control"
         value="{{ old('link_dokumen', $data->link_dokumen ?? '') }}">
 </div>
+
+<div class="mb-3">
+    <label for="foto_produk" class="form-label">Foto Produk </label>
+    <input type="file" name="foto_produk_dan_tempat_produksi" class="form-control">
+    @if(isset($data->foto_produk_dan_tempat_produksi))
+        <p class="mt-2">File saat ini: <a href="{{ asset('storage/'.$data->foto_produk_dan_tempat_produksi) }}" target="_blank">Lihat</a></p>
+    @endif
+</div>
+
+<div class="mb-3">
+    <label for="foto_tempat_produksi" class="form-label">dan Tempat Produksi</label>
+    <input type="file" name="foto_produk_dan_tempat_produksi" class="form-control">
+    @if(isset($data->foto_produk_dan_tempat_produksi))
+        <p class="mt-2">File saat ini: <a href="{{ asset('storage/'.$data->foto_produk_dan_tempat_produksi) }}" target="_blank">Lihat</a></p>
+    @endif
+</div>

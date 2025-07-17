@@ -17,10 +17,10 @@ class SpjController extends Controller
         $spj = Spj::with('details')->get();
 
         // Ambil semua detail yang sudah/ belum dibayar
-        $sudahBayar = \App\Models\SpjDetail::with('spj')
+        $sudahBayar = SpjDetail::with('spj')
                         ->where('status_pembayaran', 'sudah_dibayar')->get();
 
-        $belumBayar = \App\Models\SpjDetail::with('spj')
+        $belumBayar = SpjDetail::with('spj')
                         ->where('status_pembayaran', 'belum_dibayar')->get();
 
         return view('spj.index', compact('spj', 'sudahBayar', 'belumBayar'));
