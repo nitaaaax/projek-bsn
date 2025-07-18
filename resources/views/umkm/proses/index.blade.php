@@ -8,13 +8,17 @@
       {{-- Judul dan Tombol Aksi --}}
       <div class="row mb-4 align-items-center">
         <div class="col-md-6">
-          <h2 class="fw-bold">Data UMKM</h2>
-          <div class="d-flex gap-2 mt-2">
+          <h2 class="fw-bold mb-3">Data UMKM</h2>
+          <div class="d-flex gap-2">
             <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary btn-sm">
-              <i class="fa fa-plus"></i> Tambah UMKM
+              <i class="fa fa-plus me-1"></i> Tambah UMKM
             </a>
+            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+              Import Excel
+            </button>
           </div>
         </div>
+      </div>
       </div>
       {{-- Tabel --}}
       <div class="table-responsive">
@@ -45,9 +49,6 @@
                        <a href="{{ route('umkm.proses.export.word',  $t->id) }}" class="btn btn-success btn-sm">
                       Export Word
                     </a>
-                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
-                      Import Excel
-                    </button>
                 </td>
               </tr>
                     {{-- Modal Import --}}
@@ -58,7 +59,7 @@
               @csrf
               <div class="modal-header">
                 <h5 class="modal-title" id="importModalLabel">Import Data UMKM</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup">x</button>
               </div>
               <div class="modal-body">
                 <div class="mb-3">

@@ -41,119 +41,149 @@
             ]);
         }
 
-public function store(Request $request, $step)
-{
-    $id = $request->input('id');
+        public function store(Request $request, int $tahap, $id = null)
+        {
+            $isEdit = $id !== null;
 
-    $rules = [
-        1 => [
-            'nama_pelaku'       => 'required|string|max:255',
-            'produk'            => 'required|string|max:255',
-            'klasifikasi'       => 'required|string|max:255',
-            'status'            => 'required|string|max:255',
-            'pembina_1'         => 'required|string|max:255',
-        ],
-        2 => [
-            'pelaku_usaha_id'   => 'nullable|exists:pelaku_usaha,id',
-            'pembina_2'         => 'required|string|max:255',
-            'sinergi'           => 'required|string|max:255',
-            'nama_kontak_person'=> 'required|string|max:255',
-            'No_Hp'             => 'required|string|max:255',
-            'bulan__pertama_pembinaan' => 'required|string|max:255',
-        ],
-        3 => [
-            'pelaku_usaha_id'   => 'nullable|exists:pelaku_usaha,id',
-            'status_pembinaan'  => 'required|string|max:255',
-            'pendamping'        => 'required|string|max:255',
-            'sektor'            => 'required|string|max:255',
-            'jenis_produk'      => 'required|string|max:255',
-        ],
-        4 => [
-            'pelaku_usaha_id'   => 'nullable|exists:pelaku_usaha,id',
-            'jalan'             => 'required|string|max:255',
-            'kelurahan'         => 'required|string|max:255',
-            'kecamatan'         => 'required|string|max:255',
-            'kab_kota'          => 'required|string|max:255',
-            'provinsi'          => 'required|string|max:255',
-        ],
-        5 => [
-            'pelaku_usaha_id'   => 'nullable|exists:pelaku_usaha,id',
-            'bentuk_usaha'      => 'required|string|max:255',
-            'legalitas_usaha'   => 'required|string|max:255',
-            'nib'               => 'required|string|max:255',
-            'no_pirt'           => 'nullable|string|max:255',
-            'tanda_daftar_merk' => 'required|boolean',
-        ],
-        6 => [
-            'pelaku_usaha_id'        => 'nullable|exists:pelaku_usaha,id',
-            'omzet'                  => 'required|numeric',
-            'volume_per_tahun'       => 'required|string|max:100',
-            'jumlah_tenaga_kerja'    => 'required|integer',
-            'jangkauan_pemasaran'    => 'required|string|max:100',
-            'link_dokumen'           => 'required|string|max:255',
-            'foto_produk'            => 'nullable|image|max:2048',
-            'foto_tempat_produksi'   => 'nullable|image|max:2048',
-        ],
-    ];
+            $rules = [
+                1 => [
+                    'nama_pelaku' => 'nullable|string|max:100',
+                    'produk'      => 'nullable|string|max:100',
+                    'klasifikasi' => 'nullable|string|max:100',
+                    'status'      => 'nullable|string|max:50',
+                    'pembina_1'   => 'nullable|string|max:100',
+                ],
+                2 => [
+                    'pembina_2'               => 'nullable|string|max:100',
+                    'sinergi'                 => 'nullable|string|max:100',
+                    'nama_kontak_person'     => 'required|string|max:100',
+                    'No_Hp'                   => 'required|string|max:25',
+                    'bulan_pertama_pembinaan'=> 'nullable|string|max:50',
+                ],
+                3 => [
+                    'status_pembinaan'   => 'required|string',
+                    'tahun_dibina'       => 'nullable|digits:4',
+                    'riwayat_pembinaan'  => 'nullable|string',
+                    'email'              => 'nullable|email',
+                    'media_sosial'       => 'nullable|string|max:100',
+                ],
+                4 => [
+                    'alamat'           => 'nullable|string|max:255',
+                    'provinsi'         => 'nullable|string|max:100',
+                    'kota'             => 'nullable|string|max:100',
+                    'legalitas_usaha'  => 'nullable|string|max:100',
+                    'tahun_pendirian'  => 'nullable|digits:4',
+                ],
+                5 => [
+                    'jenis_usaha'         => 'nullable|string|max:100',
+                    'nama_merek'          => 'nullable|string|max:100',
+                    'sni'                 => 'nullable|boolean',
+                    'lspro'               => 'nullable|string|max:100',
+                    'tanda_daftar_merk'   => 'nullable|boolean',
+                ],
+                6 => [
+                    'omzet'                  => 'required|numeric',
+                    'volume_per_tahun'       => 'required|string|max:100',
+                    'jumlah_tenaga_kerja'    => 'required|integer',
+                    'jangkauan_pemasaran'    => 'required|string|max:100',
+                    'link_dokumen'           => 'required|string|max:255',
+                    'foto_produk'            => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                    'foto_tempat_produksi'   => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+                ],
+            ];
 
-    $validated = $request->validate($rules[$step]);
+            $customMessages = [
+                'foto_produk.image' => 'Kolom foto produk harus berupa gambar.',
+                'foto_produk.mimes' => 'Foto produk harus berformat jpg, jpeg, atau png.',
+                'foto_tempat_produksi.image' => 'Kolom foto tempat produksi harus berupa gambar.',
+                'foto_tempat_produksi.mimes' => 'Foto tempat produksi harus berformat jpg, jpeg, atau png.',
+            ];
 
-    switch ($step) {
-        case 1:
-            $tahap1 = Tahap1::create($validated);
-            return redirect()->route('umkm.create', ['step' => 2, 'id' => $tahap1->id]);
+            $validated = $request->validate($rules[$tahap] ?? [], $customMessages);
+            $nextId = $id;
 
-        case 2:
-            $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
-            Tahap2::updateOrCreate(['pelaku_usaha_id' => $validated['pelaku_usaha_id']], $validated);
-            return redirect()->route('umkm.create', ['step' => 3, 'id' => $validated['pelaku_usaha_id']]);
+            switch ($tahap) {
+                case 1:
+                    if ($isEdit) {
+                        $t1 = Tahap1::findOrFail($id);
+                        $t1->update($validated);
+                    } else {
+                        $t1 = Tahap1::create($validated);
+                    }
+                    $nextId = $t1->id;
+                    break;
 
-        case 3:
-            $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
-            Tahap3::updateOrCreate(['pelaku_usaha_id' => $validated['pelaku_usaha_id']], $validated);
-            return redirect()->route('umkm.create', ['step' => 4, 'id' => $validated['pelaku_usaha_id']]);
+                case 2:
+                    $validated['pelaku_usaha_id'] = $id;
+                    $t2 = Tahap2::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
+                    $nextId = $t2->pelaku_usaha_id;
+                    break;
 
-        case 4:
-            $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
-            Tahap4::updateOrCreate(['pelaku_usaha_id' => $validated['pelaku_usaha_id']], $validated);
-            return redirect()->route('umkm.create', ['step' => 5, 'id' => $validated['pelaku_usaha_id']]);
+                case 3:
+                    $validated['pelaku_usaha_id'] = $id;
+                    $t3 = Tahap3::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
+                    $nextId = $t3->pelaku_usaha_id;
+                    break;
 
-        case 5:
-            $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
-            $validated['tanda_daftar_merk'] = (bool) $request->input('tanda_daftar_merk');
-            Tahap5::updateOrCreate(['pelaku_usaha_id' => $validated['pelaku_usaha_id']], $validated);
-            return redirect()->route('umkm.create', ['step' => 6, 'id' => $validated['pelaku_usaha_id']]);
+                case 4:
+                    $validated['pelaku_usaha_id'] = $id;
+                    $t4 = Tahap4::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
+                    $nextId = $t4->pelaku_usaha_id;
+                    break;
 
-        case 6:
-            $validated['pelaku_usaha_id'] = $id ?? $request->input('pelaku_usaha_id');
-            if (!$validated['pelaku_usaha_id']) {
-                abort(400, 'pelaku_usaha_id wajib diisi di tahap 6!');
+                case 5:
+                    $validated['pelaku_usaha_id'] = $id;
+                    $validated['sni'] = $request->has('sni');
+                    $validated['tanda_daftar_merk'] = $request->has('tanda_daftar_merk');
+                    $t5 = Tahap5::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
+                    $nextId = $t5->pelaku_usaha_id;
+                    break;
+
+                case 6:
+                    $validated['pelaku_usaha_id'] = $id;
+
+                    $old = Tahap6::where('pelaku_usaha_id', $id)->first();
+
+                    // Foto produk
+                    if ($request->hasFile('foto_produk')) {
+                        if ($old && $old->foto_produk) {
+                            Storage::disk('public')->delete($old->foto_produk);
+                        }
+                        $file = $request->file('foto_produk');
+                        $filename = time() . '_produk.' . $file->getClientOriginalExtension();
+                        $path = $file->storeAs('uploads/foto_produk', $filename, 'public');
+                        $validated['foto_produk'] = $path;
+                    }
+
+                    // Foto tempat produksi
+                    if ($request->hasFile('foto_tempat_produksi')) {
+                        if ($old && $old->foto_tempat_produksi) {
+                            Storage::disk('public')->delete($old->foto_tempat_produksi);
+                        }
+                        $file = $request->file('foto_tempat_produksi');
+                        $filename = time() . '_tempat.' . $file->getClientOriginalExtension();
+                        $path = $file->storeAs('uploads/foto_tempat_produksi', $filename, 'public');
+                        $validated['foto_tempat_produksi'] = $path;
+                    }
+
+                    Tahap6::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
+
+                            if ($tahap < 6) {
+                return redirect()->route('tahap.create.tahap', ['tahap' => $tahap + 1, 'id' => $id])
+                                ->with('success', 'Data berhasil disimpan!');
+            } else {
+                return redirect()->route('umkm.proses.index')
+                                ->with('success', 'Data UMKM berhasil ditambahkan!');
             }
 
-            // Upload foto produk
-            if ($request->hasFile('foto_produk')) {
-                $validated['foto_produk'] = $request->file('foto_produk')->store('uploads/foto_produk', 'public');
             }
 
-            // Upload foto tempat produksi
-            if ($request->hasFile('foto_tempat_produksi')) {
-                $validated['foto_tempat_produksi'] = $request->file('foto_tempat_produksi')->store('uploads/foto_tempat_produksi', 'public');
-            }
+            return redirect()->route('tahap.create.tahap', [
+                'tahap' => $tahap + 1,
+                'id'    => $nextId,
+            ]);
+        }
 
-            // Simpan ke DB
-            Tahap6::updateOrCreate(
-                ['pelaku_usaha_id' => $validated['pelaku_usaha_id']],
-                $validated
-            );
 
-            // Update status UMKM jika sudah SPPT SNI
-            $status = Tahap3::where('pelaku_usaha_id', $validated['pelaku_usaha_id'])->value('status_pembinaan');
-            if ($status === '8. SPPT SNI') {
-                Tahap1::where('id', $validated['pelaku_usaha_id'])->update(['status' => 'Tersertifikasi']);
-            }
-
-            return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil disimpan!');
-    }
-}
 
     }

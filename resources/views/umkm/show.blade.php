@@ -130,6 +130,22 @@
                         -
                     @endif
                 </dd>
+              <dt>Foto Produk</dt>
+            <dd>
+                @if (!empty($tahap->tahap6->foto_produk) && file_exists(public_path('storage/' . $tahap->tahap6->foto_produk)))
+                    <img src="{{ asset('storage/' . $tahap->tahap6->foto_produk) }}" alt="Foto Produk" class="img-thumbnail" width="200">
+                @else
+                    <img src="{{ asset('storage/uploads/foto_produk/image.png') }}" alt="Default Produk" class="img-thumbnail" width="130">
+                @endif
+            </dd>
+            <dt>Foto Tempat Produksi</dt>
+            <dd>
+                @if (!empty($data->foto_tempat_produksi) && file_exists(public_path('storage/' . $data->foto_tempat_produksi)))
+                    <img src="{{ asset('storage/' . $data->foto_tempat_produksi) }}" alt="Tempat Produksi" class="img-thumbnail" width="200">
+                @else
+                    <img src="{{ asset('storage/tempat_produksi/image.png') }}" alt="Default Tempat" class="img-thumbnail" width="130">
+                @endif
+            </dd>
             </dl>
         </div>
     </div>
