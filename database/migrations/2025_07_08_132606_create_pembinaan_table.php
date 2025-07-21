@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembinaan', function (Blueprint $table) {
+        Schema::create('kontak', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pelaku_usaha_id')->constrained('pelaku_usaha')->onDelete('cascade');
             $table->string('pembina_2')->nullable();
             $table->string('sinergi')->nullable();
             $table->string('nama_kontak_person');
-            $table->string('No_Hp');
+            $table->string('no_hp');
             $table->string('bulan_pertama_pembinaan')->nullable(); 
             $table->timestamps();
         });

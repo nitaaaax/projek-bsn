@@ -32,6 +32,8 @@ Route::prefix('umkm')->name('tahap.')->controller(ContcreateUmkm::class)->group(
 });
 
 /* ---------- SPJ ---------- */
+Route::get('/spj/export', [SpjController::class, 'export'])->name('spj.export');
+Route::post('/spj/import', [\App\Http\Controllers\SpjController::class, 'import'])->name('spj.import');
 Route::get('/spj', [SpjController::class, 'index'])->name('spj.index');
 Route::get('/spj/create', [SpjController::class, 'create'])->name('spj.create');
 Route::post('/spj', [SpjController::class, 'store'])->name('spj.store');
@@ -39,9 +41,9 @@ Route::get('/spj/{id}/edit', [SpjController::class, 'edit'])->name('spj.edit');
 Route::put('/spj/{id}', [SpjController::class, 'update'])->name('spj.update');
 Route::delete('/spj/{id}', [SpjController::class, 'destroy'])->name('spj.destroy');
 Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
-Route::get('/spj/export', [SpjController::class, 'exportExcel'])->name('spj.export');
-
 
 Route::get('/umkm-proses/export-word', [UMKMProsesController::class, 'exportWord'])->name('umkm.proses.exportWord');
 Route::put('/umkm/{id}', [UmkmProsesController::class, 'update'])->name('umkm.update');
 
+
+Route::resource('sertifikasi', UMKMSertifikasiController::class);

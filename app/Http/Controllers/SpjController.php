@@ -7,7 +7,7 @@ use App\Models\SpjDetail;
 use Illuminate\Http\Request;
 use App\Exports\SpjExport;
 use Maatwebsite\Excel\Facades\Excel;
-
+use App\Imports\SpjImport;
 
 class SpjController extends Controller
 {
@@ -26,9 +26,20 @@ class SpjController extends Controller
         return view('spj.index', compact('spj', 'sudahBayar', 'belumBayar'));
     }
 
-    public function exportExcel()
+    public function export()
     {
         return Excel::download(new SpjExport, 'spj_cair.xlsx');
+    }
+
+        public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xls,xlsx'
+        ]);
+
+        Excel::import(new SpjImport, $request->file('file'));
+
+        return redirect()->back()->with('success', 'Import berhasil!');
     }
 
     // Form tambah SPJ

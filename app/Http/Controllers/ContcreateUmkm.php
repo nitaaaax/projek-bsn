@@ -54,7 +54,7 @@ class ContcreateUmkm extends Controller
                 'pembina_2'               => 'nullable|string|max:100',
                 'sinergi'                 => 'nullable|string|max:100',
                 'nama_kontak_person'     => 'required|string|max:100',
-                'No_Hp'                   => 'required|string|max:25',
+                'no_hp' => 'required|string|max:25',
                 'bulan_pertama_pembinaan'=> 'nullable|string|max:50',
             ],
             3 => [

@@ -13,28 +13,15 @@
             <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
-
-            {{-- Tombol Export ke Excel --}}
-            <a href="{{ route('spj.export') }}" class="btn btn-success btn-sm">
-              <i class="fa fa-file-excel"></i> Export Excel
+            <a href="{{ route('spj.export') }}" class="btn btn-success">
+                <i class="fa fa-file-excel"></i> Export 
             </a>
-
-            {{-- Tombol Import Excel (opsional, aktifkan nanti kalau sudah jadi) --}}
-            {{-- 
-            <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
-              @csrf
-              <label class="btn btn-secondary btn-sm mb-0">
-                <i class="fa fa-upload"></i> Import Excel
-                <input type="file" name="file" hidden onchange="this.form.submit()">
-              </label>
-            </form>
-            --}}
+            <a href="{{ route('spj.import') }}" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="fa fa-upload"></i> Import 
+            </a>
           </div>
         </div>
       </div>
-
-
-
 
       {{-- Tab Navigasi --}}
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
@@ -177,6 +164,45 @@
     </div>
   </div>
 </div>
+
+<!-- Modal Import -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Import SPJ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="file" class="form-label">Pilih File Excel</label>
+            <input type="file" name="file" class="form-control" required>
+          </div>
+
+        <div class="alert alert-warning mt-2 d-flex align-items-start" style="font-size: 14px;">
+          <i class="bi bi-exclamation-triangle-fill me-2 mt-1 text-warning fs-5"></i>
+          <div>
+            <strong>Penting!</strong><br>
+            Gunakan template berikut untuk mengisi data SPJ agar formatnya sesuai.<br>
+            <a href="{{ asset('template/template_spj.xlsx') }}" class="text-decoration-underline text-primary" download>
+              Klik di sini untuk download template.
+            </a>
+          </div>
+        </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Import</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+@endsection
 
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

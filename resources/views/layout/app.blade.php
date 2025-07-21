@@ -40,6 +40,9 @@
   <!-- Toastr -->
   <link rel="stylesheet" href="{{ asset('asset/plugins/toastr/toastr.min.css') }}">
 
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
   {{-- Tambahan style dari view --}}
   @stack('styles')
 </head>

@@ -25,10 +25,10 @@
 </style>
 
 <div class="container mt-4">
-    <h3 class="mb-4 text-primary">Detail UMKM - {{ $tahap->nama_pelaku }}</h3>
+    <h3 class="mb-4 text-primary">Edit UMKM - {{ $tahap->nama_pelaku }}</h3>
     
 
-    <form action="{{ route('umkm.update', $tahap->id) }}" method="POST">
+<form action="{{ route('sertifikasi.update', $tahap->id) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -203,7 +203,7 @@
             <button type="submit" class="btn btn-primary">
                 <i class="fa fa-save"></i> Simpan Data
             </button>
-            <a href="{{ route('umkm.proses.index') }}" class="btn btn-secondary">&larr; Kembali</a>
+            <a href="{{ route('umkm.sertifikasi.index') }}" class="btn btn-secondary">&larr; Kembali</a>
         </div>
     </form>
 </div>

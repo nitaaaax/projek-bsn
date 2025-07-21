@@ -2,26 +2,27 @@
 
 @section('content')
 <div class="container mt-4">
-  <div class="card shadow-sm">
+  <div class="card border-0 shadow rounded-4">
     <div class="card-body">
       
       {{-- Judul --}}
-      <h3 class="mb-3">Data UMKM Proses</h3>
+      <h3 class="mb-4 text-primary fw-bold"><i class="fa fa-database me-2"></i>Data UMKM Proses</h3>
 
-      {{-- Tombol Aksi di Bawah Judul --}}
+      {{-- Tombol Aksi --}}
       <div class="mb-4">
-        <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary me-2">
-          <i class="fa fa-plus me-1"></i> Tambah UMKM
-        </a>
-        <a href="{{ route('umkm.proses.exportWord') }}" class="btn btn-success">
-          <i class="fa fa-download me-1"></i> Export
-        </a>
-      </div>
+  <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary mr-2">
+    <i class="fa fa-plus mr-1"></i> Tambah UMKM
+  </a>
+  <a href="{{ route('umkm.proses.exportWord') }}" class="btn btn-success">
+    <i class="fa fa-download mr-1"></i> Export
+  </a>
+</div>
 
-      {{-- Tabel Data --}}
-      <div class="table-responsive mt-3">
-        <table class="table table-bordered table-striped align-middle text-center">
-          <thead class="table-light">
+
+      {{-- Tabel --}}
+      <div class="table-responsive">
+        <table class="table table-hover table-bordered text-center align-middle">
+          <thead class="table-primary">
             <tr>
               <th>No</th>
               <th>Nama Pelaku</th>
@@ -31,23 +32,39 @@
             </tr>
           </thead>
           <tbody>
-            @foreach ($data as $item)
+            @forelse ($data as $item)
               <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $item->nama_pelaku }}</td>
+                <td class="text-start">{{ $item->nama_pelaku }}</td>
                 <td>{{ $item->produk }}</td>
-                <td>{{ $item->status }}</td>
                 <td>
-                  <a href="{{ route('umkm.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
+                  @if (strtolower($item->status) == 'sudah')
+                    <span class="badge bg-success">Sudah</span>
+                  @elseif(strtolower($item->status) == 'belum')
+                    <span class="badge bg-danger">Belum</span>
+                  @else
+                    <span class="badge bg-secondary">{{ $item->status }}</span>
+                  @endif
+                </td>
+                <td>
+                  <a href="{{ route('umkm.show', $item->id) }}" class="btn btn-info btn-sm">
+                    <i class="fa fa-eye"></i>
+                  </a>
 
                   <form action="{{ route('umkm.destroy', $item->id) }}" method="POST" class="d-inline delete-form">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm btn-delete">Hapus</button>
+                    <button type="submit" class="btn btn-danger btn-sm btn-delete">
+                      <i class="fa fa-trash"></i>
+                    </button>
                   </form>
                 </td>
               </tr>
-            @endforeach
+            @empty
+              <tr>
+                <td colspan="5" class="text-muted">Belum ada data.</td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
@@ -56,33 +73,3 @@
   </div>
 </div>
 @endsection
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const deleteForms = document.querySelectorAll(".delete-form");
-
-    deleteForms.forEach(form => {
-      form.addEventListener("submit", function (e) {
-        e.preventDefault(); // Cegah submit langsung
-
-        Swal.fire({
-          title: 'Yakin ingin menghapus?',
-          text: "Data tidak bisa dikembalikan!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Ya, hapus!',
-          cancelButtonText: 'Batal'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            form.submit(); // Submit kalau konfirmasi OK
-          }
-        });
-      });
-    });
-  });
-</script>
-@endpush

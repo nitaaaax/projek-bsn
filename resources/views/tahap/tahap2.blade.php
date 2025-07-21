@@ -26,9 +26,9 @@
 
     {{-- No HP --}}
     <div class="mb-3 col-md-6">
-        <label for="No_Hp" class="form-label fw-bold">No HP/Telp</label>
-        <input type="text" name="No_Hp" id="no_hp" class="form-control"
-            value="{{ old('No_Hp', $data->No_Hp ?? '') }}">
+        <label for="no_hp" class="form-label fw-bold">No HP/Telp</label>
+        <input type="text" name="no_hp" id="no_hp" class="form-control"
+            value="{{ old('no_hp', $data->no_hp ?? '') }}">
     </div>
 
     {{-- Bulan Pertama Pembinaan --}}
@@ -43,7 +43,7 @@
                 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
                 ] 
                 as $num => $nama)
-                <option value="{{ $num }}" {{ old('bulan__pertama_pembinaan', $data->bulan__pertama_pembinaan ?? '') == $num ? 'selected' : '' }}>
+                <option value="{{ $num }}" {{ old('bulan_pertama_pembinaan', $data->bulan_pertama_pembinaan ?? '') == $num ? 'selected' : '' }}>
                     {{ $nama }}
                 </option>
             @endforeach

@@ -148,4 +148,98 @@ class UMKMProsesController extends Controller
 
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
     }
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nama_pelaku' => 'required|string|max:255',
+        'produk' => 'required|string|max:255',
+        'klasifikasi' => 'required|string|max:255',
+        'status' => 'required|string|max:100',
+        'pembina_1' => 'nullable|string|max:255',
+        'pembina_2' => 'nullable|string|max:255',
+        'sinergi' => 'nullable|string|max:255',
+        'nama_kontak_person' => 'required|string|max:255',
+        'no_hp' => 'required|string|max:20',
+        'bulan_pertama_pembinaan' => 'required|integer|min:1|max:12',
+    ]);
+
+    $umkm = Tahap1::with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])->findOrFail($id);
+
+    // Update Tahap1
+    $umkm->update([
+        'nama_pelaku' => $request->nama_pelaku,
+        'produk' => $request->produk,
+        'klasifikasi' => $request->klasifikasi,
+        'status' => $request->status,
+        'pembina_1' => $request->pembina_1,
+    ]);
+
+    // Update Tahap2
+    if ($umkm->tahap2) {
+        $umkm->tahap2->update([
+            'pembina_2' => $request->pembina_2,
+            'sinergi' => $request->sinergi,
+            'nama_kontak_person' => $request->nama_kontak_person,
+            'no_hp' => $request->no_hp,
+            'bulan_pertama_pembinaan' => $request->bulan_pertama_pembinaan,
+        ]);
+    }
+
+    // Update Tahap3
+    if ($umkm->tahap3) {
+        $umkm->tahap3->update([
+            'tahun_dibina' => $request->tahun_dibina,
+            'riwayat_pembinaan' => $request->riwayat_pembinaan,
+            'status_pembinaan' => $request->status_pembinaan,
+            'email' => $request->email,
+            'media_sosial' => $request->media_sosial,
+        ]);
+    }
+
+    // Update Tahap4
+    if ($umkm->tahap4) {
+        $umkm->tahap4->update([
+            'alamat' => $request->alamat,
+            'provinsi' => $request->provinsi,
+            'kota' => $request->kota,
+            'legalitas_usaha' => $request->legalitas_usaha,
+            'tahun_pendirian' => $request->tahun_pendirian,
+        ]);
+    }
+
+    // Update Tahap5
+    if ($umkm->tahap5) {
+        $umkm->tahap5->update([
+            'jenis_usaha' => $request->jenis_usaha,
+            'nama_merek' => $request->nama_merek,
+            'sni' => $request->sni,
+            'lspro' => $request->lspro,
+        ]);
+    }
+
+    // Update Tahap6
+    if ($umkm->tahap6) {
+        $umkm->tahap6->update([
+            'omzet' => $request->omzet,
+            'volume_per_tahun' => $request->volume_per_tahun,
+            'jumlah_tenaga_kerja' => $request->jumlah_tenaga_kerja,
+            'jangkauan_pemasaran' => $request->jangkauan_pemasaran,
+            'link_dokumen' => $request->link_dokumen,
+        ]);
+    }
+
+    // Pindahkan ke Sertifikasi jika status pembinaan = SPPT SNI
+    if ($request->status_pembinaan == 'SPPT SNI') {
+        $umkm->status = 'Tersertifikasi';
+        $umkm->save();
+
+        return redirect()->route('umkm.sertifikasi.index')
+            ->with('success', 'UMKM berhasil dipindahkan ke Sertifikasi.');
+    }
+
+    return redirect()->back()->with('success', 'Data berhasil diupdate');
+}
+
+
+
 }
