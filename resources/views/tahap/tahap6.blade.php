@@ -33,24 +33,60 @@
             value="{{ old('link_dokumen', $data->link_dokumen ?? '') }}">
     </div>
 
-    <div class="mb-3">
-    <label for="foto_produk" class="form-label">Foto Produk</label>
-    <input type="file" name="foto_produk" class="form-control">
-    @if ($data->foto_produk)
-        <img src="{{ asset('storage/' . $data->foto_produk) }}" alt="Foto Produk" width="150">
-    @else
-        <img src="{{ asset('storage/uploads/foto_produk/default.jpg') }}" alt="Default Foto" width="150">
-    @endif
+   <div class="mb-3">
+    <label class="form-label">Foto Produk</label>
+    <input type="file" name="gambar_produk[]" class="form-control mb-2" accept="image/*" multiple onchange="previewMultipleImages(this, 'preview_produk_container')">
+    <div id="preview_produk_container" class="d-flex flex-wrap gap-2 mt-2"></div>
     </div>
 
     <div class="mb-3">
-        <label for="foto_tempat_produksi" class="form-label">Foto Tempat Produksi</label>
-        <input type="file" name="foto_tempat_produksi" class="form-control">
-       @if ($data->foto_tempat_produksi)
-            <img src="{{ asset('storage/' . $data->foto_tempat_produksi) }}" alt="Foto Tempat Produksi" width="150">
-        @else
-            <img src="{{ asset('storage/uploads/foto_tempat_produksi/default.jpg') }}" alt="Default Tempat" width="150">
-        @endif
+        <label class="form-label">Foto Tempat Produksi</label>
+        <input type="file" name="gambar_tempat_produksi[]" class="form-control mb-2" accept="image/*" multiple onchange="previewMultipleImages(this, 'preview_tempat_container')">
+        <div id="preview_tempat_container" class="d-flex flex-wrap gap-2 mt-2"></div>
     </div>
+
+
+@push('scripts')
+<script>
+function previewMultipleImages(input, containerId) {
+    const container = document.getElementById(containerId);
+    const files = input.files;
+
+    // Reset dulu preview-nya
+    container.innerHTML = '';
+
+    for (let i = 0; i < files.length; i++) {
+        const fileReader = new FileReader();
+
+        fileReader.onload = function(e) {
+            // Buat wrapper per gambar + tombol hapus
+            const wrapper = document.createElement('div');
+            wrapper.className = 'position-relative d-inline-block';
+            wrapper.style.width = '150px';
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'img-thumbnail';
+            img.style.width = '100%';
+
+            const btnRemove = document.createElement('button');
+            btnRemove.type = 'button';
+            btnRemove.innerText = '❌';
+            btnRemove.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
+            btnRemove.style.zIndex = '5';
+
+            btnRemove.onclick = () => wrapper.remove();
+
+            wrapper.appendChild(img);
+            wrapper.appendChild(btnRemove);
+            container.appendChild(wrapper);
+        };
+
+        fileReader.readAsDataURL(files[i]);
+    }
+}
+</script>
+@endpush
+
 
 

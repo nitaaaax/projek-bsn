@@ -55,7 +55,7 @@ class ContcreateUmkm extends Controller
                 'pembina_2' => 'nullable|string|max:100',
                 'sinergi' => 'nullable|string|max:100',
                 'nama_kontak_person' => 'required|string|max:100',
-                'No_Hp' => 'required|string|max:25',
+                'no_hp' => 'required|string|max:25',
                 'bulan_pertama_pembinaan' => 'nullable|string|max:50',
             ],
             3 => [
@@ -65,12 +65,15 @@ class ContcreateUmkm extends Controller
                 'email' => 'nullable|email',
                 'media_sosial' => 'nullable|string|max:100',
             ],
-            4 => [
-                'alamat' => 'nullable|string|max:255',
-                'provinsi' => 'nullable|string|max:100',
-                'kota' => 'nullable|string|max:100',
-                'legalitas_usaha' => 'nullable|string|max:100',
-                'tahun_pendirian' => 'nullable|digits:4',
+           4 => [
+            'alamat_kantor' => 'nullable|string|max:255',
+            'provinsi_kantor' => 'nullable|string|max:100',
+            'kota_kantor' => 'nullable|string|max:100',
+            'alamat_pabrik' => 'nullable|string|max:255',
+            'provinsi_pabrik' => 'nullable|string|max:100',
+            'kota_pabrik' => 'nullable|string|max:100',
+            'legalitas_usaha' => 'nullable|string|max:100',
+            'tahun_pendirian' => 'nullable|digits:4',
             ],
             5 => [
                 'jenis_usaha' => 'nullable|string|max:100',

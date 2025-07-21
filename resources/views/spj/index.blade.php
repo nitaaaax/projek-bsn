@@ -111,70 +111,74 @@
           </div>
         </div>
 
-        {{-- TAB SUDAH --}}
-        <div class="tab-pane fade" id="sudah" role="tabpanel">
-          <div class="table-responsive">
-            <table class="table table-bordered table-striped" id="tabelSudah">
-              <thead class="table-success text-center">
-                <tr>
-                  <th>No</th>
-                  <th>Nama SPJ</th>
-                  <th>Item</th>
-                  <th>Nominal</th>
-                  <th>Keterangan</th>
-                </tr>
-              </thead>
-              <tbody>
-                @forelse($sudahBayar as $item)
-                <tr>
-                  <td>{{ $loop->iteration }}</td>
-                  <td>{{ $item->spj->nama_spj }}</td>
-                  <td>{{ $item->item }}</td>
-                  <td class="text-end">Rp{{ number_format($item->nominal, 0, ',', '.') }}</td>
-                  <td>{{ $item->keterangan }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="5" class="text-center text-muted">Tidak ada data.</td></tr>
-                @endforelse
-              </tbody>
-              <tfoot>
-                <tr>
-                  <th colspan="3" class="text-end">Total:</th>
-                  <th class="text-end fw-bold">Rp{{ number_format($sudahBayar->sum('nominal'), 0, ',', '.') }}</th>
-                  <th></th>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
+       {{-- TAB SUDAH --}}
+<div class="tab-pane fade" id="sudah" role="tabpanel">
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle" id="tabelSudah">
+      <thead class="table-success text-center">
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>Nama SPJ</th>
+          <th>Status</th>
+          <th style="width: 100px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($sudahBayar->unique('spj_id') as $i => $item)
+          <tr>
+            <td class="text-center">{{ $i + 1 }}</td>
+            <td>{{ $item->spj->nama_spj ?? '-' }}</td>
+            <td class="text-center">
+              <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
+            </td>
+            <td class="text-center">
+              <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+                <i class="fa fa-eye"></i> Detail
+              </a>
+            </td>
+          </tr>
+        @empty
+          <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
 
         {{-- TAB BELUM --}}
-        <div class="tab-pane fade" id="belum" role="tabpanel">
-          <div class="table-responsive">
-           <table id="tabelBelum" class="table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Nama</th>
-              <th>Tanggal</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-  <tbody>
-    @foreach($belumBayar as $i => $d)
-      <tr>
-        <td>{{ $i + 1 }}</td>
-        <td>{{ $d->spj->nama ?? '-' }}</td>
-        <td>{{ $d->spj->tanggal ?? '-' }}</td>
-        <td>{{ $d->status_pembayaran }}</td>
-        <td>
-          <a href="{{ route('spj.show', $d->spj->id ?? 0) }}" class="btn btn-info btn-sm">Detail</a>
-        </td>
-      </tr>
-    @endforeach
-  </tbody>
-</table>
+     <div class="tab-pane fade" id="belum" role="tabpanel">
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle" id="tabelBelum">
+      <thead class="table-warning text-center">
+        <tr>
+          <th style="width: 60px;">No</th>
+          <th>Nama SPJ</th>
+          <th>Status</th>
+          <th style="width: 100px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse($belumBayar->unique('spj_id') as $i => $d)
+          <tr>
+            <td class="text-center">{{ $i + 1 }}</td>
+            <td>{{ $d->spj->nama_spj ?? '-' }}</td>
+            <td class="text-center">
+              <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
+            </td>
+            <td class="text-center">
+              <a href="{{ route('spj.show', $d->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+                <i class="fa fa-eye"></i> Detail
+              </a>
+            </td>
+          </tr>
+        @empty
+          <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
           </div>
         </div>
@@ -224,6 +228,16 @@
 @endsection
 
 @push('styles')
+<style>
+  table tr:hover {
+    background-color: #f5f5f5;
+  }
+  .badge {
+    font-size: 0.85rem;
+    border-radius: 10px;
+  }
+</style>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush

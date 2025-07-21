@@ -6,10 +6,13 @@
 
     {{-- Jenis Usaha --}}
     <div class="mb-3 col-md-6">
-        <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
-        <input type="text" name="jenis_usaha" id="jenis_usaha" class="form-control"
-            value="{{ old('jenis_usaha', $data->jenis_usaha ?? '') }}">
+    <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
+    <select name="jenis_usaha" id="jenis_usaha" class="form-select">
+        <option value="1" {{ old('jenis_usaha', $data->jenis_usaha ?? '') === true ? 'selected' : '' }}>Pangan</option>
+        <option value="0" {{ old('jenis_usaha', $data->jenis_usaha ?? '') === false ? 'selected' : '' }}>Non Pangan</option>
+    </select>
     </div>
+
 
     {{-- Nama Merek --}}
     <div class="mb-3 col-md-6">
@@ -40,6 +43,7 @@
             value="{{ old('lspro', $data->lspro ?? '') }}">
     </div>
 </div>
+    {{-- Tanda Daftar Merk --}}
 
 <div class="mb-3">
     <label class="form-label d-block">Tanda Daftar Merek</label>

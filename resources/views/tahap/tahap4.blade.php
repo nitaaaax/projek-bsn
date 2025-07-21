@@ -3,25 +3,42 @@
 <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id ?? $id }}">
 
 
-    {{-- Alamat --}}
-    <div class="mb-3 col-md-6">
-        <label for="alamat" class="form-label fw-bold">Alamat</label>
-        <textarea name="alamat" id="alamat" class="form-control">{{ old('alamat', $data->alamat ?? '') }}</textarea>
+    <div class="row">
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Alamat Kantor</label>
+            <input type="text" name="alamat_kantor" class="form-control"
+                value="{{ old('alamat_kantor', $data->alamat_kantor ?? '') }}">
+        </div>
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Provinsi Kantor</label>
+            <input type="text" name="provinsi_kantor" class="form-control"
+                value="{{ old('provinsi_kantor', $data->provinsi_kantor ?? '') }}">
+        </div>
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Kota/Kabupaten Kantor</label>
+            <input type="text" name="kota_kantor" class="form-control"
+                value="{{ old('kota_kab_kantor', $data->kota_kab_kantor ?? '') }}">
+        </div>
     </div>
 
-    {{-- Provinsi --}}
-    <div class="mb-3 col-md-6">
-        <label for="provinsi" class="form-label fw-bold">Provinsi</label>
-        <input type="text" name="provinsi" id="provinsi" class="form-control"
-            value="{{ old('provinsi', $data->provinsi ?? '') }}">
+    <div class="row">
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Alamat Pabrik</label>
+            <input type="text" name="alamat_pabrik" class="form-control"
+                value="{{ old('alamat_pabrik', $data->alamat_pabrik ?? '') }}">
+        </div>
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Provinsi Pabrik</label>
+            <input type="text" name="provinsi_pabrik" class="form-control"
+                value="{{ old('provinsi_pabrik', $data->provinsi_pabrik ?? '') }}">
+        </div>
+        <div class="mb-3 col-md-4">
+            <label class="form-label">Kota/Kabupaten Pabrik</label>
+            <input type="text" name="kota_pabrik" class="form-control"
+                value="{{ old('kota_kab_pabrik', $data->kota_kab_pabrik ?? '') }}">
+        </div>
     </div>
 
-    {{-- Kota --}}
-    <div class="mb-3 col-md-6">
-        <label for="kota" class="form-label fw-bold">Kota/Kabupaten</label>
-        <input type="text" name="kota" id="kota" class="form-control"
-            value="{{ old('kota', $data->kota ?? '') }}">
-    </div>
 
     {{-- Legalitas Usaha --}}
     <div class="mb-3 col-md-6">

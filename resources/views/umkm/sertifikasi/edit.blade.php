@@ -101,23 +101,25 @@
                             <dt class="col-sm-4">Riwayat Pembinaan:</dt>
                             <dd class="col-sm-8"><input type="text" name="riwayat_pembinaan" class="form-control" value="{{ $tahap->tahap3->riwayat_pembinaan }}"></dd>
                            <dt class="col-sm-4">Status Pembinaan:</dt>
-<dd class="col-sm-8">
-    <select name="status_pembinaan" class="form-control">
-        <option value="">-- Pilih Status --</option>
-        <option value="Identifikasi awal dan Gap" {{ $tahap->tahap3->status_pembinaan == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>Identifikasi awal dan Gap</option>
-        <option value="Set up Sistem" {{ $tahap->tahap3->status_pembinaan == 'Set up Sistem' ? 'selected' : '' }}>Set up Sistem</option>
-        <option value="Implementasi" {{ $tahap->tahap3->status_pembinaan == 'Implementasi' ? 'selected' : '' }}>Implementasi</option>
-        <option value="Review Sistem & Audit Internal" {{ $tahap->tahap3->status_pembinaan == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>Review Sistem & Audit Internal</option>
-        <option value="Pengajuan Sertifikasi" {{ $tahap->tahap3->status_pembinaan == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>Pengajuan Sertifikasi</option>
-        <option value="Perbaikan Temuan Audit" {{ $tahap->tahap3->status_pembinaan == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>Perbaikan Temuan Audit</option>
-        <option value="Perbaikan Lokasi" {{ $tahap->tahap3->status_pembinaan == 'Perbaikan Lokasi' ? 'selected' : '' }}>Perbaikan Lokasi</option>
-        <option value="SPPT SNI"
-            style="font-weight:bold; color:green;"
-            {{ $tahap->tahap3->status_pembinaan == 'SPPT SNI' ? 'selected' : '' }}>
-            SPPT SNI (Tersertifikasi)
-        </option>
-    </select>
-</dd>
+                            <dd class="col-sm-8">
+                                <select name="status_pembinaan" class="form-control"
+                                    {{ $tahap->tahap3->status_pembinaan == 'SPPT SNI' ? 'disabled' : '' }}>
+                                    <option value="">-- Pilih Status --</option>
+                                    <option value="Identifikasi awal dan Gap" {{ $tahap->tahap3->status_pembinaan == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>Identifikasi awal dan Gap</option>
+                                    <option value="Set up Sistem" {{ $tahap->tahap3->status_pembinaan == 'Set up Sistem' ? 'selected' : '' }}>Set up Sistem</option>
+                                    <option value="Implementasi" {{ $tahap->tahap3->status_pembinaan == 'Implementasi' ? 'selected' : '' }}>Implementasi</option>
+                                    <option value="Review Sistem & Audit Internal" {{ $tahap->tahap3->status_pembinaan == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>Review Sistem & Audit Internal</option>
+                                    <option value="Pengajuan Sertifikasi" {{ $tahap->tahap3->status_pembinaan == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>Pengajuan Sertifikasi</option>
+                                    <option value="Perbaikan Temuan Audit" {{ $tahap->tahap3->status_pembinaan == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>Perbaikan Temuan Audit</option>
+                                    <option value="Perbaikan Lokasi" {{ $tahap->tahap3->status_pembinaan == 'Perbaikan Lokasi' ? 'selected' : '' }}>Perbaikan Lokasi</option>
+                                    <option value="SPPT SNI"
+                                        style="font-weight:bold; color:green;"
+                                        {{ $tahap->tahap3->status_pembinaan == 'SPPT SNI' ? 'selected' : '' }}>
+                                        SPPT SNI (Tersertifikasi)
+                                    </option>
+                                </select>
+                            </dd>
+
 
                             <dt class="col-sm-4">Email:</dt>
                             <dd class="col-sm-8"><input type="email" name="email" class="form-control" value="{{ $tahap->tahap3->email }}"></dd>

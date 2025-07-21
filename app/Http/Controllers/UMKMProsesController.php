@@ -10,17 +10,19 @@ use PhpOffice\PhpWord\SimpleType\Jc;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\UmkmExport;
 use App\Imports\UmkmImport;
+use Illuminate\Support\Facades\Storage;
 
 class UMKMProsesController extends Controller
 {
-    public function index()
-    {
-        $data = Tahap1::where('status', '!=', 'Tersertifikasi')
-            ->with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])
-            ->get();
+  public function index()
+{
+    $tahap1 = Tahap1::where('status', '!=', 'Tersertifikasi')
+        ->with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])
+        ->get();
 
-        return view('umkm.proses.index', compact('data'));
-    }
+    return view('umkm.proses.index', compact('tahap1'));
+}
+
 
     public function sertifikasi($id)
     {
@@ -36,7 +38,7 @@ class UMKMProsesController extends Controller
         $umkm = Tahap1::findOrFail($id);
         $umkm->delete();
 
-        return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data berhasil dihapus.');
     }
 
     public function update(Request $request, $id)
@@ -52,6 +54,8 @@ class UMKMProsesController extends Controller
             'nama_kontak_person' => 'required|string|max:255',
             'no_hp' => 'required|string|max:20',
             'bulan_pertama_pembinaan' => 'required|integer|min:1|max:12',
+            'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'foto_tempat_produksi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $umkm = Tahap1::with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])->findOrFail($id);
@@ -90,7 +94,7 @@ class UMKMProsesController extends Controller
                 'provinsi' => $request->provinsi,
                 'kota' => $request->kota,
                 'legalitas_usaha' => $request->legalitas_usaha,
-                'tahun_pendairian' => $request->tahun_pendirian,
+                'tahun_pendirian' => $request->tahun_pendirian,
             ]);
         }
 
@@ -100,17 +104,41 @@ class UMKMProsesController extends Controller
                 'nama_merek' => $request->nama_merek,
                 'sni' => $request->sni,
                 'lspro' => $request->lspro,
+                'tanda_daftar_merk' => $request->tanda_daftar_merk,
             ]);
         }
 
         if ($umkm->tahap6) {
-            $umkm->tahap6->update([
+            $data = [
                 'omzet' => $request->omzet,
                 'volume_per_tahun' => $request->volume_per_tahun,
                 'jumlah_tenaga_kerja' => $request->jumlah_tenaga_kerja,
                 'jangkauan_pemasaran' => $request->jangkauan_pemasaran,
                 'link_dokumen' => $request->link_dokumen,
-            ]);
+                'gambar_produk' => $request->gambar_produk,
+                'gambar_tempat_produksi' => $request->gambar_tempat_produksi,
+                'dokumen_mutu' => $request->dokumen_mutu,
+            ];
+
+            if ($request->hasFile('foto_produk')) {
+                if ($umkm->tahap6->foto_produk) {
+                    Storage::disk('public')->delete($umkm->tahap6->foto_produk);
+                }
+                $filename = time() . '_produk.' . $request->file('foto_produk')->getClientOriginalExtension();
+                $path = $request->file('foto_produk')->storeAs('uploads/foto_produk', $filename, 'public');
+                $data['foto_produk'] = $path;
+            }
+
+            if ($request->hasFile('foto_tempat_produksi')) {
+                if ($umkm->tahap6->foto_tempat_produksi) {
+                    Storage::disk('public')->delete($umkm->tahap6->foto_tempat_produksi);
+                }
+                $filename = time() . '_tempat.' . $request->file('foto_tempat_produksi')->getClientOriginalExtension();
+                $path = $request->file('foto_tempat_produksi')->storeAs('uploads/foto_tempat_produksi', $filename, 'public');
+                $data['foto_tempat_produksi'] = $path;
+            }
+
+            $umkm->tahap6->update($data);
         }
 
         if ($request->status_pembinaan == 'SPPT SNI') {
@@ -124,11 +152,6 @@ class UMKMProsesController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diupdate');
     }
 
-    public function export()
-    {
-        return Excel::download(new UmkmExport, 'data_umkm.xlsx');
-    }
-
     public function import(Request $request)
     {
         $request->validate([
@@ -140,106 +163,99 @@ class UMKMProsesController extends Controller
         return redirect()->back()->with('success', 'Data berhasil diimpor!');
     }
 
+    public function export()
+    {
+        return Excel::download(new UmkmExport, 'data_umkm.docx');
+    }
+
     public function exportWord()
     {
+        $data = Tahap1::all();
         $phpWord = new PhpWord();
-        $phpWord->setDefaultFontName('Calibri');
-        $phpWord->setDefaultFontSize(8);
+        $section = $phpWord->addSection();
 
-        $section = $phpWord->addSection([
-            'orientation' => 'landscape',
-            'marginTop' => 400,
-            'marginBottom' => 400,
-            'marginLeft' => 300,
-            'marginRight' => 300,
-        ]);
-
-        $section->addText('Data UMKM Proses (Belum Tersertifikasi)', [
-            'bold' => true,
-            'size' => 12,
-        ], ['alignment' => Jc::CENTER]);
-
+        // Judul
+        $section->addTitle('Rekapitulasi Data UMKM', 1);
         $section->addTextBreak(1);
 
-        $headers = [
-            'No', 'Nama Pelaku Usaha', 'Produk', 'Klasifikasi', 'Status', 'Pembina I', 'Pembina II', 'Sinergi',
-            'Nama Kontak', 'No HP/Telp', 'Bulan Pertama Pembinaan', 'Tahun Dibina', 'Riwayat Pembinaan', 'Gruping',
-            'Email', 'Media Sosial', 'Alamat Usaha', 'Provinsi', 'Kabupaten', 'Legalitas Usaha', 'Tahun Pendirian',
-            'Jenis Usaha', 'Nama Merek', 'SNI', 'LSPro', 'Omzet', 'Volume Produksi', 'Tenaga Kerja',
-            'Jangkauan Pemasaran', 'Link Dokumen Mutu'
-        ];
-
-        $columnWidths = array_fill(0, count($headers), 1500);
-
-        $phpWord->addTableStyle('CustomTableStyle', [
+        // Style tabel
+        $tableStyle = [
             'borderSize' => 6,
-            'borderColor' => '888888',
-            'cellMargin' => 80,
-        ], ['bgColor' => 'D9D9D9']);
+            'borderColor' => '000000',
+            'cellMargin' => 50
+        ];
+        $firstRowStyle = ['bgColor' => 'DDDDDD'];
+        $phpWord->addTableStyle('Data UMKM', $tableStyle, $firstRowStyle);
 
-        $table = $section->addTable('CustomTableStyle');
+        foreach ($data as $item) {
+            $pembinaan = Tahap2::where('pelaku_usaha_id', $item->id)->first();
+            $alamat    = Tahap4::where('pelaku_usaha_id', $item->id)->first();
+            $usaha     = Tahap5::where('pelaku_usaha_id', $item->id)->first();
+            $produksi  = Tahap6::where('pelaku_usaha_id', $item->id)->first();
 
-        $fontHeader = ['bold' => true, 'size' => 8];
-        $fontCell = ['size' => 8];
-        $cellCenter = ['alignment' => Jc::CENTER];
-        $cellLeft = ['alignment' => Jc::START];
-        $cellRight = ['alignment' => Jc::END];
+            $section->addText('UMKM: ' . $item->nama_pelaku, ['bold' => true, 'size' => 14]);
+            $section->addTextBreak(0.5);
 
-        $table->addRow(600);
-        foreach ($headers as $i => $header) {
-            $table->addCell($columnWidths[$i], ['valign' => 'center'])->addText($header, $fontHeader, $cellCenter);
-        }
+            $table = $section->addTable('Data UMKM');
 
-        $data = Tahap1::where('status', '!=', 'Tersertifikasi')
-            ->with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])
-            ->get();
-
-        $no = 1;
-        foreach ($data as $row) {
             $table->addRow();
+            $table->addCell(4000)->addText('Field', ['bold' => true]);
+            $table->addCell(8000)->addText('Value', ['bold' => true]);
 
-            $table->addCell(null)->addText($no++, $fontCell, $cellCenter);
-            $table->addCell(null)->addText($row->nama_pelaku ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText($row->produk ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText($row->klasifikasi ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText($row->status ?? '-', $fontCell, $cellCenter);
-            $table->addCell(null)->addText($row->pembina_1 ?? '-', $fontCell, $cellLeft);
+            $table->addRow();
+            $table->addCell()->addText('Nama Pelaku / UMK');
+            $table->addCell()->addText($item->nama_pelaku);
 
-            $table->addCell(null)->addText(optional($row->tahap2)->pembina_2 ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap2)->sinergi ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap2)->nama_kontak_person ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap2)->no_hp ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap2)->bulan_pertama_pembinaan ?? '-', $fontCell, $cellLeft);
+            $table->addRow();
+            $table->addCell()->addText('Nama Produk');
+            $table->addCell()->addText($item->produk);
 
-            $table->addCell(null)->addText(optional($row->tahap3)->tahun_dibina ?? '-', $fontCell, $cellCenter);
-            $table->addCell(null)->addText(optional($row->tahap3)->riwayat ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap3)->gruping ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap3)->email ?? '-', $fontCell, $cellLeft);
+            $table->addRow();
+            $table->addCell()->addText('Jenis Usaha');
+            $table->addCell()->addText($usaha->jenis_usaha ?? '-');
 
-            $table->addCell(null)->addText(optional($row->tahap5)->sosial_media ?? '-', $fontCell, $cellLeft);
+            $table->addRow();
+            $table->addCell()->addText('Tahun Berdiri');
+            $table->addCell()->addText($alamat->tahun_pendirian ?? '-');
 
-            $table->addCell(null)->addText(optional($row->tahap4)->alamat ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap4)->provinsi ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap4)->kota ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap4)->legalitas_usaha ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap4)->tahun_pendirian ?? '-', $fontCell, $cellCenter);
+            $table->addRow();
+            $table->addCell()->addText('Legalitas Usaha');
+            $table->addCell()->addText($alamat->legalitas_usaha ?? '-');
 
-            $table->addCell(null)->addText(optional($row->tahap5)->jenis_usaha ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap5)->nama_merek ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap5)->sni ?? '-', $fontCell, $cellCenter);
-            $table->addCell(null)->addText(optional($row->tahap5)->lspro ?? '-', $fontCell, $cellCenter);
+            $table->addRow();
+            $table->addCell()->addText('Omzet');
+            $table->addCell()->addText($produksi->omzet ?? '-');
 
-            $table->addCell(null)->addText(optional($row->tahap6)->omzet ?? '-', $fontCell, $cellRight);
-            $table->addCell(null)->addText(optional($row->tahap6)->volume_per_tahun ?? '-', $fontCell, $cellRight);
-            $table->addCell(null)->addText(optional($row->tahap6)->jumlah_tenaga_kerja ?? '-', $fontCell, $cellCenter);
-            $table->addCell(null)->addText(optional($row->tahap6)->jangkauan_pemasaran ?? '-', $fontCell, $cellLeft);
-            $table->addCell(null)->addText(optional($row->tahap6)->dokumen_mutu ?? '-', $fontCell, $cellLeft);
+            $table->addRow();
+            $table->addCell()->addText('Jangkauan Pemasaran');
+            $table->addCell()->addText($produksi->jangkauan_pemasaran ?? '-');
+
+            $table->addRow();
+            $table->addCell()->addText('Kontak Person');
+            $table->addCell()->addText($pembinaan->nama_kontak_person ?? '-');
+
+            $table->addRow();
+            $table->addCell()->addText('No HP');
+            $table->addCell()->addText($pembinaan->No_Hp ?? '-');
+
+            $table->addRow();
+            $table->addCell()->addText('Email');
+            $table->addCell()->addText($item->email ?? '-');
+
+            $table->addRow();
+            $table->addCell()->addText('Lokasi Usaha');
+            $lokasi = trim(($alamat->kota ?? '') . ', ' . ($alamat->provinsi ?? ''));
+            $table->addCell()->addText($lokasi);
+
+            $section->addTextBreak(1);
         }
 
-        $filename = 'UMKM_Proses_Lengkap.docx';
-        $tempFile = tempnam(sys_get_temp_dir(), 'word');
-        IOFactory::createWriter($phpWord, 'Word2007')->save($tempFile);
+        $fileName = 'data_umkm_filtered.docx';
+        $tempFile = tempnam(sys_get_temp_dir(), 'umkm_') . '.docx';
+        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
+        $objWriter->save($tempFile);
 
-        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+        return response()->download($tempFile)->deleteFileAfterSend(true);
     }
+
 }

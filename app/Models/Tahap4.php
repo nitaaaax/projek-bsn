@@ -11,7 +11,8 @@ class Tahap4 extends Model
 
     protected $fillable = [
         'pelaku_usaha_id',
-        'alamat',
+        'alamat_kantor', 'provinsi_kantor', 'kota_kantor',
+        'alamat_pabrik', 'provinsi_pabrik', 'kota_pabrik',
         'provinsi',
         'kota',
         'legalitas_usaha',

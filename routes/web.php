@@ -1,37 +1,33 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ContdataUmkm;
-use App\Http\Controllers\ContcreateUmkm;
-use App\Http\Controllers\UMKMProsesController;
-use App\Http\Controllers\UMKMSertifikasiController;
-use App\Http\Controllers\SpjController;
-use App\Http\Controllers\UmkmExportImportController;
-
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-| Di sini kamu bisa mendaftarkan semua route web aplikasi ygy.
-*/
+use App\Http\Controllers\{
+    HomeController,
+    ContdataUmkm,
+    ContcreateUmkm,
+    UMKMProsesController,
+    UMKMSertifikasiController,
+    SpjController,
+    UmkmExportImportController
+};
 
 // ---------- Beranda ----------
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
 // ---------- Data UMKM ----------
 Route::resource('/umkm', ContdataUmkm::class)->only(['index', 'show', 'destroy']);
-
-// ---------- UMKM Proses (Belum Tersertifikasi) ----------
-Route::get('/umkm-proses', [UMKMProsesController::class, 'index'])->name('umkm.proses.index');
-
-// ---------- Sertifikasi UMKM ----------
+Route::put('/umkm/{id}', [UMKMProsesController::class, 'update'])->name('umkm.update');
 Route::post('/umkm/{id}/sertifikasi', [UMKMProsesController::class, 'sertifikasi'])->name('umkm.sertifikasi');
 
-// ---------- UMKM Sertifikasi (Sudah Tersertifikasi) ----------
+// ---------- UMKM Proses ----------
+Route::get('/umkm-proses', [UMKMProsesController::class, 'index'])->name('umkm.proses.index');
+Route::get('/umkm-proses/export-word/{id}', [UMKMProsesController::class, 'exportWordPerUMKM'])->name('umkm.proses.exportWordPerUMKM');
+
+// ---------- UMKM Sertifikasi ----------
 Route::get('/umkm-sertifikasi', [UMKMSertifikasiController::class, 'index'])->name('umkm.sertifikasi.index');
 Route::delete('/umkm-sertifikasi/{id}', [UMKMSertifikasiController::class, 'destroy'])->name('umkm.sertifikasi.destroy');
+Route::get('/sertifikasi/{id}/edit', [UMKMSertifikasiController::class, 'edit'])->name('sertifikasi.edit');
+Route::put('/sertifikasi/{id}', [UMKMSertifikasiController::class, 'update'])->name('sertifikasi.update');
 
 // ---------- Tahapan Create UMKM (Form Wizard) ----------
 Route::prefix('umkm')->name('tahap.')->controller(ContcreateUmkm::class)->group(function () {
@@ -47,10 +43,7 @@ Route::prefix('umkm-proses')->name('umkm.proses.')->controller(UmkmExportImportC
 });
 
 
-
-/* ---------- SPJ ---------- */
-Route::get('/spj/export', [SpjController::class, 'export'])->name('spj.export');
-Route::post('/spj/import', [\App\Http\Controllers\SpjController::class, 'import'])->name('spj.import');
+// ---------- SPJ ----------
 Route::get('/spj', [SpjController::class, 'index'])->name('spj.index');
 Route::get('/spj/create', [SpjController::class, 'create'])->name('spj.create');
 Route::post('/spj', [SpjController::class, 'store'])->name('spj.store');
@@ -58,9 +51,6 @@ Route::get('/spj/{id}/edit', [SpjController::class, 'edit'])->name('spj.edit');
 Route::put('/spj/{id}', [SpjController::class, 'update'])->name('spj.update');
 Route::delete('/spj/{id}', [SpjController::class, 'destroy'])->name('spj.destroy');
 Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
+Route::get('/spj/export', [SpjController::class, 'export'])->name('spj.export');
+Route::post('/spj/import', [SpjController::class, 'import'])->name('spj.import');
 
-Route::get('/umkm-proses/export-word', [UMKMProsesController::class, 'exportWord'])->name('umkm.proses.exportWord');
-Route::put('/umkm/{id}', [UmkmProsesController::class, 'update'])->name('umkm.update');
-
-
-Route::resource('sertifikasi', UMKMSertifikasiController::class);
