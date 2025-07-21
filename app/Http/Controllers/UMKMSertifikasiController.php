@@ -15,7 +15,7 @@ class UMKMSertifikasiController extends Controller
     }
     public function destroy($id)
 {
-    $umkm = \App\Models\Tahap1::findOrFail($id);
+    $umkm = Tahap1::findOrFail($id);
     $umkm->delete();
 
     return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data UMKM berhasil dihapus.');

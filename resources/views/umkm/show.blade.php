@@ -206,5 +206,120 @@
             <a href="{{ route('umkm.proses.index') }}" class="btn btn-secondary">&larr; Kembali</a>
         </div>
     </form>
+    </div>
+    @endif
+
+    {{-- Tahap 3 --}}
+    @if ($tahap->tahap3)
+    <div class="card mb-3">
+        <div class="card-header bg-warning text-dark">Riwayat Pembinaan</div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Tahun Dibina:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap3->tahun_dibina }}</dd>
+                <dt class="col-sm-4">Riwayat Pembinaan:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap3->riwayat_pembinaan }}</dd>
+                <dt class="col-sm-4">Status Pembinaan:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap3->status_pembinaan }}</dd>
+                <dt class="col-sm-4">Email:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap3->email }}</dd>
+                <dt class="col-sm-4">Media Sosial:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap3->media_sosial }}</dd>
+            </dl>
+        </div>
+    </div>
+    @endif
+
+    {{-- Tahap 4 --}}
+    @if ($tahap->tahap4)
+    <div class="card mb-3">
+        <div class="card-header bg-danger text-white">Alamat dan Legalitas</div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Alamat:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap4->alamat }}</dd>
+                <dt class="col-sm-4">Provinsi:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap4->provinsi }}</dd>
+                <dt class="col-sm-4">Kota:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap4->kota }}</dd>
+                <dt class="col-sm-4">Legalitas Usaha:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap4->legalitas_usaha }}</dd>
+                <dt class="col-sm-4">Tahun Pendirian:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap4->tahun_pendirian }}</dd>
+            </dl>
+        </div>
+    </div>
+    @endif
+
+    {{-- Tahap 5 --}}
+    @if ($tahap->tahap5)
+    <div class="card mb-3">
+        <div class="card-header bg-secondary text-white"> Produk & Sertifikasi</div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Jenis Usaha:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap5->jenis_usaha }}</dd>
+                <dt class="col-sm-4">Nama Merek:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap5->nama_merek }}</dd>
+                <dt class="col-sm-4">SNI:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap5->sni ? 'Ya' : 'Tidak' }}</dd>
+                <dt class="col-sm-4">LSPro:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap5->lspro }}</dd>
+            </dl>
+        </div>
+    </div>
+    @endif
+
+    {{-- Tahap 6 --}}
+    @if ($tahap->tahap6)
+    <div class="card mb-3">
+        <div class="card-header bg-dark text-white"> Produksi</div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4">Omzet:</dt>
+                <dd class="col-sm-8">Rp {{ number_format($tahap->tahap6->omzet, 0, ',', '.') }}</dd>
+                <dt class="col-sm-4">Volume Produksi per Tahun:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap6->volume_per_tahun }}</dd>
+                <dt class="col-sm-4">Jumlah Tenaga Kerja:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap6->jumlah_tenaga_kerja }}</dd>
+                <dt class="col-sm-4">Jangkauan Pemasaran:</dt>
+                <dd class="col-sm-8">{{ $tahap->tahap6->jangkauan_pemasaran }}</dd>
+                <dt class="col-sm-4">Link Dokumen:</dt>
+                <dd class="col-sm-8">
+                    @if($tahap->tahap6->link_dokumen)
+                        <a href="{{ $tahap->tahap6->link_dokumen }}" target="_blank">Lihat Dokumen:</a>
+                    @else
+                        -
+                    @endif
+                </dd>
+              <dt>Foto Produk</dt>
+            <dd>
+                @if (!empty($tahap->tahap6->foto_produk) && file_exists(public_path('storage/' . $tahap->tahap6->foto_produk)))
+                    <img src="{{ asset('storage/' . $tahap->tahap6->foto_produk) }}" alt="Foto Produk" class="img-thumbnail" width="200">
+                @else
+                    <img src="{{ asset('storage/uploads/foto_produk/image.png') }}" alt="Default Produk" class="img-thumbnail" width="130">
+                @endif
+            </dd>
+            <dt>Foto Tempat Produksi</dt>
+            <dd>
+                @if (!empty($data->foto_tempat_produksi) && file_exists(public_path('storage/' . $data->foto_tempat_produksi)))
+                    <img src="{{ asset('storage/' . $data->foto_tempat_produksi) }}" alt="Tempat Produksi" class="img-thumbnail" width="200">
+                @else
+                    <img src="{{ asset('storage/tempat_produksi/image.png') }}" alt="Default Tempat" class="img-thumbnail" width="130">
+                @endif
+            </dd>
+            </dl>
+        </div>
+    </div>
+    @endif
+
+    {{-- Tombol Aksi --}}
+    <div class="text-end mt-4">
+        <a href="{{ route('tahap.create.tahap', ['tahap' => 1, 'id' => $tahap->id]) }}" class="btn btn-warning">
+            <i class="fa fa-edit"></i> Edit
+        </a>
+        <a href="{{ route('umkm.proses.index') }}" class="btn btn-secondary">&larr; Kembali</a>
+    </div>
+
 </div>
 @endsection

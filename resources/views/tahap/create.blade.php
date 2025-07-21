@@ -9,7 +9,7 @@
             </div>
 
             <div class="card-body">
-            <form action="{{ route('tahap.store', [$tahap, $id ?? null]) }}" method="POST">
+            <form action="{{ route('tahap.store', [$tahap, $id ?? null]) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id }}">
                     <input type="hidden" name="redirect" value="{{ request('redirect') }}">

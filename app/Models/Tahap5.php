@@ -15,6 +15,7 @@ class Tahap5 extends Model
         'nama_merek',
         'sni',
         'lspro',
+        'tanda_daftar_merk'
     ];
 
     public function tahap1(): BelongsTo
