@@ -81,7 +81,7 @@ class SpjController extends Controller
             ]);
         }
 
-        return redirect()->route('spj.index')->with('success', 'Data SPJ berhasil disimpan.');
+        return redirect()->route(route: 'spj.index')->with('success', 'Data SPJ berhasil disimpan.');
     }
 
     // Tampilkan detail SPJ
