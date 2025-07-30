@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tahap1;
+use App\Models\{Tahap1, Tahap2, Tahap3, Tahap4, Tahap5, Tahap6};
 use Illuminate\Http\Request;
+
 
 
 class UMKMSertifikasiController extends Controller
