@@ -39,6 +39,7 @@ use App\Http\Controllers\{
     Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::get('/dashboard', fn () => view('role.admin'))->name('dashboard');
+        
 
     
     // UMKM Multi Tahap Proses
