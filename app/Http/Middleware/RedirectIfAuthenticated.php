@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,16 +11,14 @@ class RedirectIfAuthenticated
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle($request, Closure $next, ...$guards)
+    public function handle(Request $request, Closure $next, ...$guards): Response
     {
         $guard = $guards[0] ?? null;
 
         if (Auth::guard($guard)->check()) {
-            $role = Auth::user()->role->nama_role ?? 'user';
-            return redirect()->route($role . '.home');
+            // Langsung redirect ke route 'home' yang menangani redirect berdasarkan role
+            return redirect()->route('home');
         }
 
         return $next($request);

@@ -15,7 +15,7 @@
     <div class="card-body">
       <h2 class="mb-4">Edit SPJ</h2>
 
-      <form action="{{ route('spj.update', $spj->id) }}" method="POST">
+      <form action="{{ route('admin.spj.update', $spj->id) }}" method="POST">
         @csrf
         @method('PUT')
 

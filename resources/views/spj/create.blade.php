@@ -6,7 +6,7 @@
     <div class="card-body">
       <h4 class="mb-4 fw-bold">Form Input SPJ</h4>
 
-      <form action="{{ route('spj.store') }}" method="POST">
+      <form action="{{ route('admin.spj.store') }}" method="POST">
         @csrf
 
         {{-- Nama SPJ dan No UKD --}}

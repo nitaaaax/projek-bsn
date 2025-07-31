@@ -13,9 +13,14 @@ class UMKMSertifikasiController extends Controller
 {
     public function index()
     {
-        
+        $user = auth()->user();
         $data = Sertifikasi::all();
-        return view('umkm.sertifikasi.index', compact('data'));
+
+        return view('umkm.sertifikasi.index', [
+            'role' => $user->role->name ?? 'user',
+            'user' => $user,
+            'data' => $data
+        ]);
     }
 
 

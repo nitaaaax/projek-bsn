@@ -123,7 +123,7 @@ class UMKMProsesController extends Controller
 
             $tahap1 = Tahap1::create($validated);
 
-            return redirect()->route('tahap.create.tahap', [
+            return redirect()->route('admin.umkm.create', [
                 'tahap' => 2,
                 'id' => $tahap1->id
             ])->with('success', 'Tahap 1 disimpan');
@@ -181,5 +181,9 @@ class UMKMProsesController extends Controller
         }
 
         abort(404, 'Tahap tidak valid.');
+    }
+    public function createTahap($tahap, $id = null)
+    {
+        return view('tahap.create', compact('tahap', 'id'));
     }
 }

@@ -14,9 +14,10 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex gap-2 mt-2">
           
-          <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary">
-            <i class="fa fa-plus mr-1"></i> Tambah UMKM
-          </a>
+<a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}">
+    <i class="fa fa-plus mr-1"></i> Tambah UMKM
+</a>
+
           
           <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
             <i class="fa fa-file-import mr-1"></i>Import Excel
@@ -24,7 +25,7 @@
         </div>
 
         {{-- Search --}}
-        <form method="GET" action="{{ route('umkm.index') }}" class="d-flex">
+<form method="GET" action="{{ route('admin.umkm.index') }}" class="d-flex">
           <input type="text" name="search" class="form-control me-2" placeholder="Cari UMKM..." value="{{ request('search') }}">
           <button class="btn btn-outline-primary" type="submit">Cari</button>
         </form>
@@ -58,11 +59,11 @@
                   @endif
                 </td>
                 <td>
-                 <a href="{{ route('umkm.show', $t->id) }}" class="btn btn-info btn-sm" title="Detail">
+                <a href="{{ route('admin.umkm.show', $t->id) }}" class="btn btn-info btn-sm" title="Detail">
                 <i class="fa fa-eye"></i>
                 </a>
 
-                <form action="{{ route('umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
+                <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
@@ -70,7 +71,7 @@
                     </button>
                 </form>
 
-                <a href="{{ route('umkm.proses.export.word') }}" class="btn btn-success btn-sm" title="Download Word">
+                <a href="{{ route('admin.umkm.proses.export.word') }}" class="btn btn-success btn-sm" title="Download Word">
                     <i class="fa fa-download"></i>
                 </a>
 
@@ -89,7 +90,7 @@
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
-            <form action="{{ route('umkm.proses.import.excel') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.umkm.proses.import.excel') }}" method="POST" enctype="multipart/form-data">
               @csrf
               <div class="modal-header">
                 <h5 class="modal-title" id="importModalLabel">Import Data UMKM</h5>

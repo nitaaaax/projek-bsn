@@ -191,7 +191,7 @@ namespace  App\Http\Controllers;
             $foto_produk = $tahap2 && $tahap2->foto_produk ? json_decode($tahap2->foto_produk, true) : [];
             $foto_tempat_produksi = $tahap2 && $tahap2->foto_tempat_produksi ? json_decode($tahap2->foto_tempat_produksi, true) : [];
 
-            return view('umkm.edit', compact(
+            return view('umkm.index', compact(
                 'tahap1', 'tahap2',
                 'foto_produk', 'foto_tempat_produksi', 'tanda_merk'
             ));
