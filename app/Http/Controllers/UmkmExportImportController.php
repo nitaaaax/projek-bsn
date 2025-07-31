@@ -20,12 +20,11 @@ class UmkmExportImportController extends Controller
             mkdir($exportDir, 0777, true);
         }
 
+        $savedFiles = [];
+
         foreach ($data as $item) {
             $tahap2 = Tahap2::where('pelaku_usaha_id', $item->id)->first();
-
-            if (!$tahap2) {
-                continue; 
-            }
+            if (!$tahap2) continue;
 
             try {
                 $template = new TemplateProcessor($templatePath);
@@ -33,7 +32,7 @@ class UmkmExportImportController extends Controller
                 return 'Gagal membuka template: ' . $e->getMessage();
             }
 
-            // Set value sesuai template Word
+            // Isi template
             $template->setValue('nama_umk', $item->nama_pelaku ?? '-');
             $template->setValue('nama_kontak_person', $item->nama_kontak_person ?? '-');
             $template->setValue('no_hp', $item->no_hp ?? '-');
@@ -53,32 +52,46 @@ class UmkmExportImportController extends Controller
             $template->setValue('jenis_usaha', $tahap2->jenis_usaha ?? '-');
             $template->setValue('produk', $item->produk ?? '-');
             $template->setValue('nama_merek', $item->nama_merek ?? '-');
-            $template->setValue('tanda_daftar_merek', $tahap2->tanda_daftar_merek ?? '-');
+            $template->setValue('tanda_daftar_merk', $tahap2->tanda_daftar_merek ?? '-');
             $template->setValue('sni', $tahap2->sni_yang_akan_diterapkan ?? '-');
             $template->setValue('omzet', $tahap2->omzet ?? '-');
             $template->setValue('volume_per_tahun', $tahap2->volume_per_tahun ?? '-');
             $template->setValue('jumlah_tenaga_kerja', $tahap2->jumlah_tenaga_kerja ?? '-');
             $template->setValue('sertifikat', $tahap2->sertifikat ?? '-');
 
-            // Handle jangkauan pemasaran
             $jangkauan = is_string($tahap2->jangkauan_pemasaran)
                 ? implode(', ', json_decode($tahap2->jangkauan_pemasaran, true))
                 : '-';
             $template->setValue('jangkauan_pemasaran', $jangkauan);
 
-            // Instansi pembina
             $template->setValue('instansi', $item->instansi ?? '-');
+            $template->setValue('tanggal_export', Carbon::now()->translatedFormat('d F Y'));
 
-            //Tanggal download
-            $tanggalFormat = Carbon::now()->translatedFormat('d F Y');
-            $template->setValue('tanggal_export', $tanggalFormat);
-
-            // Simpan hasil export
+            // Simpan ke file
             $filename = 'UMKM_' . preg_replace('/\s+/', '_', $item->nama_pelaku) . '.docx';
             $savePath = $exportDir . '/' . $filename;
             $template->saveAs($savePath);
+            $savedFiles[] = $savePath;
         }
 
-        return response()->download($savePath)->deleteFileAfterSend(true);
+        // ZIP hasil ekspor
+        if (count($savedFiles) > 0) {
+            $zipPath = storage_path('app/public/ekspor_umkm.zip');
+            $zip = new \ZipArchive();
+
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE)) {
+                foreach ($savedFiles as $file) {
+                    $zip->addFile($file, basename($file));
+                }
+                $zip->close();
+
+                return response()->download($zipPath)->deleteFileAfterSend(true);
+            } else {
+                return back()->with('error', 'Gagal membuat file ZIP.');
+            }
+        } else {
+            return back()->with('error', 'Tidak ada data yang berhasil diekspor.');
+        }
     }
+
 }

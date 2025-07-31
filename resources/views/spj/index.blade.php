@@ -10,13 +10,13 @@
         <div class="col-md-6">
           <h2 class="fw-bold">Data SPJ</h2>
           <div class="d-flex gap-2 mt-2">
-            <a href="{{ route('spj.create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('admin.spj.create') }}" class="btn btn-primary btn-sm">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
-            <a href="{{ route('spj.export') }}" class="btn btn-success">
+            <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
                 <i class="fa fa-file-excel"></i> Dowload Data
             </a>
-            <a href="{{ route('spj.import') }}" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+            <a href="{{ route('admin.spj.import') }}" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="fa fa-upload"></i>  Upload Data
             </a>
           </div>
@@ -27,7 +27,7 @@
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
     <div class="modal-content shadow-sm">
-      <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+      <form action="{{ route('admin.spj.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-header">
           <h5 class="modal-title fw-bold" id="importModalLabel">Import Data SPJ</h5>
@@ -98,11 +98,11 @@
                     Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
                   </td>
                   <td>
-                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
+                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
                    <a class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id }})">
                     <i class="fa fa-trash"></i> Hapus
                   </a>
-                  <form id="delete-form-{{ $item->id }}" action="{{ route('spj.destroy', $item->id) }}" method="POST" style="display: none;">
+                  <form id="delete-form-{{ $item->id }}" action="{{ route('admin.spj.destroy', $item->id) }}" method="POST" style="display: none;">
                     @csrf
                     @method('DELETE')
                   </form>
@@ -146,7 +146,7 @@
             <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
           </td>
           <td class="text-center">
-            <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+            <a href="{{ route('admin.spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
               <i class="fa fa-eye"></i> Detail
             </a>
           </td>
@@ -181,7 +181,7 @@
             <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
           </td>
           <td class="text-center">
-            <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+            <a href="{{ route('admin.spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
               <i class="fa fa-eye"></i> Detail
             </a>
           </td>
@@ -202,7 +202,7 @@
 <!-- Modal Import -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.spj.import') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
         <div class="modal-header">

@@ -66,10 +66,6 @@
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
                     </form>
-
-                    <div class="text-center">
-                        <a href="{{ route('register') }}" class="btn btn-outline-secondary w-100">Register</a>
-                    </div>
                 </div>
 
                 <div class="card-footer text-muted text-center small">

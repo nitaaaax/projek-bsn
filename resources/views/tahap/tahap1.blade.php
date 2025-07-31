@@ -125,6 +125,13 @@
                 value="{{ old('media_sosial', $data->media_sosial ?? '') }}">
         </div>
 
+        {{-- Lembaga Sertifikasi Produk (LSPro) --}}
+        <div class="mb-3 col-md-6">
+            <label for="lspro" class="form-label fw-bold">Lembaga Sertifikasi Produk (LSPro)</label>
+            <input type="text" name="lspro" id="lspro" class="form-control"
+                value="{{ old('lspro', $data->lspro ?? '') }}">
+        </div>
+
         {{-- Nama Merek --}}
         <div class="mb-3 col-md-6">
             <label for="nama_merek" class="form-label fw-bold">Nama Merek</label>
@@ -132,17 +139,17 @@
                 value="{{ old('nama_merek', $data->nama_merek ?? '') }}">
         </div>
 
-    {{-- Tanda Daftar Merek --}}
+        {{-- Tanda Daftar Merek --}}
         <div class="col-md-6">
             <label class="form-label fw-bold d-block mb-1">Tanda Daftar Merek</label>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="tanda_daftar_mere" id="terdaftar" value="1"
-                    {{ old('tanda_daftar_mere', $data->tanda_daftar_mere ?? 0) == 1 ? 'checked' : '' }}>
+                    {{ old('tanda_daftar_mere', $data->tanda_daftar_merk ?? 0) == 1 ? 'checked' : '' }}>
                 <label class="form-check-label" for="terdaftar">Terdaftar di Kemenkumham</label>
             </div>
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="tanda_daftar_mere" id="belum_terdaftar" value="0"
-                    {{ old('tanda_daftar_mere', $data->tanda_daftar_mere ?? 0) == 0 ? 'checked' : '' }}>
+                    {{ old('tanda_daftar_mere', $data->tanda_daftar_merk ?? 0) == 0 ? 'checked' : '' }}>
                 <label class="form-check-label" for="belum_terdaftar">Belum Terdaftar</label>
             </div>
         </div>
@@ -150,13 +157,13 @@
     </div>
 
     {{-- Riwayat Pembinaan --}}
-<div class="mb-3 col-13">
-    <label for="riwayat_pembinaan" class="form-label fw-bold">Riwayat Pembinaan</label>
-    <textarea name="riwayat_pembinaan" id="riwayat_pembinaan" class="form-control">
-        {!! old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') !!}
-    </textarea>
-</div>
+    <div class="mb-3 col-13">
+        <label for="riwayat_pembinaan" class="form-label fw-bold">Riwayat Pembinaan</label>
+        <textarea name="riwayat_pembinaan" id="riwayat_pembinaan" class="form-control">
+            {!! old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') !!}
+        </textarea>
     </div>
+        </div>
 
 
 

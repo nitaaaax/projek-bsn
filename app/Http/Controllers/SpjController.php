@@ -146,7 +146,7 @@ class SpjController extends Controller
             ]);
         }
 
-        return redirect()->route('spj.show', $spj->id)->with('success', 'SPJ berhasil diupdate.');
+        return redirect()->route('admin.spj.show', $spj->id)->with('success', 'SPJ berhasil diupdate.');
     }
 
     public function destroy($id)

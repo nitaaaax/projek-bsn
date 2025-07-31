@@ -16,17 +16,15 @@ class Tahap2 extends Model
         'legalitas_usaha','tahun_pendirian',
         'omzet','volume_per_tahun','jumlah_tenaga_kerja',
         'jangkauan_pemasaran','link_dokumen',
-        'foto_produk','foto_tempat_produksi',
-        'jenis_usaha','sni_yang_akan_diterapkan','lspro',
-        'tanda_daftar_merek','instansi','sertifikat',
+        'foto_produk','foto_tempat_produksi','sni_yang_diterapkan',
+        'instansi','sertifikat',
     ];
 
     protected $casts = [
         'jangkauan_pemasaran' => 'array',
-        'tanda_daftar_merek' => 'array',
         'foto_produk' => 'array',
         'foto_tempat_produksi' => 'array',
-        
+        'instansi' => 'array',
     ];
 
     public function tahap1(): BelongsTo

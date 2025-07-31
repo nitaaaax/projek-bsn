@@ -9,9 +9,9 @@
             </div>
 
             <div class="card-body">
-                <form action="{{ route('tahap.store', [$tahap, $id ?? null]) }}" method="POST" enctype="multipart/form-data">
+<form action="{{ route('admin.umkm.store', ['tahap' => $tahap, 'id' => $id ?? null]) }}" method="POST">
                     @csrf
-                    <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id }}">
+                    <input type="hidden" name="pelaku_usaha_id" value="{{ $tahap1->id ?? '' }}">
                     <input type="hidden" name="redirect" value="{{ request('redirect') }}">
 
                     {{-- Form dinamis berdasarkan tahap --}}
@@ -26,10 +26,11 @@
                  {{-- Navigasi tombol --}}
 <div class="mt-4 text-start ps-2">
     @if ($tahap > 1)
-        <a href="{{ route('tahap.create.tahap', ['tahap' => $tahap - 1, 'id' => $id ?? null]) }}"
-           class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
+        <a href="{{ route('admin.umkm.create', ['tahap' => $tahap - 1, 'id' => $id ?? null]) }}"
+        class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
             ← Kembali
         </a>
+
     @else
         <a href="{{ route('umkm.proses.index') }}"
            class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">

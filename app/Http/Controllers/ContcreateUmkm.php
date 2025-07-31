@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Tahap1;
 use App\Models\Tahap2;
 
@@ -16,7 +17,7 @@ class ContcreateUmkm extends Controller
 
     public function create()
     {
-        return redirect()->route('tahap.create.tahap', ['tahap' => 1]);
+    return redirect()->route('admin.umkm.create.tahap', ['tahap' => 1]);
     }
     
 
@@ -41,15 +42,17 @@ class ContcreateUmkm extends Controller
 
     public function store(Request $request, int $tahap, $id = null)
     {
-
         $isEdit = $id !== null;
+        
+        // dd($request->all());
 
         if ($tahap == 1) {
             if ($request->has('riwayat_pembinaan') && is_array($request->riwayat_pembinaan)) {
-        $request->merge([
-            'riwayat_pembinaan' => implode(', ', $request->riwayat_pembinaan),
-        ]);
-    }
+                $request->merge([
+                    'riwayat_pembinaan' => implode(', ', $request->riwayat_pembinaan),
+                ]);
+            }
+
             $rules = [
                 'nama_pelaku' => 'nullable|string|max:255',
                 'produk' => 'nullable|string|max:255',
@@ -67,10 +70,10 @@ class ContcreateUmkm extends Controller
                 'email' => 'nullable|email|max:255',
                 'media_sosial' => 'nullable|string|max:255',
                 'nama_merek' => 'nullable|string|max:255',
-                
-                
+                'lspro' => 'nullable|string|max:255',
+                'tanda_daftar_merk' => 'nullable|string|max:255',
             ];
-            
+
             $validated = $request->validate($rules);
 
             if ($isEdit) {
@@ -81,20 +84,19 @@ class ContcreateUmkm extends Controller
                 $nextId = $tahap1->id;
             }
 
-            return redirect()->route('tahap.create.tahap', ['tahap' => 2, 'id' => $nextId])
-                ->with('success', 'Tahap 1 berhasil disimpan');
+            return redirect()->route('admin.umkm.create.tahap', [
+                'tahap' => 2,
+                'id' => $nextId
+            ])->with('success', 'Tahap 1 berhasil disimpan');
         }
 
         if ($tahap == 2) {
-
-    $request->merge([
-    'jangkauan_pemasaran' => is_array($request->jangkauan_pemasaran) ? $request->jangkauan_pemasaran : (array) $request->jangkauan_pemasaran
-        ]);
-        
+            $pelaku_usaha_id = $isEdit ? $request->pelaku_usaha_id : $id;
+            $request->merge([
+                'jangkauan_pemasaran' => is_array($request->jangkauan_pemasaran) ? $request->jangkauan_pemasaran : (array) $request->jangkauan_pemasaran
+            ]);
 
             $rules = [
-                // Semua field dari tahap 2 + gabungan tahap 6 yang dulu di tahap 2
-                'pelaku_usaha_id' => 'required|exists:tahap1,id',
                 'omzet' => 'nullable|numeric',
                 'volume_per_tahun' => 'nullable|string|max:255',
                 'jumlah_tenaga_kerja' => 'nullable|integer',
@@ -107,70 +109,91 @@ class ContcreateUmkm extends Controller
                 'alamat_pabrik' => 'nullable|string|max:255',
                 'provinsi_pabrik' => 'nullable|string|max:255',
                 'kota_pabrik' => 'nullable|string|max:255',
-                'instansi' => 'nullable|array',
-                'instansi.*' => 'nullable|string|max:255',
+                'instansi' => 'nullable|string|max:255',
                 'legalitas_usaha' => 'nullable|string|max:255',
                 'tahun_pendirian' => 'nullable|string|max:4',
                 'foto_produk.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'foto_tempat_produksi.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
-                'sni_yang_akan_diterapkan' => 'nullable|string',
-                'lspro' => 'nullable|string|max:255',
-                'tanda_daftar_merek' => 'nullable|string|max:255',
+                'sni_yang_diterapkan' => 'nullable|string',
+                'sertifikat' => 'nullable|string',
             ];
 
-            
-            $validated = $request->validate($rules);
-            $validated['instansi'] = json_encode($validated['instansi']);
+                $validated = $request->validate($rules);
+                $validated['pelaku_usaha_id'] = $pelaku_usaha_id; // Ensure this is included
 
-            // Handle foto produk
-            $foto_produk_paths = [];
-            if ($request->hasFile('foto_produk')) {
-                foreach ($request->file('foto_produk') as $file) {
-                    if ($file->isValid()) {
-                        $filename = uniqid() . '_produk.' . $file->getClientOriginalExtension();
-                        $path = $file->storeAs('uploads/foto_produk', $filename, 'public');
-                        $foto_produk_paths[] = $path;
+                // Handle file uploads
+                $foto_produk_paths = [];
+                if ($request->hasFile('foto_produk')) {
+                    foreach ($request->file('foto_produk') as $file) {
+                        if ($file->isValid()) {
+                            $filename = 'produk_'.time().'_'.Str::random(5).'.'.$file->getClientOriginalExtension();
+                            $path = $file->storeAs('public/uploads/foto_produk', $filename);
+                            $foto_produk_paths[] = str_replace('public/', '', $path);
+                        }
                     }
                 }
-            }
-            if ($isEdit) {
-                $existing = Tahap2::where('pelaku_usaha_id', $id)->first();
-                $existing_produk = $existing && $existing->foto_produk ? json_decode($existing->foto_produk, true) : [];
-                $foto_produk_paths = array_merge($existing_produk, $foto_produk_paths);
-            }
-            $validated['foto_produk'] = json_encode($foto_produk_paths);
 
-            // Handle foto tempat produksi
-            $foto_tempat_paths = [];
-            if ($request->hasFile('foto_tempat_produksi')) {
-                foreach ($request->file('foto_tempat_produksi') as $file) {
-                    if ($file->isValid()) {
-                        $filename = uniqid() . '_tempat.' . $file->getClientOriginalExtension();
-                        $path = $file->storeAs('uploads/foto_tempat_produksi', $filename, 'public');
-                        $foto_tempat_paths[] = $path;
+                $foto_tempat_produksi_paths = [];
+                if ($request->hasFile('foto_tempat_produksi')) {
+                    foreach ($request->file('foto_tempat_produksi') as $file) {
+                        if ($file->isValid()) {
+                            $filename = 'tempat_'.time().'_'.Str::random(5).'.'.$file->getClientOriginalExtension();
+                            $path = $file->storeAs('public/uploads/foto_tempat_produksi', $filename);
+                            $foto_tempat_produksi_paths[] = str_replace('public/', '', $path);
+                        }
                     }
                 }
+
+                // Now safely use $pelaku_usaha_id since it's been assigned
+                $validated['foto_produk'] = !empty($foto_produk_paths) 
+                    ? json_encode($foto_produk_paths) 
+                    : ($isEdit ? Tahap2::where('pelaku_usaha_id', $pelaku_usaha_id)->value('foto_produk') : json_encode([]));
+                
+                $validated['foto_tempat_produksi'] = !empty($foto_tempat_produksi_paths) 
+                    ? json_encode($foto_tempat_produksi_paths) 
+                    : ($isEdit ? Tahap2::where('pelaku_usaha_id', $pelaku_usaha_id)->value('foto_tempat_produksi') : json_encode([]));
+
+                if ($isEdit) {
+                    Tahap2::updateOrCreate(['pelaku_usaha_id' => $pelaku_usaha_id], $validated);
+                } else {
+                    Tahap2::create($validated);
+                }
+
+                return redirect()->route('umkm.proses.index')->with('success', 'Tahap 2 berhasil disimpan');
             }
-            if ($isEdit) {
-                $existing = Tahap2::where('pelaku_usaha_id', $id)->first();
-                $existing_tempat = $existing && $existing->foto_tempat_produksi ? json_decode($existing->foto_tempat_produksi, true) : [];
-                $foto_tempat_paths = array_merge($existing_tempat, $foto_tempat_paths);
-            }
-            $validated['foto_tempat_produksi'] = json_encode($foto_tempat_paths);
-
-            // Jangkauan pemasaran juga disimpan sebagai json
-            $validated['jangkauan_pemasaran'] = json_encode($validated['jangkauan_pemasaran']);
-
-            if ($isEdit) {
-                Tahap2::updateOrCreate(['pelaku_usaha_id' => $id], $validated);
-            } else {
-                Tahap2::create($validated);
-            }
-
-            return redirect()->route('umkm.proses.index')->with('success', 'UMKM berhasil disimpan');
-        }
-
+        
         abort(404, 'Tahap tidak valid.');
     }
+
+    public function destroy($id)
+    {
+        // Hapus data tahap 1 dan tahap 2 (jika pakai relasi pelaku_usaha_id)
+        $tahap1 = Tahap1::findOrFail($id);
+        
+        // Jika ada tahap2 terkait
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+        if ($tahap2) {
+            $tahap2->delete();
+        }
+
+        $tahap1->delete();
+
+        return redirect()->route('admin.umkm.index')->with('success', 'Data UMKM berhasil dihapus.');
+    }
+    public function show($id)
+    {
+        $tahap1 = Tahap1::findOrFail($id);
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+
+        // Pastikan view 'umkm.sertifikasi.show' ada
+        if (!view()->exists('umkm.sertifikasi.show')) {
+            abort(404, "View 'umkm.sertifikasi.show' not found.");
+        }
+
+        return view('umkm.sertifikasi.show', compact('tahap1', 'tahap2'));
+    }
+
+
+
 }
