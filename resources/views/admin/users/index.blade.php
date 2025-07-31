@@ -2,54 +2,94 @@
 
 @section('content')
 <div class="container mt-4">
-  <h2>Tambah Akun</h2>
+  <div class="card shadow-sm">
+    <div class="card-body">
 
-  {{-- Notifikasi jika ada error --}}
-  @if ($errors->any())
-    <div class="alert alert-danger">
-      <ul class="mb-0">
-        @foreach ($errors->all() as $error)
-          <li>{{ $error }}</li>
-        @endforeach
-      </ul>
+      {{-- Judul dan Tombol Tambah Akun --}}
+      <div class="mb-2">
+        <h4 class="fw-bold mb-0">Daftar Akun</h4>
+      </div>
+      <div class="mb-3">
+        <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
+          <i class="fa fa-plus"></i> Tambah Akun
+        </a>
+      </div>
+
+      {{-- Flash Message --}}
+      @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+      @endif
+
+      {{-- Search di kanan atas tabel, sejajar dengan judul kolom Aksi --}}
+      <div class="d-flex justify-content-end mb-2">
+        <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex" style="width: 250px;">
+          <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Cari nama/email..." value="{{ request('search') }}">
+          <button class="btn btn-sm btn-outline-primary" type="submit">Cari</button>
+        </form>
+      </div>
+
+      {{-- Tabel --}}
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="bg-light text-dark text-center fw-bold">
+            <tr>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($users as $user)
+            <tr>
+              <td>{{ $user->name }}</td>
+              <td>{{ $user->email }}</td>
+              <td>{{ $user->role->name }}</td>
+              <td class="text-center">
+                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning me-1">
+                  <i class="fa fa-edit"></i>
+                </a>
+                <button onclick="confirmDelete({{ $user->id }})" class="btn btn-sm btn-danger">
+                  <i class="fa fa-trash"></i>
+                </button>
+                <form id="delete-form-{{ $user->id }}" action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-none">
+                  @csrf
+                  @method('DELETE')
+                </form>
+              </td>
+            </tr>
+            @empty
+            <tr>
+              <td colspan="4" class="text-center text-muted">Belum ada data akun.</td>
+            </tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
+
     </div>
-  @endif
-
-  <form action="{{ route('admin.users.store') }}" method="POST">
-    @csrf
-
-    <div class="mb-3">
-      <label for="name" class="form-label fw-bold">Nama</label>
-      <input type="text" class="form-control" name="name" value="{{ old('name') }}" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="username" class="form-label fw-bold">Username</label>
-      <input type="text" class="form-control" name="username" value="{{ old('username') }}" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="email" class="form-label fw-bold">Email</label>
-      <input type="email" class="form-control" name="email" value="{{ old('email') }}" required>
-    </div>
-
-    <div class="mb-3">
-      <label for="password" class="form-label fw-bold">Password</label>
-      <input type="password" class="form-control" name="password" required>
-    </div>
-
-    <div class="mb-3">
-        <label for="role" class="form-label">Role</label>
-        <select name="role" id="role" class="form-control" required>
-            <option value="">-- Pilih Role --</option>
-            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-            <option value="user" {{ old('role') == 'user' ? 'selected' : '' }}>User</option>
-        </select>
-    </div>
-
-
-    <button type="submit" class="btn btn-primary">Simpan</button>
-    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Kembali</a>
-  </form>
+  </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmDelete(id) {
+  Swal.fire({
+    title: 'Yakin ingin menghapus?',
+    text: "Data ini tidak bisa dikembalikan!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Ya, hapus!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      document.getElementById('delete-form-' + id).submit();
+    }
+  });
+}
+</script>
+@endpush
