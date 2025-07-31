@@ -6,22 +6,20 @@ use App\Models\Spj;
 use App\Models\SpjDetail;
 use Illuminate\Http\Request;
 use App\Exports\SpjExport;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\SpjImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SpjController extends Controller
 {
-    // Menampilkan semua data SPJ
     public function index()
     {
         $spj = Spj::with('details')->get();
 
-        // Ambil semua detail yang sudah/ belum dibayar
         $sudahBayar = SpjDetail::with('spj')
-                        ->where('status_pembayaran', 'sudah_dibayar')->get();
+            ->where('status_pembayaran', 'Sudah Dibayar')->get();
 
         $belumBayar = SpjDetail::with('spj')
-                        ->where('status_pembayaran', 'belum_dibayar')->get();
+            ->where('status_pembayaran', 'Belum Dibayar')->get();
 
         return view('spj.index', compact('spj', 'sudahBayar', 'belumBayar'));
     }
@@ -31,52 +29,57 @@ class SpjController extends Controller
         return Excel::download(new SpjExport, 'spj_cair.xlsx');
     }
 
-        public function import(Request $request)
+    public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xls,xlsx'
-        ]);
-
         Excel::import(new SpjImport, $request->file('file'));
-
-        return redirect()->back()->with('success', 'Import berhasil!');
+        return redirect()->back()->with('success', 'Data berhasil diimpor!');
     }
 
-    // Form tambah SPJ
     public function create()
     {
         return view('spj.create');
     }
 
-    // Simpan data SPJ dan semua detailnya
     public function store(Request $request)
     {
         $request->validate([
             'nama_spj'             => 'required|string|max:255',
             'no_ukd'               => 'nullable|string|max:255',
             'keterangan'           => 'nullable|string',
+            'dokumen'              => 'nullable|string|max:255',
             'item.*'               => 'required|string',
             'nominal.*'            => 'required|numeric|min:0',
-            'status_pembayaran.*'  => 'required|in:belum_dibayar,sudah_dibayar',
+            'status_pembayaran.*'  => 'required|string',
             'keterangan_detail.*'  => 'nullable|string',
-            'dokumen'              => 'nullable|string|max:255',
         ]);
 
-        // Simpan data utama SPJ
         $spj = Spj::create([
             'nama_spj'   => $request->nama_spj,
             'no_ukd'     => $request->no_ukd,
             'keterangan' => $request->keterangan,
-            'dokumen'    => $request->dokumen, // ini yang ditambahkan
+            'dokumen'    => $request->dokumen,
         ]);
 
-        // Simpan detail SPJ
         foreach ($request->item as $i => $item) {
+            $status = strtolower(trim($request->status_pembayaran[$i] ?? ''));
+
+            switch ($status) {
+                case 'sudah dibayar':
+                case 'Sudah Dibayar':
+                    $status = 'Sudah Dibayar';
+                    break;
+                case 'belum dibayar':
+                case 'Belum Dibayar':
+                default:
+                    $status = 'Belum Dibayar'; // fallback biar tidak null
+                    break;
+            }
+
             SpjDetail::create([
                 'spj_id'            => $spj->id,
                 'item'              => $item,
                 'nominal'           => $request->nominal[$i],
-                'status_pembayaran' => $request->status_pembayaran[$i],
+                'status_pembayaran' => $status,
                 'keterangan'        => $request->keterangan_detail[$i] ?? null,
             ]);
         }
@@ -84,30 +87,29 @@ class SpjController extends Controller
         return redirect()->route('spj.index')->with('success', 'Data SPJ berhasil disimpan.');
     }
 
-    // Tampilkan detail SPJ
     public function show($id)
     {
         $spj = Spj::with('details')->findOrFail($id);
         return view('spj.show', compact('spj'));
     }
 
-    // Form edit SPJ
     public function edit($id)
     {
         $spj = Spj::with('details')->findOrFail($id);
         return view('spj.edit', compact('spj'));
     }
 
-    // Update SPJ dan semua detail item-nya
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama_spj'      => 'required|string|max:255',
-            'no_ukd'        => 'nullable|string|max:255',
-            'keterangan'    => 'nullable|string',
-            'item.*'        => 'required|string',
-            'nominal.*'     => 'required|numeric|min:0',
-            'pembayaran.*'  => 'required|in:belum_dibayar,sudah_dibayar',
+            'nama_spj'             => 'required|string|max:255',
+            'no_ukd'               => 'nullable|string|max:255',
+            'keterangan'           => 'nullable|string',
+            'dokumen'              => 'nullable|string|max:255',
+            'item.*'               => 'required|string',
+            'nominal.*'            => 'required|numeric|min:0',
+            'status_pembayaran.*'  => 'required|string',
+            'keterangan_detail.*'  => 'nullable|string',
         ]);
 
         $spj = Spj::findOrFail($id);
@@ -115,25 +117,38 @@ class SpjController extends Controller
             'nama_spj'   => $request->nama_spj,
             'no_ukd'     => $request->no_ukd,
             'keterangan' => $request->keterangan,
+            'dokumen'    => $request->dokumen,
         ]);
 
-        // Hapus semua detail lama
         $spj->details()->delete();
 
-        // Simpan ulang semua detail
         foreach ($request->item as $i => $item) {
+            $status = strtolower(trim($request->status_pembayaran[$i] ?? ''));
+
+            switch ($status) {
+                case 'sudah dibayar':
+                case 'Sudah Dibayar':
+                    $status = 'Sudah Dibayar';
+                    break;
+                case 'belum dibayar':
+                case 'Belum Dibayar':
+                default:
+                    $status = 'Belum Dibayar';
+                    break;
+            }
+
             SpjDetail::create([
                 'spj_id'            => $spj->id,
                 'item'              => $item,
                 'nominal'           => $request->nominal[$i],
-                'status_pembayaran' => $request->pembayaran[$i],
+                'status_pembayaran' => $status,
+                'keterangan'        => $request->keterangan_detail[$i] ?? null,
             ]);
         }
 
         return redirect()->route('spj.show', $spj->id)->with('success', 'SPJ berhasil diupdate.');
     }
 
-    // Hapus SPJ dan semua detailnya
     public function destroy($id)
     {
         $spj = Spj::findOrFail($id);

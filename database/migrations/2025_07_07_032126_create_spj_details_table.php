@@ -12,7 +12,7 @@ return new class extends Migration {
             $table->foreignId('spj_id')->constrained('spjs')->onDelete('cascade'); // relasi ke tabel spjs
             $table->string('item'); // nama item biaya
             $table->decimal('nominal', 15, 2); // nominal biaya
-            $table->enum('status_pembayaran', ['belum_dibayar', 'sudah_dibayar'])->default('belum_dibayar');
+            $table->enum('status_pembayaran', ['Belum Dibayar', 'Sudah Dibayar'])->default('Belum Dibayar');
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });

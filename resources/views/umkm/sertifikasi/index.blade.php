@@ -21,27 +21,27 @@
             </tr>
           </thead>
           <tbody>
-            @forelse($tahap1 as $t)
+            @forelse($data as $item)
               <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $t->nama_pelaku }}</td>
-                <td>{{ $t->produk }}</td>
+                <td>{{ $item->nama_pelaku }}</td>
+                <td>{{ $item->produk }}</td>
                 <td>
-                  @if(strtolower($t->status) === 'tersertifikasi')
+                  @if(strtolower($item->status) === 'tersertifikasi')
                     <span class="badge bg-success">Tersertifikasi</span>
                   @else
-                    <span class="badge bg-secondary">{{ $t->status }}</span>
+                    <span class="badge bg-secondary">{{ $item->status }}</span>
                   @endif
                 </td>
                 <td>
-                  <a href="{{ route('sertifikasi.edit', $t->id) }}" class="btn btn-warning btn-sm">
-                    <i class="fa fa-edit"></i> Edit
+                  <a href="{{ route('umkm.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                      <i class="fa fa-edit"></i> Edit
                   </a>
 
-                  <form action="{{ route('umkm.sertifikasi.destroy', $t->id) }}" method="POST" class="d-inline" id="delete-form-{{ $t->id }}">
+                  <form action="{{ route('umkm.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $t->id }})">
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
                       <i class="fa fa-trash"></i> Hapus
                     </button>
                   </form>

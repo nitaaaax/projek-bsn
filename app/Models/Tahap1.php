@@ -7,43 +7,21 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tahap1 extends Model
 {
-    protected $table = 'pelaku_usaha';
+    protected $table = 'tahap1';
 
     protected $fillable = [
-        'nama_pelaku',
-        'produk',
-        'klasifikasi',
-        'status',
-        'pembina_1',
+        'nama_pelaku', 'produk', 'klasifikasi', 'status', 'pembina_1', 'pembina_2',
+        'sinergi', 'nama_kontak_person', 'no_hp', 'bulan_pertama_pembinaan', 'tahun_dibina',
+        'riwayat_pembinaan', 'status_pembinaan', 'email', 'media_sosial', 'nama_merek',
     ];
 
-    // Relasi ke Tahap 2 (tabel: kontak)
+    protected $casts = [
+    'riwayat_pembinaan' => 'array',
+];
+
     public function tahap2(): HasOne
     {
         return $this->hasOne(Tahap2::class, 'pelaku_usaha_id');
     }
-
-    // Relasi ke Tahap 3 (tabel: pembinaan)
-    public function tahap3(): HasOne
-    {
-        return $this->hasOne(Tahap3::class, 'pelaku_usaha_id');
-    }
-
-    // Relasi ke Tahap 4 (tabel: alamat, model: LegalitasUsaha)
-    public function tahap4(): HasOne
-    {
-        return $this->hasOne(Tahap4::class, 'pelaku_usaha_id');
-    }
-
-    // Relasi ke Tahap 5 (tabel: usaha)
-    public function tahap5(): HasOne
-    {
-        return $this->hasOne(Tahap5::class, 'pelaku_usaha_id');
-    }
-
-    // Relasi ke Tahap 6 (tabel: produksi)
-    public function tahap6(): HasOne
-    {
-        return $this->hasOne(Tahap6::class, 'pelaku_usaha_id');
-    }
 }
+

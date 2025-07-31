@@ -2,260 +2,184 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{Tahap1, Tahap2, Tahap3, Tahap4, Tahap5, Tahap6};
+use App\Models\Tahap1;
+use App\Models\Tahap2;
+use App\Models\Sertifikasi;
 use Illuminate\Http\Request;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\SimpleType\Jc;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\UmkmExport;
-use App\Imports\UmkmImport;
-use Illuminate\Support\Facades\Storage;
 
 class UMKMProsesController extends Controller
 {
-  public function index()
-{
-    $tahap1 = Tahap1::where('status', '!=', 'Tersertifikasi')
-        ->with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])
-        ->get();
-
-    return view('umkm.proses.index', compact('tahap1'));
-}
-
-
-    public function sertifikasi($id)
+    public function index(Request $request)
     {
-        $umkm = Tahap1::findOrFail($id);
-        $umkm->status = 'Tersertifikasi';
-        $umkm->save();
+        $search = $request->search;
 
-        return redirect()->route('umkm.proses.index')->with('success', 'UMKM berhasil disertifikasi!');
+        $tahap1 = Tahap1::where('status', '!=', 'Tersertifikasi')
+            ->when($search, function ($query) use ($search) {
+                $query->where('nama_pelaku', 'like', "%$search%")
+                      ->orWhere('produk', 'like', "%$search%");
+            })
+            ->get();
+
+        return view('umkm.proses.index', compact('tahap1'));
     }
 
     public function destroy($id)
     {
-        $umkm = Tahap1::findOrFail($id);
+        $umkm = Tahap1::with('tahap2')->findOrFail($id);
+
+        if ($umkm->status === 'Tersertifikasi') {
+            return redirect()->back()->with('error', 'Data UMKM sudah tersertifikasi dan tidak dapat dihapus.');
+        }
+
+        $umkm->tahap2()->delete();
         $umkm->delete();
 
-        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data berhasil dihapus.');
+        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data proses berhasil dihapus.');
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama_pelaku' => 'required|string|max:255',
-            'produk' => 'required|string|max:255',
-            'klasifikasi' => 'required|string|max:255',
-            'status' => 'required|string|max:100',
-            'pembina_1' => 'nullable|string|max:255',
-            'pembina_2' => 'nullable|string|max:255',
-            'sinergi' => 'nullable|string|max:255',
-            'nama_kontak_person' => 'required|string|max:255',
-            'no_hp' => 'required|string|max:20',
-            'bulan_pertama_pembinaan' => 'required|integer|min:1|max:12',
-            'foto_produk' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'foto_tempat_produksi' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        $tahap1 = Tahap1::findOrFail($id);
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first() ?? new Tahap2(['pelaku_usaha_id' => $id]);
+
+        // 1️⃣ Update Tahap 1
+        $tahap1->update($request->only([
+            'nama_pelaku','produk','klasifikasi','status','pembina_1','pembina_2',
+            'sinergi','nama_kontak_person','no_hp','bulan_pertama_pembinaan',
+            'tahun_dibina','riwayat_pembinaan','status_pembinaan','email',
+            'media_sosial','nama_merek'
+        ]));
+
+        // 2️⃣ Persiapkan data Tahap 2
+        $data2 = $request->only([
+            'omzet','volume_per_tahun','jumlah_tenaga_kerja','link_dokumen',
+            'alamat_kantor','provinsi_kantor','kota_kantor',
+            'alamat_pabrik','provinsi_pabrik','kota_pabrik',
+            'legalitas_usaha','tahun_pendirian','jenis_usaha',
+            'sni_yang_akan_diterapkan','lspro','instansi','sertifikat'
         ]);
 
-        $umkm = Tahap1::with(['tahap2', 'tahap3', 'tahap4', 'tahap5', 'tahap6'])->findOrFail($id);
+        // Checkbox & Array
+        $data2['jangkauan_pemasaran'] = $request->input('jangkauan_pemasaran', []);
+        $data2['tanda_daftar_merek'] = $request->input('tanda_daftar_merek', []);
 
-        $umkm->update([
-            'nama_pelaku' => $request->nama_pelaku,
-            'produk' => $request->produk,
-            'klasifikasi' => $request->klasifikasi,
-            'status' => $request->status,
-            'pembina_1' => $request->pembina_1,
-        ]);
-
-        if ($umkm->tahap2) {
-            $umkm->tahap2->update([
-                'pembina_2' => $request->pembina_2,
-                'sinergi' => $request->sinergi,
-                'nama_kontak_person' => $request->nama_kontak_person,
-                'no_hp' => $request->no_hp,
-                'bulan_pertama_pembinaan' => $request->bulan_pertama_pembinaan,
-            ]);
-        }
-
-        if ($umkm->tahap3) {
-            $umkm->tahap3->update([
-                'tahun_dibina' => $request->tahun_dibina,
-                'riwayat_pembinaan' => $request->riwayat_pembinaan,
-                'status_pembinaan' => $request->status_pembinaan,
-                'email' => $request->email,
-                'media_sosial' => $request->media_sosial,
-            ]);
-        }
-
-        if ($umkm->tahap4) {
-            $umkm->tahap4->update([
-                'alamat' => $request->alamat,
-                'provinsi' => $request->provinsi,
-                'kota' => $request->kota,
-                'legalitas_usaha' => $request->legalitas_usaha,
-                'tahun_pendirian' => $request->tahun_pendirian,
-            ]);
-        }
-
-        if ($umkm->tahap5) {
-            $umkm->tahap5->update([
-                'jenis_usaha' => $request->jenis_usaha,
-                'nama_merek' => $request->nama_merek,
-                'sni' => $request->sni,
-                'lspro' => $request->lspro,
-                'tanda_daftar_merk' => $request->tanda_daftar_merk,
-            ]);
-        }
-
-        if ($umkm->tahap6) {
-            $data = [
-                'omzet' => $request->omzet,
-                'volume_per_tahun' => $request->volume_per_tahun,
-                'jumlah_tenaga_kerja' => $request->jumlah_tenaga_kerja,
-                'jangkauan_pemasaran' => $request->jangkauan_pemasaran,
-                'link_dokumen' => $request->link_dokumen,
-                'gambar_produk' => $request->gambar_produk,
-                'gambar_tempat_produksi' => $request->gambar_tempat_produksi,
-                'dokumen_mutu' => $request->dokumen_mutu,
-            ];
-
-            if ($request->hasFile('foto_produk')) {
-                if ($umkm->tahap6->foto_produk) {
-                    Storage::disk('public')->delete($umkm->tahap6->foto_produk);
-                }
-                $filename = time() . '_produk.' . $request->file('foto_produk')->getClientOriginalExtension();
-                $path = $request->file('foto_produk')->storeAs('uploads/foto_produk', $filename, 'public');
-                $data['foto_produk'] = $path;
+        // 3️⃣ Foto Produk
+        $fotoProduk = $request->input('old_foto_produk', $tahap2->foto_produk ?? []);
+        if ($request->hasFile('foto_produk')) {
+            foreach ($request->file('foto_produk') as $file) {
+                $fotoProduk[] = $file->store('uploads/foto_produk', 'public');
             }
+        }
+        $data2['foto_produk'] = $fotoProduk;
 
-            if ($request->hasFile('foto_tempat_produksi')) {
-                if ($umkm->tahap6->foto_tempat_produksi) {
-                    Storage::disk('public')->delete($umkm->tahap6->foto_tempat_produksi);
-                }
-                $filename = time() . '_tempat.' . $request->file('foto_tempat_produksi')->getClientOriginalExtension();
-                $path = $request->file('foto_tempat_produksi')->storeAs('uploads/foto_tempat_produksi', $filename, 'public');
-                $data['foto_tempat_produksi'] = $path;
+        // 4️⃣ Foto Tempat Produksi
+        $fotoTempat = $request->input('old_foto_tempat_produksi', $tahap2->foto_tempat_produksi ?? []);
+        if ($request->hasFile('foto_tempat_produksi')) {
+            foreach ($request->file('foto_tempat_produksi') as $file) {
+                $fotoTempat[] = $file->store('uploads/foto_tempat', 'public');
             }
+        }
+        $data2['foto_tempat_produksi'] = $fotoTempat;
 
-            $umkm->tahap6->update($data);
+        // 5️⃣ Simpan Tahap 2
+        $tahap2->fill($data2)->save();
+
+        // 6️⃣ Simpan otomatis ke Sertifikasi jika SPPT SNI
+        if ($tahap1->status_pembinaan === '9. SPPT SNI') {
+            Sertifikasi::updateOrCreate(
+                ['pelaku_usaha_id' => $tahap1->id],
+                array_merge($tahap1->toArray(), $data2)
+            );
+
+            $tahap1->update(['status' => 'Tersertifikasi']);
         }
 
-        if ($request->status_pembinaan == 'SPPT SNI') {
-            $umkm->status = 'Tersertifikasi';
-            $umkm->save();
+        return redirect()->back()->with('success', 'Data berhasil diperbarui.');
+    }
 
-            return redirect()->route('umkm.sertifikasi.index')
-                ->with('success', 'UMKM berhasil dipindahkan ke Sertifikasi.');
+    public function store(Request $request, $tahap)
+    {
+        // ---------------- Tahap 1 ----------------
+        if ($tahap == 1) {
+            $validated = $request->validate([
+                'nama_pelaku' => 'nullable|string|max:255',
+                'produk' => 'nullable|string|max:255',
+                'klasifikasi' => 'nullable|string',
+                'status' => 'nullable|string',
+                'pembina_1' => 'nullable|string',
+                'pembina_2' => 'nullable|string',
+                'sinergi' => 'nullable|string',
+                'nama_kontak_person' => 'nullable|string',
+                'no_hp' => 'nullable|string',
+                'bulan_pertama_pembinaan' => 'nullable|string',
+                'tahun_dibina' => 'nullable|string',
+                'riwayat_pembinaan' => 'nullable|string',
+                'status_pembinaan' => 'nullable|string',
+                'email' => 'nullable|email',
+                'media_sosial' => 'nullable|string',
+                'nama_merek' => 'nullable|string',
+                'tanda_daftar_merek' => 'nullable|string',
+            ]);
+
+            $tahap1 = Tahap1::create($validated);
+
+            return redirect()->route('tahap.create.tahap', [
+                'tahap' => 2,
+                'id' => $tahap1->id
+            ])->with('success', 'Tahap 1 disimpan');
         }
 
-        return redirect()->back()->with('success', 'Data berhasil diupdate');
-    }
+        // ---------------- Tahap 2 ----------------
+        if ($tahap == 2) {
+            $validated = $request->validate([
+                'pelaku_usaha_id' => 'required|exists:pelaku_usaha,id',
+                'omzet' => 'nullable|numeric',
+                'volume_per_tahun' => 'nullable|numeric',
+                'jumlah_tenaga_kerja' => 'nullable|numeric',
+                'jangkauan_pemasaran' => 'nullable|array',
+                'jangkauan_pemasaran.*' => 'in:Local,Nasional,Internasional',
+                'link_dokumen' => 'nullable|url',
+                'alamat_kantor' => 'nullable|string',
+                'provinsi_kantor' => 'nullable|string',
+                'kota_kantor' => 'nullable|string',
+                'alamat_pabrik' => 'nullable|string',
+                'provinsi_pabrik' => 'nullable|string',
+                'kota_pabrik' => 'nullable|string',
+                'legalitas_usaha' => 'nullable|string',
+                'tahun_pendirian' => 'nullable|string',
+                'foto_produk' => 'nullable|array',
+                'foto_produk.*' => 'image|mimes:jpg,jpeg,png',
+                'foto_tempat_produksi' => 'nullable|array',
+                'foto_tempat_produksi.*' => 'image|mimes:jpg,jpeg,png',
+                'jenis_usaha' => 'nullable|string',
+                'sni_yang_akan_diterapkan' => 'nullable|string',
+                'lspro' => 'nullable|string',
+                'tanda_daftar_merek' => 'nullable|array',
+                'instansi' => 'nullable|string',
+                'sertifikat' => 'nullable|string',
+            ]);
 
-    public function import(Request $request)
-    {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv'
-        ]);
+            $tahap2 = Tahap2::firstOrNew(['pelaku_usaha_id' => $validated['pelaku_usaha_id']]);
 
-        Excel::import(new UmkmImport, $request->file('file'));
+            // Foto Produk
+            $validated['foto_produk'] = $request->file('foto_produk')
+                ? array_map(fn($f) => $f->store('uploads/foto_produk', 'public'), $request->file('foto_produk'))
+                : ($tahap2->foto_produk ?? []);
 
-        return redirect()->back()->with('success', 'Data berhasil diimpor!');
-    }
+            // Foto Tempat Produksi
+            $validated['foto_tempat_produksi'] = $request->file('foto_tempat_produksi')
+                ? array_map(fn($f) => $f->store('uploads/foto_tempat', 'public'), $request->file('foto_tempat_produksi'))
+                : ($tahap2->foto_tempat_produksi ?? []);
 
-    public function export()
-    {
-        return Excel::download(new UmkmExport, 'data_umkm.docx');
-    }
+            // Array
+            $validated['jangkauan_pemasaran'] = $validated['jangkauan_pemasaran'] ?? [];
+            $validated['tanda_daftar_merek'] = $validated['tanda_daftar_merek'] ?? [];
 
-    public function exportWord()
-    {
-        $data = Tahap1::all();
-        $phpWord = new PhpWord();
-        $section = $phpWord->addSection();
+            $tahap2->fill($validated)->save();
 
-        // Judul
-        $section->addTitle('Rekapitulasi Data UMKM', 1);
-        $section->addTextBreak(1);
-
-        // Style tabel
-        $tableStyle = [
-            'borderSize' => 6,
-            'borderColor' => '000000',
-            'cellMargin' => 50
-        ];
-        $firstRowStyle = ['bgColor' => 'DDDDDD'];
-        $phpWord->addTableStyle('Data UMKM', $tableStyle, $firstRowStyle);
-
-        foreach ($data as $item) {
-            $pembinaan = Tahap2::where('pelaku_usaha_id', $item->id)->first();
-            $alamat    = Tahap4::where('pelaku_usaha_id', $item->id)->first();
-            $usaha     = Tahap5::where('pelaku_usaha_id', $item->id)->first();
-            $produksi  = Tahap6::where('pelaku_usaha_id', $item->id)->first();
-
-            $section->addText('UMKM: ' . $item->nama_pelaku, ['bold' => true, 'size' => 14]);
-            $section->addTextBreak(0.5);
-
-            $table = $section->addTable('Data UMKM');
-
-            $table->addRow();
-            $table->addCell(4000)->addText('Field', ['bold' => true]);
-            $table->addCell(8000)->addText('Value', ['bold' => true]);
-
-            $table->addRow();
-            $table->addCell()->addText('Nama Pelaku / UMK');
-            $table->addCell()->addText($item->nama_pelaku);
-
-            $table->addRow();
-            $table->addCell()->addText('Nama Produk');
-            $table->addCell()->addText($item->produk);
-
-            $table->addRow();
-            $table->addCell()->addText('Jenis Usaha');
-            $table->addCell()->addText($usaha->jenis_usaha ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Tahun Berdiri');
-            $table->addCell()->addText($alamat->tahun_pendirian ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Legalitas Usaha');
-            $table->addCell()->addText($alamat->legalitas_usaha ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Omzet');
-            $table->addCell()->addText($produksi->omzet ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Jangkauan Pemasaran');
-            $table->addCell()->addText($produksi->jangkauan_pemasaran ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Kontak Person');
-            $table->addCell()->addText($pembinaan->nama_kontak_person ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('No HP');
-            $table->addCell()->addText($pembinaan->No_Hp ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Email');
-            $table->addCell()->addText($item->email ?? '-');
-
-            $table->addRow();
-            $table->addCell()->addText('Lokasi Usaha');
-            $lokasi = trim(($alamat->kota ?? '') . ', ' . ($alamat->provinsi ?? ''));
-            $table->addCell()->addText($lokasi);
-
-            $section->addTextBreak(1);
+            return redirect()->route('umkm.sertifikasi.index')->with('success', 'UMKM berhasil disimpan');
         }
 
-        $fileName = 'data_umkm_filtered.docx';
-        $tempFile = tempnam(sys_get_temp_dir(), 'umkm_') . '.docx';
-        $objWriter = IOFactory::createWriter($phpWord, 'Word2007');
-        $objWriter->save($tempFile);
-
-        return response()->download($tempFile)->deleteFileAfterSend(true);
+        abort(404, 'Tahap tidak valid.');
     }
-
 }

@@ -11,47 +11,48 @@ class SpjImport implements ToCollection
 {
     public function collection(Collection $rows)
     {
-        // Lewati baris header
-        $data = $rows->skip(1);
+        $spj = null;
+        $allowedStatuses = ['sudah dibayar', 'belum dibayar'];
 
-        // Kelompokkan berdasarkan Nama SPJ + No UKD
-        $grouped = $data->groupBy(function ($row) {
-            return $row[1] . '|' . $row[2]; // kolom 1 = nama_spj, kolom 2 = no_ukd
-        });
+        foreach ($rows as $index => $row) {
+            if ($index === 0) continue; // skip header
 
-        foreach ($grouped as $group) {
-            $first = $group->first();
+            $nama_spj = trim($row[1] ?? '');
+            $no_ukd = trim($row[2] ?? '');
+            $dokumen = trim($row[3] ?? '');
+            $keterangan = trim($row[4] ?? '');
+            $item_string = trim($row[5] ?? '');
 
-            // Simpan data utama SPJ
-            $spj = new Spj();
-            $spj->nama_spj = $first[1] ?? '-';             // kolom ke-1 = Nama SPJ
-            $spj->no_ukd = $first[2] ?? '-';               // kolom ke-2 = No UKD
-            $spj->dokumen = $first[3] ?? '-';              // kolom ke-3 = Dokumen
-            $spj->keterangan = strip_tags($first[7] ?? ''); // kolom ke-7 = Keterangan
-            $spj->save();
+            // skip baris jika nama SPJ kosong
+            if (empty($nama_spj)) continue;
 
-            foreach ($group as $row) {
-                // Validasi item dan nominal
-                if (empty($row[4]) || !is_numeric($row[5])) {
-                    continue;
+            // Buat SPJ utama
+            $spj = Spj::create([
+                'nama_spj'   => $nama_spj,
+                'no_ukd'     => $no_ukd,
+                'dokumen'    => $dokumen,
+                'keterangan' => $keterangan,
+            ]);
+
+            // Pecah detail berdasarkan koma jika ada banyak
+            $items = explode(',', $item_string);
+            foreach ($items as $itemData) {
+                $parts = explode('/', $itemData);
+                $item = $parts[0] ?? null;
+                $nominal = isset($parts[1]) && is_numeric($parts[1]) ? intval($parts[1]) : 0;
+                $status = isset($parts[2]) && in_array(strtolower(trim($parts[2])), $allowedStatuses)
+                            ? strtolower(trim($parts[2]))
+                            : null;
+
+                if ($item) {
+                    SpjDetail::create([
+                        'spj_id'            => $spj->id,
+                        'item'              => trim($item),
+                        'nominal'           => $nominal,
+                        'status_pembayaran' => $status,
+                        'keterangan'        => $keterangan,
+                    ]);
                 }
-
-                // Normalisasi status pembayaran
-                $rawStatus = strtolower(trim($row[6] ?? 'belum_dibayar'));
-                $status = str_replace(' ', '_', $rawStatus);
-
-                // Pastikan nilainya valid enum
-                if (!in_array($status, ['sudah_dibayar', 'belum_dibayar'])) {
-                    $status = 'belum_dibayar'; // fallback kalau tidak valid
-                }
-
-                // Simpan detail
-                $detail = new SpjDetail();
-                $detail->spj_id = $spj->id;
-                $detail->item = $row[4];                    // kolom ke-4 = Item
-                $detail->nominal = (float) $row[5];         // kolom ke-5 = Nominal
-                $detail->status_pembayaran = $status;       // kolom ke-6 = Status Pembayaran
-                $detail->save();
             }
         }
     }

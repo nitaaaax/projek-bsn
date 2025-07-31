@@ -88,11 +88,15 @@
 @endsection
 
 @push('scripts')
-  {{-- CKEditor --}}
-  <script src="https://cdn.ckeditor.com/4.4.3/standard/ckeditor.js"></script>
-  <script>
-    CKEDITOR.replace('editor1');
-  </script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  ClassicEditor
+    .create(document.querySelector('#editor1'))
+    .catch(error => {
+      console.error(error);
+    });
+</script>
+
 
   {{-- JS Item Dinamis + Total --}}
   <script>

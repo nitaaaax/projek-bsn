@@ -14,10 +14,10 @@
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
             <a href="{{ route('spj.export') }}" class="btn btn-success">
-                <i class="fa fa-file-excel"></i> Export 
+                <i class="fa fa-file-excel"></i> Dowload Data
             </a>
             <a href="{{ route('spj.import') }}" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
-                <i class="fa fa-upload"></i> Import 
+                <i class="fa fa-upload"></i>  Upload Data
             </a>
           </div>
         </div>
@@ -25,18 +25,32 @@
 
       {{-- Modal Import --}}
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+    <div class="modal-content shadow-sm">
       <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="modal-header">
-          <h5 class="modal-title" id="importModalLabel">Import Data SPJ</h5>
+          <h5 class="modal-title fw-bold" id="importModalLabel">Import Data SPJ</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
-            <label for="file" class="form-label">Pilih file Excel (.xlsx / .xls / .csv)</label>
+            <label for="file" class="form-label">Pilih file Excel</label>
             <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+          </div>
+
+          <div class="alert alert-warning d-flex align-items-start p-3 rounded shadow-sm" role="alert" style="font-size: 14px; background-color: #fff8e1; border-left: 6px solid #ffc107;">
+            <div class="me-2 mt-1">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#ffc107" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.707c.89 0 1.438-.99.982-1.767L8.982 1.566zm-.982 4.905a.905.905 0 1 1 1.81 0l-.35 3.5a.555.555 0 0 1-1.11 0l-.35-3.5zM8 13.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+              </svg>
+            </div>
+            <div>
+              Gunakan template berikut agar format sesuai.<br>
+              <a href="{{ asset('template/template_importspj.xlsx') }}" class="btn btn-sm btn-primary mt-2 shadow-sm" download>
+                ⬇️ Download Template
+              </a>
+            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -111,7 +125,7 @@
           </div>
         </div>
 
-       {{-- TAB SUDAH --}}
+        {{-- TAB SUDAH --}}
 <div class="tab-pane fade" id="sudah" role="tabpanel">
   <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle" id="tabelSudah">
@@ -125,28 +139,29 @@
       </thead>
       <tbody>
         @forelse($sudahBayar->unique('spj_id') as $i => $item)
-          <tr>
-            <td class="text-center">{{ $i + 1 }}</td>
-            <td>{{ $item->spj->nama_spj ?? '-' }}</td>
-            <td class="text-center">
-              <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
-            </td>
-            <td class="text-center">
-              <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
-                <i class="fa fa-eye"></i> Detail
-              </a>
-            </td>
-          </tr>
+        <tr>
+          <td class="text-center">{{ $i + 1 }}</td>
+          <td>{{ $item->spj->nama_spj ?? '-' }}</td>
+          <td class="text-center">
+            <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
+          </td>
+          <td class="text-center">
+            <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+              <i class="fa fa-eye"></i> Detail
+            </a>
+          </td>
+        </tr>
         @empty
-          <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+        <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
         @endforelse
       </tbody>
     </table>
   </div>
 </div>
 
-        {{-- TAB BELUM --}}
-     <div class="tab-pane fade" id="belum" role="tabpanel">
+
+       {{-- TAB BELUM --}}
+<div class="tab-pane fade" id="belum" role="tabpanel">
   <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle" id="tabelBelum">
       <thead class="table-warning text-center">
@@ -158,32 +173,28 @@
         </tr>
       </thead>
       <tbody>
-        @forelse($belumBayar->unique('spj_id') as $i => $d)
-          <tr>
-            <td class="text-center">{{ $i + 1 }}</td>
-            <td>{{ $d->spj->nama_spj ?? '-' }}</td>
-            <td class="text-center">
-              <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
-            </td>
-            <td class="text-center">
-              <a href="{{ route('spj.show', $d->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
-                <i class="fa fa-eye"></i> Detail
-              </a>
-            </td>
-          </tr>
+        @forelse($belumBayar->unique('spj_id') as $i => $item)
+        <tr>
+          <td class="text-center">{{ $i + 1 }}</td>
+          <td>{{ $item->spj->nama_spj ?? '-' }}</td>
+          <td class="text-center">
+            <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
+          </td>
+          <td class="text-center">
+            <a href="{{ route('spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
+              <i class="fa fa-eye"></i> Detail
+            </a>
+          </td>
+        </tr>
         @empty
-          <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+        <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
         @endforelse
       </tbody>
     </table>
   </div>
 </div>
 
-
-          </div>
-        </div>
       </div>
-
     </div>
   </div>
 </div>
@@ -228,16 +239,6 @@
 @endsection
 
 @push('styles')
-<style>
-  table tr:hover {
-    background-color: #f5f5f5;
-  }
-  .badge {
-    font-size: 0.85rem;
-    border-radius: 10px;
-  }
-</style>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 @endpush

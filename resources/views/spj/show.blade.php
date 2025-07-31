@@ -7,36 +7,35 @@
       <h2 class="font-weight-bold mb-4">Detail SPJ</h2>
 
       {{-- Informasi Umum --}}
-      <div class="mb-4">
-        <table class="table table-borderless">
-          <tr>
-            <th style="width: 150px;">Nama SPJ</th>
-            <td>: {{ $spj->nama_spj }}</td>
-          </tr>
-          <tr>
-            <th>No UKD</th>
-            <td>: {{ $spj->no_ukd }}</td>
-          </tr>
-          <tr>
-          <th style="vertical-align: top;">Keterangan</th>
-          <td>
-            <div style="display: inline;">:</div>
-            <div style="display: inline-block; max-width: 1000px;">
-              {!! $spj->keterangan ? $spj->keterangan : '-' !!}
-            </div>
-          </td>
-          </tr>
-          <tr>
-            <th>Dokumen</th>
-            <td>: 
-              @if ($spj->dokumen)
-                <a href="{{ $spj->dokumen }}" target="_blank">{{ $spj->dokumen }}</a>
-              @else
-                -
-              @endif
-            </td>
-          </tr>
-        </table>
+      <div class="row mb-4">
+        <div class="col-md-4 mb-2">
+          <strong>Nama SPJ</strong><br>
+          : {{ $spj->nama_spj }}
+        </div>
+        <div class="col-md-4 mb-2">
+          <strong>No UKD</strong><br>
+          : {{ $spj->no_ukd }}
+        </div>
+        <div class="col-md-4 mb-2">
+          <strong>Dokumen</strong><br>
+          : 
+          @if ($spj->dokumen)
+            <a href="{{ $spj->dokumen }}" target="_blank">{{ $spj->dokumen }}</a>
+          @else
+            -
+          @endif
+        </div>
+
+       <div class="col-md-12 mt-3 d-flex align-items-start">
+        <div style="min-width: 130px;"><strong>Keterangan</strong></div>
+        <div class="me-2">:</div>
+        <div class="flex-grow-1" style="margin-top: -2px;">
+          @if($spj->keterangan)
+            {!! nl2br($spj->keterangan) !!}
+          @else
+            -
+          @endif
+        </div>
       </div>
 
       {{-- Tabel Detail Item --}}
@@ -69,8 +68,9 @@
         </table>
       </div>
 
+      {{-- Aksi --}}
       <div class="d-flex mt-4">
-        <a href="{{ route('spj.index') }}" class="btn btn-secondary mr-2">
+        <a href="{{ route('spj.index') }}" class="btn btn-secondary" style="margin-right: 12px;">
           <i class="fas fa-arrow-left"></i> Kembali ke daftar SPJ
         </a>
         <a href="{{ route('spj.edit', $spj->id) }}" class="btn btn-warning">

@@ -24,7 +24,7 @@
         <div class="row">
           <!-- Box 1 - SPJ -->
           <div class="col-lg-6 col-12">
-            <div class="small-box bg-info">
+            <div class="small-box">
               <div class="inner">
                 <h3>{{ $jumlahSpj }}</h3>
                 <p>Jumlah SPJ</p>
@@ -40,7 +40,7 @@
 
           <!-- Box 2 - UMKM -->
           <div class="col-lg-6 col-12">
-            <div class="small-box bg-success">
+            <div class="small-box">
               <div class="inner">
                 <h3>{{ $jumlahUmkm }}</h3>
                 <p>Jumlah UMKM</p>

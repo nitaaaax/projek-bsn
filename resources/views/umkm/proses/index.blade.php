@@ -11,14 +11,23 @@
       </h3>
 
       {{-- Tombol Aksi --}}
-      <div class="mb-4 d-flex gap-2">
-        <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary">
-          <i class="fa fa-plus mr-1"></i> Tambah UMKM
-        </a>
-        
-        <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
-          Import Excel
-        </button>
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex gap-2 mt-2">
+          
+          <a href="{{ route('tahap.create.tahap', ['tahap' => 1]) }}" class="btn btn-primary">
+            <i class="fa fa-plus mr-1"></i> Tambah UMKM
+          </a>
+          
+          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fa fa-file-import mr-1"></i>Import Excel
+          </button>
+        </div>
+
+        {{-- Search --}}
+        <form method="GET" action="{{ route('umkm.index') }}" class="d-flex">
+          <input type="text" name="search" class="form-control me-2" placeholder="Cari UMKM..." value="{{ request('search') }}">
+          <button class="btn btn-outline-primary" type="submit">Cari</button>
+        </form>
       </div>
 
       {{-- Tabel --}}
@@ -49,20 +58,20 @@
                   @endif
                 </td>
                 <td>
-                  <a href="{{ route('umkm.show', $t->id) }}" class="btn btn-info btn-sm">
-                    <i class="fa fa-eye"></i> Detail
-                  </a>
+                 <a href="{{ route('umkm.show', $t->id) }}" class="btn btn-info btn-sm" title="Detail">
+                <i class="fa fa-eye"></i>
+                </a>
 
-                  <form action="{{ route('umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
+                <form action="{{ route('umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm btn-delete">
-                      <i class="fa fa-trash"></i>
+                    <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
+                        <i class="fa fa-trash"></i>
                     </button>
-                  </form>
+                </form>
 
-                 <a href="{{ route('umkm.proses.export.word') }}" class="btn btn-success">
-                    Export Word
+                <a href="{{ route('umkm.proses.export.word') }}" class="btn btn-success btn-sm" title="Download Word">
+                    <i class="fa fa-download"></i>
                 </a>
 
                 </td>
@@ -106,27 +115,26 @@
 </div>
 @endsection
 
-
 @push('scripts')
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script>
-    document.querySelectorAll('.delete-form').forEach(form => {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        Swal.fire({
-          title: 'Yakin ingin menghapus?',
-          text: "Data akan dihapus permanen!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Ya, hapus!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.submit();
-          }
-        });
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.submit();
+        }
       });
     });
-  </script>
+  });
+</script>
 @endpush

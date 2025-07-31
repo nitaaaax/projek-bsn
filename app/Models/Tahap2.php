@@ -7,18 +7,27 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tahap2 extends Model
 {
-    protected $table = 'kontak';
+    protected $table = 'tahap2';
 
     protected $fillable = [
         'pelaku_usaha_id',
-        'pembina_2',
-        'sinergi',
-        'nama_kontak_person',
-        'no_hp',
-        'bulan_pertama_pembinaan',
+        'alamat_kantor','provinsi_kantor','kota_kantor',
+        'alamat_pabrik','provinsi_pabrik','kota_pabrik',
+        'legalitas_usaha','tahun_pendirian',
+        'omzet','volume_per_tahun','jumlah_tenaga_kerja',
+        'jangkauan_pemasaran','link_dokumen',
+        'foto_produk','foto_tempat_produksi',
+        'jenis_usaha','sni_yang_akan_diterapkan','lspro',
+        'tanda_daftar_merek','instansi','sertifikat',
     ];
 
-
+    protected $casts = [
+        'jangkauan_pemasaran' => 'array',
+        'tanda_daftar_merek' => 'array',
+        'foto_produk' => 'array',
+        'foto_tempat_produksi' => 'array',
+        
+    ];
 
     public function tahap1(): BelongsTo
     {
