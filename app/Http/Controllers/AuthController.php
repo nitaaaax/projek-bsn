@@ -45,7 +45,7 @@ class AuthController extends Controller
 
         User::create($validated);
 
-        return redirect()->route('login')->with('success', 'Akun berhasil dibuat. Silakan login.');
+        return redirect()->route('auth.login')->with('success', 'Akun berhasil dibuat. Silakan login.');
     }
 
     public function processLogin(Request $request)
