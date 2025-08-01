@@ -57,7 +57,7 @@ class UMKMProsesController extends Controller
             'alamat_kantor','provinsi_kantor','kota_kantor',
             'alamat_pabrik','provinsi_pabrik','kota_pabrik',
             'legalitas_usaha','tahun_pendirian','jenis_usaha',
-            'sni_yang_akan_diterapkan','lspro','instansi','sertifikat'
+            'sni_yang_akan_diterapkan','lspro','instansi','sertifikasi'
         ]);
 
         // Checkbox & Array
@@ -149,6 +149,7 @@ class UMKMProsesController extends Controller
         }
 
         if ($tahap == 2) {
+            
             $request->merge([
                 'jangkauan_pemasaran' => is_array($request->jangkauan_pemasaran) ? $request->jangkauan_pemasaran : (array) $request->jangkauan_pemasaran
             ]);
@@ -175,7 +176,7 @@ class UMKMProsesController extends Controller
                 'foto_tempat_produksi.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
                 'sni_yang_diterapkan' => 'nullable|string',
-                'sertifikat' => 'nullable|string',
+                'sertifikasi' => 'nullable|string',
             ];
 
             $validated = $request->validate($rules);
@@ -225,8 +226,18 @@ class UMKMProsesController extends Controller
         abort(404, 'Tahap tidak valid.');
     }
 
-    public function createTahap($tahap, $id = null)
-    {
-        return view('tahap.create', compact('tahap', 'id'));
+  public function createTahap($tahap, $id = null)
+{
+    $tahap1 = Tahap1::find($id); // Ambil data UMKM tahap 1
+    $data = null;
+
+    if ($tahap == 2 && $id) {
+        $data = Tahap2::where('pelaku_usaha_id', $id)->first();
     }
+
+    $pelaku_usaha_id = $tahap1?->id; // <- Pastikan ID pelaku usaha diambil
+
+    return view('tahap.create', compact('tahap', 'id', 'tahap1', 'data', 'pelaku_usaha_id'));
+}
+
 }

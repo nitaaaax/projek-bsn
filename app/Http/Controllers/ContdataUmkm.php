@@ -110,9 +110,8 @@ namespace  App\Http\Controllers;
                     'foto_produk.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                     'foto_tempat_produksi' => 'nullable|array',
                     'foto_tempat_produksi.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                    'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
                     'sni_yang_diterapkan' => 'nullable|string',
-                    'sertifikat' => 'nullable|string',
+                    'sertifikasi' => 'nullable|string',
                 ];
 
                 $validated = $request->validate($rules);
@@ -121,6 +120,7 @@ namespace  App\Http\Controllers;
 
                 $pelaku_usaha_id = $request->pelaku_usaha_id;
                 $validated['instansi'] = json_encode($validated['instansi']);
+                $validated['pelaku_usaha_id'] = $pelaku_usaha_id;
 
             // Proses upload foto_produk (walaupun tidak divalidasi)
                 $foto_produk_paths = [];
@@ -164,6 +164,7 @@ namespace  App\Http\Controllers;
         
         public function show($id)
         {
+            
             $model = Tahap2::where('pelaku_usaha_id', $id)->firstOrFail();
 
             if (auth()->user()->role == 'user') {
@@ -196,7 +197,8 @@ namespace  App\Http\Controllers;
                     : (is_array($tahap2->jangkauan_pemasaran) ? $tahap2->jangkauan_pemasaran : []);
             }
 
-            return view('umkm.show', compact(
+            return view('admin.umkm.show', compact(
+                
                 'tahap1', 'tahap2', 'pelaku_usaha_id',
                 'foto_produk', 'foto_tempat_produksi', 'jangkauan'
             ));
@@ -285,7 +287,7 @@ namespace  App\Http\Controllers;
                 'tanda_daftar_merk' => 'nullable|array',
                 'tanda_daftar_merk.*' => 'string|max:255',
                 'instansi' => 'nullable|string|max:255',
-                'sertifikat' => 'nullable|string|max:255'
+                'sertifikasi' => 'nullable|string|max:255',
             ]);
 
             

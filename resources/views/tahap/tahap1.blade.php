@@ -1,5 +1,5 @@
     <div class="row">
-        <input type="hidden" name="pelaku_usaha_id" value="{{ $data->pelaku_usaha_id ?? '' }}">
+    <input type="hidden" name="pelaku_usaha_id" value="{{ $id }}">
 
         {{-- Nama Pelaku --}}
         <div class="mb-3 col-md-6">
@@ -143,16 +143,33 @@
         <div class="col-md-6">
             <label class="form-label fw-bold d-block mb-1">Tanda Daftar Merek</label>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tanda_daftar_mere" id="terdaftar" value="1"
-                    {{ old('tanda_daftar_mere', $data->tanda_daftar_merk ?? 0) == 1 ? 'checked' : '' }}>
+                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="terdaftar" value="1"
+                    {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 1 ? 'checked' : '' }}>
                 <label class="form-check-label" for="terdaftar">Terdaftar di Kemenkumham</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tanda_daftar_mere" id="belum_terdaftar" value="0"
-                    {{ old('tanda_daftar_mere', $data->tanda_daftar_merk ?? 0) == 0 ? 'checked' : '' }}>
+                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="belum_terdaftar" value="0"
+                    {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 0 ? 'checked' : '' }}>
                 <label class="form-check-label" for="belum_terdaftar">Belum Terdaftar</label>
             </div>
         </div>
+
+    {{-- Jenis Usaha --}}
+    <div class="col-md-6">
+        <label class="form-label fw-bold d-block mb-1">Jenis Usaha</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="jenis_usaha" id="pangan" value="Pangan"
+                {{ old('jenis_usaha', $data->jenis_usaha ?? '') == 'Pangan' ? 'checked' : '' }}>
+            <label class="form-check-label" for="pangan">Pangan</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="jenis_usaha" id="nonpangan" value="Nonpangan"
+                {{ old('jenis_usaha', $data->jenis_usaha ?? '') == 'Nonpangan' ? 'checked' : '' }}>
+            <label class="form-check-label" for="nonpangan">Nonpangan</label>
+        </div>
+    </div>
+
+
 
     </div>
 

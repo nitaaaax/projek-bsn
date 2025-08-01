@@ -15,6 +15,7 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+
     public function home()
     {
         $jumlahSpj = Spj::count();
@@ -26,23 +27,38 @@ class AuthController extends Controller
 
     public function processLogin(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        // Validasi input email dan password
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+        // Cari user berdasarkan email
+        $user = User::where('email', $request->email)->first();
 
-            // Arahkan ke route 'home' yang akan menampilkan konten berdasarkan role
-            return redirect()->route('home')->with('success', 'Login berhasil!');
+        if (!$user) {
+            return back()->withErrors(['email' => 'User tidak ditemukan'])->withInput();
         }
 
-        return back()->withErrors(['email' => 'Login gagal']);
+        // Cek password menggunakan Hash::check()
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['password' => 'Password salah'])->withInput();
+        }
+
+        // Login user secara manual
+        Auth::login($user);
+
+        // Regenerate session
+        $request->session()->regenerate();
+
+        // Redirect ke home dengan pesan sukses
+        return redirect()->route('home')->with('success', 'Login berhasil!');
     }
 
     public function logout(Request $request)
     {
-        session()->forget('user');
-
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

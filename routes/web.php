@@ -42,21 +42,18 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::resource('users', UserController::class);
         Route::get('/dashboard', fn () => view('role.admin'))->name('dashboard');
-        
+Route::prefix('umkm-proses')->name('umkm.')->group(function () {
+    Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
+    Route::get('/create', [ContcreateUmkm::class, 'create'])->name('create');
+    Route::get('/create/{tahap}/{id?}', [ContcreateUmkm::class, 'showTahap'])->name('create.tahap');
+    Route::post('/store/{tahap}/{id?}', [ContcreateUmkm::class, 'store'])->name('store');
 
-    // UMKM Multi Tahap Proses
-    Route::prefix('umkm-proses')->name('umkm.')->group(function () {
-        Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
-        Route::post('/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('proses.import.excel');
-        Route::get('/export/word', [UmkmExportImportController::class, 'exportWord'])->name('proses.export.word');
-
-        Route::get('/create/{tahap}/{id?}', [ContcreateUmkm::class, 'create'])->name('create'); 
-        Route::post('/store/{tahap}/{id?}', [ContcreateUmkm::class, 'store'])->name('store');
-
-        Route::get('/{id}/edit', [ContdataUmkm::class, 'edit'])->name('edit');
+    Route::get('/{id}/edit', [ContcreateUmkm::class, 'edit'])->name('edit');
+    Route::delete('/{id}', [ContcreateUmkm::class, 'destroy'])->name('destroy');
+    Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
         Route::delete('/{id}', [ContcreateUmkm::class, 'destroy'])->name('destroy');
         Route::get('/{id}', [ContdataUmkm::class, 'show'])->name('show');
-
+Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap');
         Route::get('/tahap/{tahap}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap');
         Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
     });

@@ -9,9 +9,9 @@
             </div>
 
             <div class="card-body">
-<form action="{{ route('admin.umkm.store', ['tahap' => $tahap, 'id' => $id ?? null]) }}" method="POST">
+            <form action="{{ route('admin.umkm.store', ['tahap' => $tahap, 'id' => $id ?? null]) }}" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <input type="hidden" name="pelaku_usaha_id" value="{{ $tahap1->id ?? '' }}">
+            <input type="hidden" name="pelaku_usaha_id" value="{{ $pelaku_usaha_id }}">
                     <input type="hidden" name="redirect" value="{{ request('redirect') }}">
 
                     {{-- Form dinamis berdasarkan tahap --}}
@@ -23,27 +23,27 @@
                         <p class="text-danger">Tahap tidak valid.</p>
                     @endif
 
-                 {{-- Navigasi tombol --}}
-<div class="mt-4 text-start ps-2">
-    @if ($tahap > 1)
-        <a href="{{ route('admin.umkm.create', ['tahap' => $tahap - 1, 'id' => $id ?? null]) }}"
-        class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
-            ← Kembali
-        </a>
+            {{-- Navigasi tombol --}}
+            <div class="mt-4 text-start ps-2">
+                @if ($tahap > 1)
+                    <a href="{{ route('admin.umkm.create', ['tahap' => $tahap - 1, 'id' => $id ?? null]) }}"
+                    class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
+                       Lanjut
+                    </a>
 
-    @else
-        <a href="{{ route('umkm.proses.index') }}"
-           class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
-            ← Kembali
-        </a>
-    @endif
+                @else
+                    <a href="{{ route('umkm.proses.index') }}"
+                    class="btn btn-outline-secondary btn-sm" style="min-width: 90px; font-size: 0.85rem;">
+                        ← Kembali
+                    </a>
+                @endif
 
-    <button type="submit"
-        class="btn btn-{{ $tahap < 2 ? 'primary' : 'success' }} btn-sm ms-2"
-        style="min-width: 90px; font-size: 0.85rem;">
-        {{ $tahap < 2 ? 'Lanjut →' : 'Simpan' }}
-    </button>
-</div>
+                <button type="submit"
+                    class="btn btn-{{ $tahap < 2 ? 'primary' : 'success' }} btn-sm ms-2"
+                    style="min-width: 90px; font-size: 0.85rem;">
+                    {{ $tahap < 2 ? 'Lanjut →' : 'Simpan' }}
+                </button>
+            </div>
 
 
                 </form>

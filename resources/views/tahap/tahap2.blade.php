@@ -1,5 +1,5 @@
     <div class="row">
-        <input type="hidden" name="pelaku_usaha_id" value="{{ $data->pelaku_usaha_id ?? '' }}">
+    <input type="hidden" name="pelaku_usaha_id" value="{{ $id }}">
 
         {{-- Alamat Kantor --}}
         <div class="mb-3 col-md-12">
@@ -105,10 +105,10 @@
             <textarea name="instansi" class="form-control">{{ old('instansi', $data->instansi ?? '') }}</textarea>
         </div>
 
-        {{-- Sertifikat --}}
+        {{-- sertifikasi --}}
         <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Sertifikat</label>
-            <textarea name="sertifikat" class="form-control">{{ old('sertifikat', $data->sertifikat ?? '') }}</textarea>
+            <label class="form-label fw-bold">Sertifikasi</label>
+            <textarea name="sertifikasi" class="form-control">{{ old('sertifikasi', $data->sertifikasi ?? '') }}</textarea>
         </div>
 
         {{-- SNI yang Akan Diterapkan --}}
@@ -118,6 +118,15 @@
         </div>
     </div>
     
+    {{-- Gruping --}}
+    <div class="mb-3">
+        <label for="gruping" class="form-label fw-bold">Gruping</label>
+        <input type="text" name="gruping" class="form-control" value="{{ old('gruping') }}" placeholder="Contoh: UMKM Pangan Lokal">
+        @error('gruping')
+            <div class="text-danger">{{ $message }}</div>
+        @enderror
+    </div>
+
         {{-- Upload Foto Produk --}}
         <div class="mb-3 col-md-12">
             <label class="form-label fw-bold">Foto Produk</label>

@@ -88,30 +88,13 @@
         </ul>
       </li>
 
-     {{-- HANYA UNTUK ADMIN --}}
+      {{-- HANYA UNTUK ADMIN --}}
     @if (Auth::check() && Auth::user()->role?->name === 'admin')
-      <li class="nav-item has-treeview">
-        <a href="#" class="nav-link">
+      <li class="nav-item">
+        <a href="{{ route('admin.users.index') }}" class="nav-link">
           <i class="nav-icon fas fa-user-shield"></i>
-          <p>
-            Role Management
-            <i class="right fas fa-angle-left"></i>
-          </p>
+          <p>Role Management</p>
         </a>
-        <ul class="nav nav-treeview">
-          <li class="nav-item">
-            <a href="{{ route('admin.users.index') }}" class="nav-link">
-              <i class="far fa-circle nav-icon"></i>
-              <p>Manipulasi Account</p>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="{{ route('admin.users.index') }}" class="nav-link">
-              <i class="far fa-circle nav-icon"></i>
-              <p>Manipulasi Role</p>
-            </a>
-          </li>
-        </ul>
       </li>
     @endif
     </ul>

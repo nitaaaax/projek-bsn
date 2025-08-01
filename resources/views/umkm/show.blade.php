@@ -355,7 +355,6 @@ function previewImages(input, targetId) {
     target.innerHTML = "";
 
     const files = Array.from(input.files);
-    const newFileList = new DataTransfer();
 
     files.forEach((file, index) => {
         const reader = new FileReader();
@@ -392,34 +391,30 @@ function previewImages(input, targetId) {
     });
 }
 
-// Hapus gambar lama dari DOM dan form
 document.addEventListener('DOMContentLoaded', function () {
+    // Hapus gambar lama dari DOM dan form
     document.querySelectorAll('.btn-remove-old').forEach(button => {
         button.addEventListener('click', function () {
             const wrapper = this.closest('.old-foto-produk') || this.closest('.old-foto-tempat');
             wrapper.remove();
         });
     });
-});
-</script>
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const checkboxes = document.querySelectorAll('.instansi-checkbox');
+    // Toggle input instansi
+    const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"][name="instansi_check[]"]');
 
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                const textInput = this.parentElement.querySelector('.instansi-text');
-                if (this.checked) {
-                    textInput.style.display = 'block';
-                } else {
-                    textInput.style.display = 'none';
-                    textInput.value = '';
-                }
-            });
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', function () {
+            const inputId = 'input_' + this.value;
+            const textInput = document.getElementById(inputId);
+            if (this.checked) {
+                textInput.style.display = 'block';
+            } else {
+                textInput.style.display = 'none';
+                textInput.value = '';
+            }
         });
     });
+});
 </script>
-@endpush
 @endpush

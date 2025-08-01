@@ -7,7 +7,7 @@
 
       {{-- Judul dan Tombol Tambah Akun --}}
       <div class="mb-2">
-        <h4 class="fw-bold mb-0">Daftar Akun</h4>
+        <h4 class="fw-bold mb-0">Role Manajement</h4>
       </div>
       <div class="mb-3">
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary">

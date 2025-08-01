@@ -17,7 +17,7 @@ class Tahap2 extends Model
             'omzet','volume_per_tahun','jumlah_tenaga_kerja',
             'jangkauan_pemasaran','link_dokumen',
             'foto_produk','foto_tempat_produksi','sni_yang_diterapkan',
-            'instansi','sertifikat',
+            'instansi','sertifikat','gruping',
         ];
 
         protected $casts = [

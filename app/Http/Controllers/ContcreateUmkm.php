@@ -9,16 +9,22 @@ use App\Models\Tahap2;
 
 class ContcreateUmkm extends Controller
 {
-    public function index()
-    {
-        $tahap = Tahap1::count();
-        return view('tahap.create', compact('tahap'));
-    }
+  public function index()
+{
+    $tahap = 1;
+    $pelaku_usaha_id = null; // atau angka jika perlu
+    $id = null;
+    $data = null;
+
+    return view('tahap.create', compact('tahap', 'pelaku_usaha_id', 'id', 'data'));
+}
+
 
     public function create()
-    {
-    return redirect()->route('admin.umkm.create.tahap', ['tahap' => 1]);
-    }
+{
+    return redirect()->route('admin.umkm.create.tahap', ['tahap' => 1, 'id' => 1]); 
+}
+
     
 
     public function showTahap(int $tahap, $id = null)
@@ -44,7 +50,6 @@ class ContcreateUmkm extends Controller
     {
         $isEdit = $id !== null;
         
-        // dd($request->all());
 
         if ($tahap == 1) {
             if ($request->has('riwayat_pembinaan') && is_array($request->riwayat_pembinaan)) {
@@ -71,6 +76,7 @@ class ContcreateUmkm extends Controller
                 'media_sosial' => 'nullable|string|max:255',
                 'nama_merek' => 'nullable|string|max:255',
                 'lspro' => 'nullable|string|max:255',
+                'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
                 'tanda_daftar_merk' => 'nullable|string|max:255',
             ];
 
@@ -80,19 +86,24 @@ class ContcreateUmkm extends Controller
                 Tahap1::findOrFail($id)->update($validated);
                 $nextId = $id;
             } else {
-                $tahap1 = Tahap1::create($validated);
-                $nextId = $tahap1->id;
-            }
+        $validated['pelaku_usaha_id'] = $request->pelaku_usaha_id;
+        $tahap1 = Tahap1::create($validated);
+                        $nextId = $tahap1->id;
+                    }
 
-            return redirect()->route('admin.umkm.create.tahap', [
-                'tahap' => 2,
-                'id' => $nextId
-            ])->with('success', 'Tahap 1 berhasil disimpan');
+                    return redirect()->route('admin.umkm.create.tahap', [
+                        'tahap' => 2,
+                        'id' => $tahap1->id
+                    ])->with('success', 'Tahap 1 berhasil disimpan');
+                }
+
+                if ($tahap == 2) {
+        $pelaku_usaha_id = $request->pelaku_usaha_id ?? $id;
+
+        if (!$pelaku_usaha_id) {
+            return back()->withErrors(['pelaku_usaha_id' => 'ID Pelaku Usaha tidak ditemukan.']);
         }
-
-        if ($tahap == 2) {
-            $pelaku_usaha_id = $isEdit ? $request->pelaku_usaha_id : $id;
-            $request->merge([
+                    $request->merge([
                 'jangkauan_pemasaran' => is_array($request->jangkauan_pemasaran) ? $request->jangkauan_pemasaran : (array) $request->jangkauan_pemasaran
             ]);
 
@@ -114,9 +125,9 @@ class ContcreateUmkm extends Controller
                 'tahun_pendirian' => 'nullable|string|max:4',
                 'foto_produk.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
                 'foto_tempat_produksi.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-                'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
                 'sni_yang_diterapkan' => 'nullable|string',
-                'sertifikat' => 'nullable|string',
+                'sertifikasi' => 'nullable|string',
+                'gruping' => 'nullable|string'
             ];
 
                 $validated = $request->validate($rules);
@@ -179,7 +190,7 @@ class ContcreateUmkm extends Controller
 
         $tahap1->delete();
 
-        return redirect()->route('admin.umkm.index')->with('success', 'Data UMKM berhasil dihapus.');
+        return redirect()->route('admin.umkm.proses.index')->with('success', 'Data UMKM berhasil dihapus.');
     }
     public function show($id)
     {
@@ -191,7 +202,7 @@ class ContcreateUmkm extends Controller
             abort(404, "View 'umkm.sertifikasi.show' not found.");
         }
 
-        return view('umkm.sertifikasi.show', compact('tahap1', 'tahap2'));
+return view('admin.umkm-proses.show', compact('tahap1', 'tahap2'));
     }
 
 

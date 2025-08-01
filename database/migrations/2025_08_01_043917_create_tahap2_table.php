@@ -4,13 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTahap2Table extends Migration
-{
-    public function up()
+return new class extends Migration {
+    public function up(): void
     {
+        Schema::dropIfExists('tahap2');
+
         Schema::create('tahap2', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('pelaku_usaha_id'); // FK ke tahap1.id
+            $table->unsignedBigInteger('pelaku_usaha_id');
             $table->string('alamat_kantor')->nullable();
             $table->string('provinsi_kantor')->nullable();
             $table->string('kota_kantor')->nullable();
@@ -22,18 +23,20 @@ class CreateTahap2Table extends Migration
             $table->bigInteger('omzet')->nullable();
             $table->bigInteger('volume_per_tahun')->nullable();
             $table->integer('jumlah_tenaga_kerja')->nullable();
-            $table->string('jangkauan_pemasaran')->nullable();
-            $table->string('link_dokumen')->nullable();
-            $table->json('foto_produk')->nullable(); // simpan array foto sebagai JSON
-            $table->json('foto_tempat_produksi')->nullable();
-            $table->timestamps();
-
-            $table->foreign('pelaku_usaha_id')->references('id')->on('tahap1')->onDelete('cascade');
+            $table->longText('jangkauan_pemasaran')->nullable();
+            $table->longText('link_dokumen')->nullable();
+            $table->longText('foto_produk')->nullable();
+            $table->longText('foto_tempat_produksi')->nullable();
+            $table->longText('instansi')->nullable();
+            $table->text('sertifikasi')->nullable();
+            $table->string('sni_yang_diterapkan')->nullable();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('tahap2');
     }
-}
+};
