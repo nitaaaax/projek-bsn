@@ -17,7 +17,7 @@ class Tahap1 extends Model
 
     protected $casts = [
     'riwayat_pembinaan' => 'array',
-];
+    ];
 
     public function tahap2(): HasOne
     {

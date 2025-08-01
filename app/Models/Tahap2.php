@@ -9,23 +9,23 @@ class Tahap2 extends Model
 {
     protected $table = 'tahap2';
 
-    protected $fillable = [
-        'pelaku_usaha_id',
-        'alamat_kantor','provinsi_kantor','kota_kantor',
-        'alamat_pabrik','provinsi_pabrik','kota_pabrik',
-        'legalitas_usaha','tahun_pendirian',
-        'omzet','volume_per_tahun','jumlah_tenaga_kerja',
-        'jangkauan_pemasaran','link_dokumen',
-        'foto_produk','foto_tempat_produksi','sni_yang_diterapkan',
-        'instansi','sertifikat',
-    ];
+        protected $fillable = [
+            'pelaku_usaha_id',
+            'alamat_kantor','provinsi_kantor','kota_kantor',
+            'alamat_pabrik','provinsi_pabrik','kota_pabrik',
+            'legalitas_usaha','tahun_pendirian',
+            'omzet','volume_per_tahun','jumlah_tenaga_kerja',
+            'jangkauan_pemasaran','link_dokumen',
+            'foto_produk','foto_tempat_produksi','sni_yang_diterapkan',
+            'instansi','sertifikat',
+        ];
 
-    protected $casts = [
-        'jangkauan_pemasaran' => 'array',
-        'foto_produk' => 'array',
-        'foto_tempat_produksi' => 'array',
-        'instansi' => 'array',
-    ];
+        protected $casts = [
+            'jangkauan_pemasaran' => 'array',
+            'foto_produk' => 'array',
+            'foto_tempat_produksi' => 'array',
+            'instansi' => 'array',
+        ];
 
     public function tahap1(): BelongsTo
     {

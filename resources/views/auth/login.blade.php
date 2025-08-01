@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="card-footer text-muted text-center small">
-                    &copy; {{ date('Y') }} Samudraz
+                    &copy; {{ date('Y') }} KLT BSN
                 </div>
             </div>
 

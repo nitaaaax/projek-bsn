@@ -80,9 +80,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/import', [SpjController::class, 'import'])->name('import');
     });
 
-    // Export & Import UMKM
-    Route::get('/umkm/export-word', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word');
-    Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
     });
 
     // --------------------- USER ROUTES ---------------------
@@ -93,10 +90,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
             Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
         });
-
-        Route::get('/umkm/export-word', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word');
-        Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
     });
+
+     // Export & Import UMKM
+    Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
+    Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
 
 // ---------------------- AJAX WILAYAH ----------------------
 Route::get('/get-kota/{provinsi}', [WilayahController::class, 'getKota']);

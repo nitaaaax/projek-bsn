@@ -10,13 +10,13 @@
         <div class="col-md-6">
           <h2 class="fw-bold">Data SPJ</h2>
           <div class="d-flex gap-2 mt-2">
-            <a href="{{ route('admin.spj.create') }}" class="btn btn-primary btn-sm">
+            <a href="{{ route('admin.spj.create') }}" class="btn btn-primary">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
             <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
                 <i class="fa fa-file-excel"></i> Dowload Data
             </a>
-            <a href="{{ route('admin.spj.import') }}" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#importModal">
+            <a href="{{ route('admin.spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="fa fa-upload"></i>  Upload Data
             </a>
           </div>
@@ -187,7 +187,9 @@
           </td>
         </tr>
         @empty
-        <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+       <tr>
+          <td colspan="5" class="text-muted">Belum Ada Data</td>
+        </tr>
         @endforelse
       </tbody>
     </table>
