@@ -1,6 +1,12 @@
 @extends('layout.app')
 
 @section('content')
+<style>
+.btn.border:hover {
+  background-color: rgba(0,0,0,0.03);
+}
+</style>
+
 <div class="container mt-4">
   <div class="card">
     <div class="card-body">
@@ -24,43 +30,21 @@
       </div>
 
       {{-- Modal Import --}}
-<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
-    <div class="modal-content shadow-sm">
-      <form action="{{ route('admin.spj.import') }}" method="POST" enctype="multipart/form-data">
-        @csrf
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold" id="importModalLabel">Import Data SPJ</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
+        <div class="d-flex gap-2 mt-2">
+          <a href="{{ route('admin.spj.create') }}" class="btn border" style="color: #2EC6DF; border-color: #2EC6DF; background-color: #fff;">
+            <i class="fa fa-plus"></i> Tambah SPJ
+          </a>
+          <a href="{{ route('admin.spj.export') }}" class="btn border" style="color: #28a745; border-color: #28a745; background-color: #fff;">
+            <i class="fa fa-file-excel"></i> Dowload Data
+          </a>
+          <a href="{{ route('admin.spj.import') }}" class="btn border" style="color: #ffc107; border-color: #ffc107; background-color: #fff;" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fa fa-upload"></i> Upload Data
+          </a>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label for="file" class="form-label">Pilih file Excel</label>
-            <input type="file" name="file" class="form-control" accept=".xlsx,.xls,.csv" required>
-          </div>
-
-          <div class="alert alert-warning d-flex align-items-start p-3 rounded shadow-sm" role="alert" style="font-size: 14px; background-color: #fff8e1; border-left: 6px solid #ffc107;">
-            <div class="me-2 mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#ffc107" viewBox="0 0 16 16">
-                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.707c.89 0 1.438-.99.982-1.767L8.982 1.566zm-.982 4.905a.905.905 0 1 1 1.81 0l-.35 3.5a.555.555 0 0 1-1.11 0l-.35-3.5zM8 13.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-              </svg>
-            </div>
-            <div>
-              Gunakan template berikut agar format sesuai.<br>
-              <a href="{{ asset('template/template_importspj.xlsx') }}" class="btn btn-sm btn-primary mt-2 shadow-sm" download>
-                ⬇️ Download Template
-              </a>
-            </div>
-          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-          <button type="submit" class="btn btn-primary">Import Sekarang</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
+      </div>
 
       {{-- Tab Navigasi --}}
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">

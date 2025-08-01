@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-  public function index(Request $request)
+    public function index(Request $request)
     {
         $search = $request->search;
 
@@ -31,7 +31,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
             'username' => 'required|unique:users,username', 
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
@@ -39,7 +38,6 @@ class UserController extends Controller
         ]);
 
         User::create([
-            'name' => $request->name,
             'username' => $request->username, 
             'email' => $request->email,
             'password' => bcrypt($request->password),
@@ -49,7 +47,7 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Akun Berhasil Ditambahkan.');;
     }
 
-        public function destroy($id)
+    public function destroy($id)
     {
         $user = User::findOrFail($id);
         
@@ -62,37 +60,51 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'Akun berhasil dihapus.');
     }
 
-    public function edit($id)
+    public function updateRole(Request $request, $id)
     {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
         $user = User::findOrFail($id);
-        $roles = Role::all();
-        return view('admin.users.edit', compact('user', 'roles'));
+
+        // Tidak bisa ubah role sendiri
+        if ($user->id === auth()->id()) {
+            return redirect()->back()->with('error', 'Kamu tidak bisa mengubah rolenya sendiri.');
+        }
+
+        $user->role_id = $request->role_id;
+        $user->save();
+
+        return redirect()->back()->with('success', 'Role berhasil diperbarui.');
     }
 
-    public function update(Request $request, $id)
+    public function profile()
     {
-        $user = User::findOrFail($id);
+        $user = auth()->user(); // Ambil user yang sedang login
+        return view('partial.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user(); // Tidak butuh ID dari route
 
         $request->validate([
-            'name' => 'required',
             'username' => 'required',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'role_id' => 'required|exists:roles,id',
             'password' => 'nullable|min:6',
         ]);
 
-        $user->name = $request->name;
         $user->username = $request->username;
         $user->email = $request->email;
-        $user->role_id = $request->role_id;
 
-        // Update password hanya jika diisi
         if ($request->filled('password')) {
             $user->password = bcrypt($request->password);
         }
 
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun berhasil diperbarui.');
+        return redirect()->route('profile.view')->with('success', 'Profil berhasil diperbarui.');
     }
+
 }
