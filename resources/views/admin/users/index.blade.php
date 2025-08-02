@@ -14,12 +14,6 @@
           <i class="fa fa-plus"></i> Tambah Akun
         </a>
       </div>
-
-      {{-- Flash Message --}}
-      @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-      @endif
-
       {{-- Search di kanan atas tabel, sejajar dengan judul kolom Aksi --}}
       <div class="d-flex justify-content-end mb-2">
         <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex" style="width: 250px;">
@@ -33,7 +27,7 @@
         <table class="table table-bordered align-middle">
           <thead class="bg-light text-dark text-center fw-bold">
             <tr>
-              <th>Nama</th>
+              <th>Username</th>
               <th>Email</th>
               <th>Role</th>
               <th>Aksi</th>
@@ -42,13 +36,22 @@
           <tbody>
             @forelse ($users as $user)
             <tr>
-              <td>{{ $user->name }}</td>
+              <td>{{ $user->username }}</td>
               <td>{{ $user->email }}</td>
-              <td>{{ $user->role->name }}</td>
+              <td>
+               <form action="{{ route('admin.users.updateRole', $user->id) }}" method="POST">
+    @csrf
+    {{-- HAPUS @method('PUT') karena sekarang pakai POST --}}
+    <select name="role_id" onchange="this.form.submit()" class="form-select form-select-sm" {{ $user->id === auth()->id() ? 'disabled' : '' }}>
+        @foreach(App\Models\Role::all() as $role)
+            <option value="{{ $role->id }}" {{ $user->role_id == $role->id ? 'selected' : '' }}>
+                {{ ucfirst($role->name) }}
+            </option>
+        @endforeach
+    </select>
+               </form>
+              </td>
               <td class="text-center">
-                <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-warning me-1">
-                  <i class="fa fa-edit"></i>
-                </a>
                 <button onclick="confirmDelete({{ $user->id }})" class="btn btn-sm btn-danger">
                   <i class="fa fa-trash"></i>
                 </button>

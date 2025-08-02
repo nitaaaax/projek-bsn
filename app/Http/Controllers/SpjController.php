@@ -14,6 +14,7 @@ class SpjController extends Controller
     public function index()
     {
         $spj = Spj::with('details')->get();
+        $user = auth()->user();
 
         $sudahBayar = SpjDetail::with('spj')
             ->where('status_pembayaran', 'Sudah Dibayar')->get();
@@ -21,7 +22,7 @@ class SpjController extends Controller
         $belumBayar = SpjDetail::with('spj')
             ->where('status_pembayaran', 'Belum Dibayar')->get();
 
-        return view('spj.index', compact('spj', 'sudahBayar', 'belumBayar'));
+        return view('spj.index', compact('spj', 'sudahBayar', 'belumBayar','user'));
     }
 
     public function export()

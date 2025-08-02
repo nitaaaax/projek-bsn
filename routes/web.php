@@ -43,6 +43,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
 
     Route::get('/dashboard', fn () => view('role.admin'))->name('dashboard');
     Route::resource('users', UserController::class);
+    Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
 
     // UMKM Proses (Admin full akses Tahap 1 & 2)
     Route::prefix('umkm-proses')->name('umkm.')->group(function () {
@@ -53,6 +54,9 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
         Route::get('/{id}/edit', [ContcreateUmkm::class, 'edit'])->name('edit');
         Route::delete('/{id}', [ContcreateUmkm::class, 'destroy'])->name('destroy');
         Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
+
+        Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap');
+        Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
     });
 
     // UMKM Sertifikasi
@@ -94,3 +98,11 @@ Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExc
 
 // ---------------------- AJAX WILAYAH ----------------------
 Route::get('/get-kota/{provinsi}', [WilayahController::class, 'getKota']);
+
+// ---------------------- PROFILE ----------------------
+Route::prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [UserController::class, 'profile'])->name('view');
+    Route::post('/', [UserController::class, 'updateProfile'])->name('update');
+});
+
+

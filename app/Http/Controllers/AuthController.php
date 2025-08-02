@@ -64,4 +64,13 @@ class AuthController extends Controller
 
         return redirect()->route('login');
     }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        $role = auth()->user()->role->name; // 'admin' atau 'user'
+
+        return view('auth.profile', compact('role', 'user'));
+    }
+
 }

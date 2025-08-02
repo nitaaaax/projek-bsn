@@ -14,7 +14,7 @@
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex gap-2 mt-2">
           
-      <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-info">
+      <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
           <i class="fa fa-plus mr-1"></i>Tambah UMKM
       </a>
 
