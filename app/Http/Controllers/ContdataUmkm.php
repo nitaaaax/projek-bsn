@@ -39,7 +39,6 @@ namespace  App\Http\Controllers;
         {
             $isEdit = $id !== null;
             
-            // dd($request->all());
 
             if ($tahap == 1) {
                 if ($request->has('riwayat_pembinaan') && is_array($request->riwayat_pembinaan)) {
@@ -119,7 +118,7 @@ namespace  App\Http\Controllers;
                 
 
                 $pelaku_usaha_id = $request->pelaku_usaha_id;
-                $validated['instansi'] = json_encode($validated['instansi']);
+$validated['instansi'] = json_encode($request->input('instansi', []));
                 $validated['pelaku_usaha_id'] = $pelaku_usaha_id;
 
             // Proses upload foto_produk (walaupun tidak divalidasi)
@@ -162,47 +161,71 @@ namespace  App\Http\Controllers;
             abort(404, 'Tahap tidak valid.');
         }
         
-        public function show($id)
-        {
-            
-            $model = Tahap2::where('pelaku_usaha_id', $id)->firstOrFail();
+      public function show($id)
+{
+    $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
 
-            if (auth()->user()->role == 'user') {
-                return view('user.umkm.show', compact('model'));
-            }
-
-            $tahap1 = Tahap1::findOrFail($id);
-            $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
-            $pelaku_usaha_id = $tahap1->id;
-
-            // Cegah error jika data sudah dalam bentuk array
-            $foto_produk = [];
-            if ($tahap2 && !empty($tahap2->foto_produk)) {
-                $foto_produk = is_string($tahap2->foto_produk)
-                    ? json_decode($tahap2->foto_produk, true)
-                    : (is_array($tahap2->foto_produk) ? $tahap2->foto_produk : []);
-            }
-
-            $foto_tempat_produksi = [];
-            if ($tahap2 && !empty($tahap2->foto_tempat_produksi)) {
-                $foto_tempat_produksi = is_string($tahap2->foto_tempat_produksi)
-                    ? json_decode($tahap2->foto_tempat_produksi, true)
-                    : (is_array($tahap2->foto_tempat_produksi) ? $tahap2->foto_tempat_produksi : []);
-            }
-
-            $jangkauan = [];
-            if ($tahap2 && !empty($tahap2->jangkauan_pemasaran)) {
-                $jangkauan = is_string($tahap2->jangkauan_pemasaran)
-                    ? json_decode($tahap2->jangkauan_pemasaran, true)
-                    : (is_array($tahap2->jangkauan_pemasaran) ? $tahap2->jangkauan_pemasaran : []);
-            }
-
-            return view('admin.umkm.show', compact(
-                
-                'tahap1', 'tahap2', 'pelaku_usaha_id',
-                'foto_produk', 'foto_tempat_produksi', 'jangkauan'
-            ));
+    if (auth()->user()->role == 'user') {
+        if (!$tahap2) {
+            abort(404, 'Data tidak ditemukan.');
         }
+        return view('user.umkm.show', ['model' => $tahap2]);
+    }
+
+    $tahap1 = Tahap1::findOrFail($id);
+    $pelaku_usaha_id = $tahap1->id;
+
+    // Default kosong dulu
+    $foto_produk = [];
+    $foto_tempat_produksi = [];
+    $jangkauan = [];
+    $instansiArray = [];
+    $instansiFormatted = [];
+
+    if ($tahap2) {
+        // Foto Produk
+        if (!empty($tahap2->foto_produk)) {
+            $foto_produk = is_string($tahap2->foto_produk)
+                ? json_decode($tahap2->foto_produk, true)
+                : (is_array($tahap2->foto_produk) ? $tahap2->foto_produk : []);
+        }
+
+        // Foto Tempat Produksi
+        if (!empty($tahap2->foto_tempat_produksi)) {
+            $foto_tempat_produksi = is_string($tahap2->foto_tempat_produksi)
+                ? json_decode($tahap2->foto_tempat_produksi, true)
+                : (is_array($tahap2->foto_tempat_produksi) ? $tahap2->foto_tempat_produksi : []);
+        }
+
+        // Jangkauan Pemasaran
+        if (!empty($tahap2->jangkauan_pemasaran)) {
+            $jangkauan = is_string($tahap2->jangkauan_pemasaran)
+                ? json_decode($tahap2->jangkauan_pemasaran, true)
+                : (is_array($tahap2->jangkauan_pemasaran) ? $tahap2->jangkauan_pemasaran : []);
+        }
+
+        // Instansi Pembina
+        if (!empty($tahap2->instansi)) {
+            $decoded = json_decode($tahap2->instansi, true);
+            $instansiArray = is_array($decoded) ? $decoded : [];
+
+            foreach ($instansiArray as $label => $value) {
+                if (!empty($value)) {
+                    $instansiFormatted[] = "$label: $value";
+                }
+            }
+        }
+    }
+
+    return view('umkm.show', compact(
+        'tahap1', 'tahap2', 'pelaku_usaha_id',
+        'foto_produk', 'foto_tempat_produksi', 'jangkauan',
+        'instansiArray', 'instansiFormatted'
+    ));
+
+
+
+    }
 
         public function destroy($id)
         {
@@ -315,7 +338,7 @@ namespace  App\Http\Controllers;
                 $validated2
             );
 
-            return redirect()->route('umkm.index')->with('success', 'Data UMKM berhasil diperbarui.');
+            return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil diperbarui.');
         }
 
 

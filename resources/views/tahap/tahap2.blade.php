@@ -1,5 +1,7 @@
     <div class="row">
-    <input type="hidden" name="pelaku_usaha_id" value="{{ $id }}">
+<form method="POST" action="/projek-bsn/admin/umkm-proses/store/1/{{ $id }}">
+    @csrf
+    <input type="hidden" name="pelaku_usaha_id" value="{{ $tahap1->id ?? $id ?? '' }}">
 
         {{-- Alamat Kantor --}}
         <div class="mb-3 col-md-12">

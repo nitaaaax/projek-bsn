@@ -14,7 +14,7 @@ use App\Http\Controllers\{
     WilayahController
 };
 
-// ---------------------- PUBLIC (Guest) ----------------------
+// ---------------------- GUEST ----------------------
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -22,13 +22,13 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'processLogin']);
 });
 
-// ---------------------- Redirect Default ----------------------
+// ---------------------- DEFAULT REDIRECT ----------------------
 Route::get('/', fn () => redirect()->route('login'));
 
 // ---------------------- LOGOUT ----------------------
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-// ---------------------- Home ----------------------
+// ---------------------- HOME ----------------------
 Route::middleware('auth')->get('/home', [HomeController::class, 'index'])->name('home');
 
 // ---------------------- READ-ONLY USER DASHBOARD ----------------------
@@ -38,31 +38,28 @@ Route::middleware('auth')->group(function () {
     Route::get('/umkm-sertifikasi', [UMKMSertifikasiController::class, 'index'])->name('umkm.sertifikasi.index');
 });
 
-// --------------------- ADMIN ROUTES ---------------------
-    Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::resource('users', UserController::class);
-        Route::get('/dashboard', fn () => view('role.admin'))->name('dashboard');
-Route::prefix('umkm-proses')->name('umkm.')->group(function () {
-    Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
-    Route::get('/create', [ContcreateUmkm::class, 'create'])->name('create');
-    Route::get('/create/{tahap}/{id?}', [ContcreateUmkm::class, 'showTahap'])->name('create.tahap');
-    Route::post('/store/{tahap}/{id?}', [ContcreateUmkm::class, 'store'])->name('store');
+// ---------------------- ADMIN ROUTES ----------------------
+Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/{id}/edit', [ContcreateUmkm::class, 'edit'])->name('edit');
-    Route::delete('/{id}', [ContcreateUmkm::class, 'destroy'])->name('destroy');
-    Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
+    Route::get('/dashboard', fn () => view('role.admin'))->name('dashboard');
+    Route::resource('users', UserController::class);
+
+    // UMKM Proses (Admin full akses Tahap 1 & 2)
+    Route::prefix('umkm-proses')->name('umkm.')->group(function () {
+        Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
+        Route::get('/create', [ContcreateUmkm::class, 'create'])->name('create');
+        Route::get('/create/{tahap}/{id?}', [ContcreateUmkm::class, 'showTahap'])->name('create.tahap');
+        Route::post('/store/{tahap}/{id?}', [ContcreateUmkm::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ContcreateUmkm::class, 'edit'])->name('edit');
         Route::delete('/{id}', [ContcreateUmkm::class, 'destroy'])->name('destroy');
-        Route::get('/{id}', [ContdataUmkm::class, 'show'])->name('show');
-Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap');
-        Route::get('/tahap/{tahap}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap');
-        Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
+        Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
     });
 
-    // Sertifikasi UMKM
+    // UMKM Sertifikasi
     Route::prefix('umkm-sertifikasi')->name('sertifikasi.')->group(function () {
         Route::get('/', [UMKMSertifikasiController::class, 'index'])->name('index');
         Route::get('/{id}/edit', [UMKMSertifikasiController::class, 'edit'])->name('edit');
-        Route::put('/{id}/update', [UMKMSertifikasiController::class, 'update'])->name('update');
+        Route::put('/tahap/update/{id}', [ContdataUmkm::class, 'update'])->name('tahap.update');
     });
 
     // SPJ
@@ -77,22 +74,23 @@ Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])
         Route::get('/export', [SpjController::class, 'export'])->name('export');
         Route::post('/import', [SpjController::class, 'import'])->name('import');
     });
+});
 
+// ---------------------- USER ROUTES (READ-ONLY + SHOW) ----------------------
+Route::prefix('user')->middleware(['auth', 'checkRole:user'])->name('user.')->group(function () {
+    Route::get('/dashboard', fn () => view('role.user'))->name('dashboard');
+
+    Route::prefix('umkm-proses')->name('umkm.')->group(function () {
+        Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
+        Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
+        Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.user');
+        Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update.user');
     });
+});
 
-    // --------------------- USER ROUTES ---------------------
-    Route::prefix('user')->middleware(['auth', 'checkRole:user'])->name('user.')->group(function () {
-        Route::get('/dashboard', fn () => view('role.user'))->name('dashboard');
-
-        Route::prefix('umkm-proses')->name('umkm.')->group(function () {
-            Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
-            Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
-        });
-    });
-
-     // Export & Import UMKM
-    Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
-    Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
+// ---------------------- EXPORT / IMPORT ----------------------
+Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
+Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
 
 // ---------------------- AJAX WILAYAH ----------------------
 Route::get('/get-kota/{provinsi}', [WilayahController::class, 'getKota']);
