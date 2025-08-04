@@ -1,5 +1,4 @@
-    <div class="row">
-    <input type="hidden" name="pelaku_usaha_id" value="{{ $id }}">
+      <div class="row">
 
         {{-- Nama Pelaku --}}
         <div class="mb-3 col-md-6">
@@ -30,12 +29,12 @@
                 <option value="drop/tidak dilanjutkan" {{ old('status', $data->status ?? '') == 'drop/tidak dilanjutkan' ? 'selected' : '' }}>
                     Drop / Tidak Dilanjutkan
                 </option>
-                <option value="masih di bina" {{ old('status', $data->status ?? '') == 'masih di bina' ? 'selected' : '' }}>
+                <option value="masih dibina" {{ old('status', $data->status ?? '') == 'masih dibina' ? 'selected' : '' }}>
                     Masih di Bina
                 </option>
-                </select>
-            </div>
-
+            </select>
+        </div>
+        
         {{-- Pembina 1 --}}
         <div class="mb-3 col-md-6">
             <label for="pembina_1" class="form-label fw-bold">Pembina I</label>
@@ -81,7 +80,7 @@
                     5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
                     9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
                 ] as $num => $nama)
-                    <option value="{{ $num }}" {{ old('bulan_pertama_pembinaan', $data->bulan_pertama_pembinaan ?? '') == $num ? 'selected' : '' }}>
+                    <option value="{{ $nama }}" {{ old('bulan_pertama_pembinaan', $data->bulan_pertama_pembinaan ?? '') == $nama ? 'selected' : '' }}>
                         {{ $nama }}
                     </option>
                 @endforeach
@@ -100,13 +99,13 @@
             <label for="status_pembinaan" class="form-label fw-bold">Status Pembinaan</label>
             <select name="status_pembinaan" id="status_pembinaan" class="form-control">
                 <option value="">-- Pilih Status --</option>
-                <option value="1. Identifikasi awal dan Gap" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '1. Identifikasi awal dan Gap' ? 'selected' : '' }}> Identifikasi awal dan Gap</option>
-                <option value="2. Set up Sistem" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '2. Set up Sistem' ? 'selected' : '' }}> Set up Sistem</option>
-                <option value="3. Implementasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '3. Implementasi' ? 'selected' : '' }}> Implementasi</option>
-                <option value="4. Review Sistem & Audit Internal" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '4. Review Sistem & Audit Internal' ? 'selected' : '' }}> Review Sistem & Audit Internal</option>
-                <option value="5. Pengajuan Sertifikasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '5. Pengajuan Sertifikasi' ? 'selected' : '' }}> Pengajuan Sertifikasi</option>
-                <option value="6. Perbaikan Temuan Audit" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '6. Perbaikan Temuan Audit' ? 'selected' : '' }}> Perbaikan Temuan Audit</option>
-                <option value="7. Perbaikan Lokasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == '7. Perbaikan Lokasi' ? 'selected' : '' }}> Perbaikan Lokasi</option>
+                <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}> Identifikasi awal dan Gap</option>
+                <option value="Set up Sistem" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}> Set up Sistem</option>
+                <option value="Implementasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}> Implementasi</option>
+                <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}> Review Sistem & Audit Internal</option>
+                <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}> Pengajuan Sertifikasi</option>
+                <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}> Perbaikan Temuan Audit</option>
+                <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}> Perbaikan Lokasi</option>
                 <option value="SPPT SNI" style="font-weight:bold; color:green;" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }}>SPPT SNI (Tersertifikasi)</option>
             </select>
         </div>
@@ -143,12 +142,12 @@
         <div class="col-md-6">
             <label class="form-label fw-bold d-block mb-1">Tanda Daftar Merek</label>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="terdaftar" value="1"
+                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="terdaftar" value="Terdaftar di Kemenkumham"
                     {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 1 ? 'checked' : '' }}>
                 <label class="form-check-label" for="terdaftar">Terdaftar di Kemenkumham</label>
             </div>
             <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="belum_terdaftar" value="0"
+                <input class="form-check-input" type="radio" name="tanda_daftar_merk" id="belum_terdaftar" value="Belum Terdaftar"
                     {{ old('tanda_daftar_merk', $data->tanda_daftar_merk ?? 0) == 0 ? 'checked' : '' }}>
                 <label class="form-check-label" for="belum_terdaftar">Belum Terdaftar</label>
             </div>
@@ -168,22 +167,16 @@
             <label class="form-check-label" for="nonpangan">Nonpangan</label>
         </div>
     </div>
-
-
-
-    </div>
-
-    {{-- Riwayat Pembinaan --}}
-    <div class="mb-3 col-13">
-        <label for="riwayat_pembinaan" class="form-label fw-bold">Riwayat Pembinaan</label>
-        <textarea name="riwayat_pembinaan" id="riwayat_pembinaan" class="form-control">
-            {!! old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') !!}
-        </textarea>
-    </div>
+           {{-- Riwayat Pembinaan --}}
+        <div class="mb-3 col-md-12">
+            <label class="form-label fw-bold">Riwayat Pembinaan</label>
+            <textarea name="riwayat_pembinaan" class="form-control">{{ old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') }}</textarea>
         </div>
 
+    </div>
 
-
+ 
+    @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
     let editorRiwayat;
@@ -202,3 +195,4 @@
         document.querySelector('#riwayat_pembinaan').value = editorRiwayat.getData();
     });
 </script>
+    @endpush

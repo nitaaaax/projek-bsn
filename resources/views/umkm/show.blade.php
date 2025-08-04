@@ -4,7 +4,35 @@
     <div class="container mt-4">
 <form action="{{ route('admin.umkm.store', ['tahap' => 2, 'id' => $tahap1->id]) }}" method="POST">
     @csrf
-    @method('PUT')
+    @method('POST')
+            @php
+                // Tanda Daftar Merek
+                $tanda_daftar_merk = [];
+                if (!empty($tahap2->tanda_daftar_merk)) {
+                    $tanda_daftar_merk = is_string($tahap2->tanda_daftar_merk)
+                        ? json_decode($tahap2->tanda_daftar_merk, true)
+                        : (array) $tahap2->tanda_daftar_merk;
+                }
+
+                // Status Pembinaan
+                $status_pembinaan = [];
+                if (!empty($tahap2->status_pembinaan)) {
+                    $status_pembinaan = is_string($tahap2->status_pembinaan)
+                        ? json_decode($tahap2->status_pembinaan, true)
+                        : (array) $tahap2->status_pembinaan;
+                }
+
+                // Jangkauan Pemasaran
+                $jangkauan_pemasaran = [];
+                if (!empty($tahap2->jangkauan_pemasaran)) {
+                    $jangkauan_pemasaran = is_string($tahap2->jangkauan_pemasaran)
+                        ? json_decode($tahap2->jangkauan_pemasaran, true)
+                        : (array) $tahap2->jangkauan_pemasaran;
+                }
+
+                 // Instansi
+                $instansiArray = json_decode($tahap2->instansi ?? '{}', true) ?? [];
+            @endphp
 
 
             {{-- CARD 1: Data Tahap 1 --}}
@@ -14,7 +42,6 @@
                 </div>
 
                 <div class="card-body row g-3">
-                    {{-- Nama Pelaku sampai Nama Merek --}}
                     @foreach ([
                         'nama_pelaku' => 'Nama Pelaku',
                         'produk' => 'Produk',
@@ -28,6 +55,8 @@
                         'email' => 'Email',
                         'media_sosial' => 'Media Sosial',
                         'nama_merek' => 'Nama Merek',
+                        'lspro' => 'LSPRO',
+
                     ] as $field => $label)
                         <div class="col-md-6">
                             <label class="form-label">{{ $label }}</label>
@@ -36,90 +65,74 @@
                         </div>
                     @endforeach
 
-                    {{-- Select Status --}}
+                    {{-- Status --}}
                     <div class="col-md-6">
                         <label class="form-label">Status</label>
                         <select name="status" class="form-control">
                             <option value="">-- Pilih Status --</option>
-                            <option value="aktif" {{ old('status', $tahap1->status ?? '') == 'aktif' ? 'selected' : '' }}>Aktif</option>
                             <option value="drop/tidak dilanjutkan" {{ old('status', $tahap1->status ?? '') == 'drop/tidak dilanjutkan' ? 'selected' : '' }}>Drop / Tidak Dilanjutkan</option>
-                            <option value="masih di bina" {{ old('status', $tahap1->status ?? '') == 'masih di bina' ? 'selected' : '' }}>Masih di Bina</option>
+                            <option value="masih dibina" {{ old('status', $tahap1->status ?? '') == 'masih dibina' ? 'selected' : '' }}>Masih di Bina</option>
                         </select>
                     </div>
 
-                    {{-- Select Bulan Pertama Pembinaan --}}
+                    {{-- Bulan Pertama Pembinaan --}}
                     <div class="col-md-6">
                         <label class="form-label">Bulan Pembinaan Pertama</label>
                         <select name="bulan_pertama_pembinaan" class="form-control">
                             @foreach ([
-                                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-                                5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-                                9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
-                            ] as $key => $label)
-                                <option value="{{ $key }}"
-                                    {{ old('bulan_pertama_pembinaan', $tahap1->bulan_pertama_pembinaan ?? '') == $key ? 'selected' : '' }}>
-                                    {{ $label }}
+                                'Januari', 'Februari', 'Maret', 'April',
+                                'Mei', 'Juni', 'Juli', 'Agustus',
+                                'September', 'Oktober', 'November', 'Desember'
+                            ] as $bulan)
+                                <option value="{{ $bulan }}"
+                                    {{ old('bulan_pertama_pembinaan', $tahap1->bulan_pertama_pembinaan ?? '') == $bulan ? 'selected' : '' }}>
+                                    {{ $bulan }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    {{-- Select Status Pembinaan --}}
+                    {{-- Status Pembinaan --}}
                     <div class="col-md-6">
                         <label class="form-label">Status Pembinaan</label>
                         <select name="status_pembinaan" class="form-control">
                             <option value="">-- Pilih Status Pembinaan --</option>
-                            @foreach ([
-                                '1. Identifikasi awal dan Gap',
-                                '2. Set up Sistem',
-                                '3. Implementasi',
-                                '4. Review Sistem & Audit Internal',
-                                '5. Pengajuan Sertifikasi',
-                                '6. Perbaikan Temuan Audit',
-                                '7. Perbaikan Lokasi',
-                                '8. Monitoring Pasca Sertifikasi',
-                                '9. SPPT SNI'
-                            ] as $item)
-                                <option
-                                    value="{{ $item }}"
-                                    {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == $item ? 'selected' : '' }}
-                                    @if($item == '9. SPPT SNI') style="color: green; font-weight: bold;" @endif>
-                                    {{ $item }}
-                                </option>
-                            @endforeach
+                            <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
+                            <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
+                            <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
+                            <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
+                            <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
+                            <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
+                            <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
+                            <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
+                            <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
+                        </select>
+                    </div>
+
+
+                    {{-- Jenis Usaha --}}
+                    <div class="col-md-6">
+                        <label class="form-label">Jenis Usaha</label>
+                        <select name="jenis_usaha" class="form-control">
+                            <option value="">-- Pilih Jenis Usaha --</option>
+                            <option value="Pangan" {{ old('jenis_usaha', $tahap1->jenis_usaha ?? '') == 'Pangan' ? 'selected' : '' }}>Pangan</option>
+                            <option value="Nonpangan" {{ old('jenis_usaha', $tahap1->jenis_usaha ?? '') == 'Nonpangan' ? 'selected' : '' }}>Nonpangan</option>
                         </select>
                     </div>
 
                     {{-- Riwayat Pembinaan --}}
                     <div class="col-md-12">
                         <label class="form-label">Riwayat Pembinaan</label>
-                        <textarea name="riwayat_pembinaan" id="riwayat_pembinaan" class="form-control" rows="4">
-{!! old('riwayat_pembinaan', is_array($tahap1->riwayat_pembinaan) ? implode(', ', $tahap1->riwayat_pembinaan) : ($tahap1->riwayat_pembinaan ?? '')) !!}
-                        </textarea>
-
+                        <textarea name="riwayat_pembinaan" class="form-control" rows="4">{{ old('riwayat_pembinaan', $tahap1->riwayat_pembinaan ?? '') }}</textarea>
                     </div>
                 </div>
             </div>
-
-            @php
-    $tahap2 = $tahap2 ?? (object)[];
-    $foto_produk = $foto_produk ?? [];
-    $foto_tempat_produksi = $foto_tempat_produksi ?? [];
-
-    // Decode Tanda merek
-    $merek = [];
-    if (!empty($tahap2->merek)) {
-        $decoded = json_decode($tahap2->merek, true);
-        $merek = is_array($decoded) ? $decoded : [$tahap2->merek];
-    }
-@endphp
-
-<div>
-    <strong>Tanda Merek:</strong>
-    {{ !empty($merek) ? implode(', ', $merek) : '-' }}
-</div>
-
-
+            
+                @php
+                $tahap2 = $tahap2 ?? (object)[];
+                $foto_produk = $foto_produk ?? [];
+                $foto_tempat_produksi = $foto_tempat_produksi ?? [];
+                @endphp
 
             {{-- CARD 2: Data Tahap 2 --}}
             <div class="card shadow-sm mb-4 border-0 rounded-3">
@@ -180,6 +193,7 @@
                         <label class="form-label">Alamat Pabrik</label>
                         <textarea name="alamat_pabrik" class="form-control" rows="2">{{ old('alamat_pabrik', $tahap2->alamat_pabrik ?? '') }}</textarea>
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Provinsi Pabrik</label>
                         <input type="text" name="provinsi_pabrik" class="form-control"
@@ -206,173 +220,113 @@
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">SNI yang Akan Diterapkan</label>
-                        <input type="text" name="sni_yang_akan_diterapkan" class="form-control"
-                            value="{{ old('sni_yang_akan_diterapkan', $tahap2->sni_yang_akan_diterapkan ?? '') }}">
+                        <input type="text" name="sni_yang_diterapkan" class="form-control"
+                            value="{{ old('sni_yang_diterapkan', $tahap2->sni_yang_diterapkan ?? '') }}">
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">LSPRO</label>
-                        <input type="text" name="lspro" class="form-control"
-                            value="{{ old('lspro', $tahap2->lspro ?? '') }}">
-                    </div>
-                <div class="col-md-6">
-@php
-    // Pastikan $instansiArray terdefinisi dan array
-    $instansiArray = $instansiArray ?? [];
 
-    // Format teks instansi yang terisi
-    $instansiFormatted = [];
-    foreach ($instansiArray as $label => $value) {
-        if (!empty($value)) {
-            $valueStr = is_array($value) ? implode(', ', $value) : $value;
-            $instansiFormatted[] = "$label: $valueStr";
-        }
-    }
-@endphp
-
-
-{{-- Tampilkan Instansi --}}
-<strong>Instansi:</strong> {{ !empty($instansiFormatted) ? implode('; ', $instansiFormatted) : '-' }}
-
-<div class="col-md-12 mb-3 mt-2">
-<label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
-
-    @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
-       @php
-    $isChecked = !empty($instansiArray[$item]);
-    $rawValue = old("instansi_detail.$item", $instansiArray[$item] ?? '');
-    $inputValue = is_array($rawValue) ? implode(', ', $rawValue) : $rawValue;
-@endphp
-
-
-        <div class="form-check mb-2">
-            <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
-                {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
-
-            <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
-
-            <input type="text" class="form-control mt-1"
-                name="instansi_detail[{{ $item }}]"
-                id="input_{{ $item }}"
-                placeholder="Isi nama {{ strtolower($item) }}"
-                value="{{ $inputValue }}"
-                {{ $isChecked ? '' : 'style=display:none;' }}>
-        </div>
-    @endforeach
-</div>
-
-
-                </div>
                     <div class="col-md-6">
                         <label class="form-label">Sertifikat yang Dimiliki</label>
                         <input type="text" name="sertifikat" class="form-control"
                             value="{{ old('sertifikat', $tahap2->sertifikat ?? '') }}">
                     </div>
 
-                    {{-- Jenis Usaha --}}
-                    <div class="mb-3 col-md-6">
-                        <label for="jenis_usaha" class="form-label fw-bold">Jenis Usaha</label>
-                        <select name="jenis_usaha" id="jenis_usaha" class="form-control">
-                            <option value="">-- Pilih Jenis Usaha --</option>
-                            <option value="Pangan" {{ old('jenis_usaha', $tahap2->jenis_usaha ?? '') == 'Pangan' ? 'selected' : '' }}>Pangan</option>
-                            <option value="Nonpangan" {{ old('jenis_usaha', $tahap2->jenis_usaha ?? '') == 'Nonpangan' ? 'selected' : '' }}>Nonpangan</option>
-                        </select>
-                    </div>
-                        <div class="form-group">
-    <label for="produk">Produk</label>
-    <input type="text" name="produk" class="form-control" 
-        value="{{ old('produk', optional($tahap2)->produk) }}">
-</div>
-
-
-                    {{-- Tanda Daftar merek --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-l    abel">Tanda Daftar merek</label>
-                        <div class="ms-2">
-                            @foreach (["Terdaftar di Kemenkumham", "Belum Terdaftar"] as $option)
-                                <div class="form-check">
-                                    <input type="checkbox" name="merek[]" class="form-check-input"
-                                    value="{{ $option }}" id="merek{{ Str::slug($option, '_') }}"
-                                    {{ in_array($option, old('merek', $merek)) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="merek{{ Str::slug($option, '_') }}">{{ $option }}</label>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    {{-- Jangkauan Pemasaran --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Jangkauan Pemasaran</label>
-                        <div class="ms-2">
+                        {{-- Jangkauan Pemasaran --}}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Jangkauan Pemasaran</label>
                             @foreach (["Local", "Nasional", "Internasional"] as $option)
                                 <div class="form-check">
                                     <input type="checkbox" name="jangkauan_pemasaran[]" class="form-check-input"
                                         value="{{ $option }}" id="jangkauan_{{ $option }}"
-                                        {{ in_array($option, $jangkauan) ? 'checked' : '' }}>
+                                        {{ in_array($option, $jangkauan_pemasaran ?? []) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="jangkauan_{{ $option }}">{{ $option }}</label>
                                 </div>
                             @endforeach
                         </div>
+
+
+                        {{-- Instansi --}}
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
+                            @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
+                                @php
+                                    $isChecked = !empty($instansiArray[$item]);
+                                    $rawValue = old("instansi_detail.$item", $instansiArray[$item] ?? '');
+                                    $inputValue = is_array($rawValue) ? implode(', ', $rawValue) : $rawValue;
+                                @endphp
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
+                                        {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
+                                    <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
+                                    <input type="text" class="form-control mt-1"
+                                        name="instansi_detail[{{ $item }}]"
+                                        id="input_{{ $item }}"
+                                        placeholder="Isi nama {{ strtolower($item) }}"
+                                        value="{{ $inputValue }}"
+                                        {{ $isChecked ? '' : 'style=display:none;' }}>
+                                </div>
+                            @endforeach
+                        </div>
                     </div>
+                    {{-- Foto Produk --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+                        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
 
-    {{-- Foto Produk --}}
-    <div class="col-md-6 mb-3">
-        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
-        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
-
-        {{-- Preview Foto Lama --}}
-        <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
-@if (is_array($foto_produk) && count($foto_produk) > 0)
-    @foreach ($foto_produk as $foto)
-
-                    <div class="position-relative me-2 mb-2 old-foto-produk">
-                        <img src="{{ asset('storage/foto_produk/' . $foto) }}" width="100" class="rounded">
-                        <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
-                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">
-                            &times;
-                        </button>
+                        {{-- Preview Foto Lama --}}
+                        <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
+                            @if (is_array($foto_produk) && count($foto_produk) > 0)
+                                @foreach ($foto_produk as $foto)
+                                    <div class="position-relative me-2 mb-2 old-foto-produk">
+                                        <img src="{{ asset('storage/app/public/uploads/foto_produk' . $foto) }}" width="100" class="rounded">
+                                        <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
+                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-muted">Belum ada foto produk.</p>
+                            @endif
+                        </div>
+                        <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
                     </div>
-                @endforeach
-            @else
-                <p class="text-muted">Belum ada foto produk.</p>
-            @endif
-        </div>
-
-        {{-- Preview Gambar Baru --}}
-        <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
-    </div>
-
 
                     {{-- Foto Tempat Produksi --}}
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
                         <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
+
+                        {{-- Preview Foto Lama --}}
                         <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
-                            @foreach ($foto_tempat_produksi as $foto)
-                                <div class="position-relative me-2 mb-2 old-foto-tempat">
-                                    <img src="{{ asset('storage/' . $foto) }}" width="100" class="rounded">
-                                    <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
-                                    <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">
-                                        &times;
-                                    </button>
-                                </div>
-                            @endforeach
+                            @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
+                                @foreach ($foto_tempat_produksi as $foto)
+                                    <div class="position-relative me-2 mb-2 old-foto-tempat">
+                                        <img src="{{ asset('storage/app/public/uploads/foto_tempat_produksi' . $foto) }}" width="100" class="rounded">
+                                        <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
+                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-muted">Belum ada foto tempat produksi.</p>
+                            @endif
                         </div>
                         <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
                     </div>
+                    </div>
+
+                    {{-- Tombol Submit dan Kembali --}}
+                    <div class="col-12 d-flex justify-content-end gap-3 mb-4">
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" title="Simpan Perubahan">
+                            <i class="fas fa-save"></i> Simpan
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            {{-- Submit dan Kembali --}}
-            <div class="d-flex justify-content-end gap-3 mb-5 me-3">
-                <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
-                    <i class="fas fa-arrow-left"></i> Kembali
-                </a>
-                <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" title="Simpan Perubahan">
-                    <i class="fas fa-save"></i> Simpan
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
+
+
     @endsection
 
     @push('scripts')
@@ -444,4 +398,25 @@
         });
     });
     </script>
+    <script>
+    function previewImages(input, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ""; // clear sebelumnya
+
+        if (input.files) {
+            Array.from(input.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "rounded me-2 mb-2";
+                    img.style.width = "100px";
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    }
+</script>
+
     @endpush

@@ -1,27 +1,23 @@
-    <div class="row">
-<form method="POST" action="/projek-bsn/admin/umkm-proses/store/1/{{ $id }}">
-    @csrf
-    <input type="hidden" name="pelaku_usaha_id" value="{{ $tahap1->id ?? $id ?? '' }}">
+        <div class="row">            
+            {{-- Alamat Kantor --}}
+            <div class="mb-3 col-md-12">
+                <label class="form-label fw-bold">Alamat Kantor</label>
+                <textarea name="alamat_kantor" class="form-control">{{ old('alamat_kantor', $data->alamat_kantor ?? '') }}</textarea>
+            </div>
 
-        {{-- Alamat Kantor --}}
-        <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Alamat Kantor</label>
-            <textarea name="alamat_kantor" class="form-control">{{ old('alamat_kantor', $data->alamat_kantor ?? '') }}</textarea>
-        </div>
-
-        {{-- Provinsi & Kota Kantor --}}
-        <div class="mb-3 col-md-6">
-            <label class="form-label fw-bold">Provinsi Kantor</label>
-            <select name="provinsi_kantor" id="provinsi_kantor" class="form-control">
-                <option value="">-- Pilih Provinsi --</option>
-            </select>
-        </div>
-        <div class="mb-3 col-md-6">
-            <label class="form-label fw-bold">Kota Kantor</label>
-            <select name="kota_kantor" id="kota_kantor" class="form-control">
-                <option value="">-- Pilih Kota --</option>
-            </select>
-        </div>
+            {{-- Provinsi & Kota Kantor --}}
+            <div class="mb-3 col-md-6">
+                <label class="form-label fw-bold">Provinsi Kantor</label>
+                <select name="provinsi_kantor" id="provinsi_kantor" class="form-control">
+                    <option value="">-- Pilih Provinsi --</option>
+                </select>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label fw-bold">Kota Kantor</label>
+                <select name="kota_kantor" id="kota_kantor" class="form-control">
+                    <option value="">-- Pilih Kota --</option>
+                </select>
+            </div>
 
         {{-- Alamat Pabrik --}}
         <div class="mb-3 col-md-12">
@@ -101,16 +97,33 @@
             <input type="url" name="link_dokumen" class="form-control" value="{{ old('link_dokumen', $data->link_dokumen ?? '') }}">
         </div>
 
-        {{-- Instansi --}}
-        <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
-            <textarea name="instansi" class="form-control">{{ old('instansi', $data->instansi ?? '') }}</textarea>
-        </div>
+      {{-- Instansi --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
+        @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
+            @php
+                $isChecked = old('instansi_check') && in_array($item, old('instansi_check', []));
+                $inputValue = old("instansi_detail.$item", '');
+            @endphp
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
+                    {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
+                <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
+                <input type="text" class="form-control mt-1"
+                    name="instansi_detail[{{ $item }}]"
+                    id="input_{{ $item }}"
+                    placeholder="Isi nama {{ strtolower($item) }}"
+                    value="{{ $inputValue }}"
+                    {{ $isChecked ? '' : 'style=display:none;' }}>
+            </div>
+        @endforeach
+    </div>
 
-        {{-- sertifikasi --}}
+
+        {{-- sertifikat --}}
         <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Sertifikasi</label>
-            <textarea name="sertifikasi" class="form-control">{{ old('sertifikasi', $data->sertifikasi ?? '') }}</textarea>
+            <label class="form-label fw-bold">Sertifikat Lain yang Dimiliki</label>
+            <textarea name="sertifikat" class="form-control">{{ old('sertifikat', $data->sertifikat ?? '') }}</textarea>
         </div>
 
         {{-- SNI yang Akan Diterapkan --}}
@@ -129,55 +142,24 @@
         @enderror
     </div>
 
-        {{-- Upload Foto Produk --}}
-        <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Foto Produk</label>
-            <input type="file" name="foto_produk[]" multiple class="form-control" accept="image/jpeg,image/png,image/jpg" onchange="previewMultipleImages(this, 'previewFotoProduk')">
+    {{-- Preview Foto Produk Lama --}}
+    <div class="d-flex flex-wrap mt-2">
+        @foreach ($foto_produk as $foto)
+            <div class="me-2 mb-2 position-relative">
+                <img src="{{ asset('storage/uploads/gambar_produk' . $foto) }}" width="100" class="rounded">
+            </div>
+        @endforeach
+    </div>
 
-            <small class="text-muted">Format: JPEG, PNG, JPG (Max 2MB per file)</small>
+    {{-- Preview Foto Tempat Produksi Lama --}}
+    <div class="d-flex flex-wrap mt-2">
+        @foreach ($foto_tempat_produksi as $foto)
+            <div class="me-2 mb-2 position-relative">
+                <img src="{{ asset('storage/uploads/gambar_tempat_produksi' . $foto) }}" width="100" class="rounded">
+            </div>
+        @endforeach
+    </div>
 
-            {{-- Preview New Images --}}
-            <div id="previewFotoProduk" class="mt-2"></div>
-
-            {{-- Preview Existing Images --}}
-            @if (!empty($data->foto_produk))
-                <div class="mt-2">
-                    @foreach (json_decode($data->foto_produk, true) ?? [] as $img)
-                        <div class="d-inline-block position-relative me-2 mb-2">
-                            <img src="{{ asset('storage/'.$img) }}" alt="" width="100" class="img-thumbnail">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeImage(this, 'foto_produk', '{{ $img }}')">
-                                &times;
-                            </button>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-
-        {{-- Upload Foto Tempat Produksi --}}
-        <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Foto Tempat Produksi</label>
-            <input type="file" name="foto_tempat_produksi[]" multiple class="form-control" accept="image/jpeg,image/png,image/jpg" onchange="previewMultipleImages(this, 'previewTempatProduksi')">
-
-            <small class="text-muted">Format: JPEG, PNG, JPG (Max 2MB per file)</small>
-
-            {{-- Preview New Images --}}
-            <div id="previewTempatProduksi" class="mt-2"></div>
-
-            {{-- Preview Existing Images --}}
-            @if (!empty($data->foto_tempat_produksi))
-                <div class="mt-2">
-                    @foreach (json_decode($data->foto_tempat_produksi, true) ?? [] as $img)
-                        <div class="d-inline-block position-relative me-2 mb-2">
-                            <img src="{{ asset('storage/'.$img) }}" alt="" width="100" class="img-thumbnail">
-                            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0" onclick="removeImage(this, 'foto_tempat_produksi', '{{ $img }}')">
-                                &times;
-                            </button>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-        </div>
 
     <!-- Hidden fields to track removed images -->
     <input type="hidden" name="removed_foto_produk" id="removed_foto_produk" value="">
@@ -289,35 +271,53 @@
     </script>
     
     <script>
-function previewMultipleImages(input, previewId) {
-    const preview = document.getElementById(previewId);
-    preview.innerHTML = '';
-    
-    if (input.files) {
-        Array.from(input.files).forEach(file => {
+    function previewMultipleImages(input, previewId) {
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+
+        Array.from(input.files).forEach((file, index) => {
             const reader = new FileReader();
-            reader.onload = function(e) {
+
+            reader.onload = function (e) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'd-inline-block position-relative me-2 mb-2';
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.width = 100;
-                img.className = 'img-thumbnail me-2 mb-2';
-                preview.appendChild(img);
-            }
+                img.className = 'img-thumbnail';
+                img.style.width = '100px';
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
+                btn.style.zIndex = 5;
+                btn.innerHTML = '&times;';
+                btn.onclick = () => wrapper.remove(); // Just remove preview
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(btn);
+                preview.appendChild(wrapper);
+            };
+
             reader.readAsDataURL(file);
         });
     }
-}
 
-function removeImage(button, fieldType, imagePath) {
-    // Add to removed images list
-    const hiddenField = document.getElementById(`removed_${fieldType}`);
-    const removedImages = hiddenField.value ? JSON.parse(hiddenField.value) : [];
-    removedImages.push(imagePath);
-    hiddenField.value = JSON.stringify(removedImages);
-    
-    // Remove from display
-    button.parentElement.remove();
-}
+    function removeImage(button, fieldType, imagePath) {
+        const hiddenField = document.getElementById(`removed_${fieldType}`);
+        let removedImages = [];
+
+        try {
+            removedImages = hiddenField.value ? JSON.parse(hiddenField.value) : [];
+        } catch (e) {
+            removedImages = [];
+        }
+
+        removedImages.push(imagePath);
+        hiddenField.value = JSON.stringify(removedImages);
+
+        button.parentElement.remove();
+    }
     </script>
 
     <!--INstansi yang pernah membina-->
@@ -339,5 +339,13 @@ function removeImage(button, fieldType, imagePath) {
                 });
             });
         });
+    </script>
+
+    <script>
+    function toggleInput(key) {
+        var checkbox = document.getElementById("check_" + key);
+        var input = document.getElementById("input_" + key);
+        input.style.display = checkbox.checked ? "block" : "none";
+    }
     </script>
     @endpush

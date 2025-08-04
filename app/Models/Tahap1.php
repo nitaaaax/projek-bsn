@@ -19,10 +19,9 @@ class Tahap1 extends Model
         'riwayat_pembinaan' => 'array',
     ];
 
-    public function tahap2(): HasOne
+    public function tahap2()
     {
         return $this->hasOne(Tahap2::class, 'pelaku_usaha_id', 'id');
-        // foreignKey = pelaku_usaha_id, localKey = id
     }
 }
 

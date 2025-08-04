@@ -27,7 +27,7 @@ class Tahap2 extends Model
         'instansi' => 'array',
     ];
 
-    public function tahap1(): BelongsTo
+    public function tahap1()
     {
         return $this->belongsTo(Tahap1::class, 'pelaku_usaha_id', 'id');
     }
