@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            UserSeeder::class, // ✅ dipanggil di sini, bukan dalam dirinya sendiri
+            UserSeeder::class,
+            ProvinsiSeeder::class,  
         ]);
     }
 

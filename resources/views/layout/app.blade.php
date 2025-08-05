@@ -52,7 +52,7 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="{{ asset('asset/dist/img/logoumkm.png') }}" alt="Logo UMKM" height="60" width="60">
+    <img class="animation__shake" src="{{ asset('asset/dist/img/logo-umkm.png') }}" alt="Logo UMKM" height="60" width="60">
   </div>
 
   <!-- Navbar -->

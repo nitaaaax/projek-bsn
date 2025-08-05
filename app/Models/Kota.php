@@ -1,12 +1,21 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Kota extends Model
 {
-    protected $table = 'kota';
-    public $timestamps = false;
+    use HasFactory;
 
-    protected $fillable = ['provinsi', 'nama_kota'];
+    protected $table = 'kotas';
+
+    protected $fillable = ['nama', 'provinsi_id'];
+
+    // Relasi ke provinsi
+    public function provinsi()
+    {
+        return $this->belongsTo(Provinsi::class);
+    }
 }

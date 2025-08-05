@@ -13,10 +13,11 @@
       {{-- Tombol Aksi --}}
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex gap-2 mt-2">
-          
-      <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
-          <i class="fa fa-plus mr-1"></i>Tambah UMKM
-      </a>
+    @if(optional(Auth::user()->role)->name === 'admin')
+        <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
+            <i class="fa fa-plus mr-1"></i>Tambah UMKM
+        </a>
+    @endif
 
           
           <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
@@ -60,18 +61,28 @@
                 </td>
                 <td>
 
-                <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                    <i class="fa fa-eye"></i>
-                </a>
+                @php
+                  $role = optional(Auth::user()->role)->name;
+              @endphp
 
+              @if($role === 'admin')
+                  <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                      <i class="fa fa-eye"></i>
+                  </a>
+              @elseif($role === 'user')
+                  <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                      <i class="fa fa-eye"></i>
+                  </a>
+              @endif
+             @if(optional(Auth::user()->role)->name === 'admin')
                 <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </form>
-
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
+                <i class="fa fa-trash"></i>
+                </button>
+             </form>
+             @endif
                 <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm">
                 <i class="fa fa-download"></i> 
                 </a>

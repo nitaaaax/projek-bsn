@@ -16,9 +16,11 @@
         <div class="col-md-6">
           <h2 class="fw-bold">Data SPJ</h2>
           <div class="d-flex gap-2 mt-2">
+          @if(optional(Auth::user()->role)->name === 'admin')
             <a href="{{ route('admin.spj.create') }}" class="btn btn-primary">
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
+          @endif
             <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
                 <i class="fa fa-file-excel"></i> Dowload Data
             </a>
@@ -29,22 +31,6 @@
         </div>
       </div>
 
-      {{-- Modal Import --}}
-      <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;">
-        <div class="d-flex gap-2 mt-2">
-          <a href="{{ route('admin.spj.create') }}" class="btn border" style="color: #2EC6DF; border-color: #2EC6DF; background-color: #fff;">
-            <i class="fa fa-plus"></i> Tambah SPJ
-          </a>
-          <a href="{{ route('admin.spj.export') }}" class="btn border" style="color: #28a745; border-color: #28a745; background-color: #fff;">
-            <i class="fa fa-file-excel"></i> Dowload Data
-          </a>
-          <a href="{{ route('admin.spj.import') }}" class="btn border" style="color: #ffc107; border-color: #ffc107; background-color: #fff;" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="fa fa-upload"></i> Upload Data
-          </a>
-        </div>
-        </div>
-      </div>
 
       {{-- Tab Navigasi --}}
       <ul class="nav nav-tabs mb-3" id="spjTabs" role="tablist">
@@ -82,10 +68,21 @@
                     Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
                   </td>
                   <td>
-                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-info btn-sm">Detail</a>
-                   <a class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id }})">
+                   {{-- Tombol Detail, tampilkan berdasarkan role --}}
+                  @if(optional(Auth::user()->role)->name === 'admin')
+                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
+                      <i class="fa fa-eye"></i> Detail 
+                    </a>
+                  @elseif(optional(Auth::user()->role)->name === 'user')
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                  @endif
+                  @if(optional(Auth::user()->role)->name === 'admin')
+                    <a class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id }})">
                     <i class="fa fa-trash"></i> Hapus
-                  </a>
+                    </a>
+                  @endif
                   <form id="delete-form-{{ $item->id }}" action="{{ route('admin.spj.destroy', $item->id) }}" method="POST" style="display: none;">
                     @csrf
                     @method('DELETE')
@@ -130,11 +127,17 @@
             <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
           </td>
           <td class="text-center">
-            <a href="{{ route('admin.spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
-              <i class="fa fa-eye"></i> Detail
-            </a>
+            {{-- Tombol Detail, tampilkan berdasarkan role --}}
+                  @if(optional(Auth::user()->role)->name === 'admin')
+                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
+                      <i class="fa fa-eye"></i> Detail 
+                    </a>
+                  @elseif(optional(Auth::user()->role)->name === 'user')
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                  @endif
           </td>
-        </tr>
         @empty
         <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
         @endforelse
@@ -165,9 +168,16 @@
             <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
           </td>
           <td class="text-center">
-            <a href="{{ route('admin.spj.show', $item->spj->id ?? 0) }}" class="btn btn-sm btn-outline-info">
-              <i class="fa fa-eye"></i> Detail
-            </a>
+             {{-- Tombol Detail, tampilkan berdasarkan role --}}
+                  @if(optional(Auth::user()->role)->name === 'admin')
+                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
+                      <i class="fa fa-eye"></i> Detail 
+                    </a>
+                  @elseif(optional(Auth::user()->role)->name === 'user')
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                      <i class="fa fa-eye"></i> Detail
+                    </a>
+                  @endif
           </td>
         </tr>
         @empty
@@ -206,7 +216,7 @@
           <div>
             <strong>Penting!</strong><br>
             Gunakan template berikut untuk mengisi data SPJ agar formatnya sesuai.<br>
-            <a href="{{ asset('template/template_spj.xlsx') }}" class="text-decoration-underline text-primary" download>
+            <a href="{{ asset('template/template_importspj.xlsx') }}" class="text-decoration-underline text-primary" download>
               Klik di sini untuk download template.
             </a>
           </div>

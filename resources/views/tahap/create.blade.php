@@ -11,8 +11,10 @@
                 <div class="card-body">
                     {{-- Blade fix: gunakan $tahapNumber --}}
                     @if (in_array($tahapNumber, [1, 2]))
-                    <p>Form action: {{ route('admin.umkm.store', ['tahap' => $tahapNumber, 'id' => $id ?? null]) }}</p>
-                        <form action="{{ route('admin.umkm.store', ['tahap' => $tahapNumber, 'id' => $id ?? null]) }}" method="POST" enctype="multipart/form-data">
+                    <form 
+                        action="{{ route('admin.umkm.store', ['tahap' => $tahapNumber] + ($tahapNumber == 2 ? ['id' => $id] : [])) }}" 
+                        method="POST" 
+                        enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="redirect" value="{{ request('redirect') }}">
 

@@ -2,9 +2,10 @@
 
     @section('content')
     <div class="container mt-4">
-<form action="{{ route('admin.umkm.store', ['tahap' => 2, 'id' => $tahap1->id]) }}" method="POST">
+<form action="{{ route('admin.umkm.tahap.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
-    @method('POST')
+    @method('PUT')
+
             @php
                 // Tanda Daftar Merek
                 $tanda_daftar_merk = [];
@@ -31,7 +32,7 @@
                 }
 
                  // Instansi
-                $instansiArray = json_decode($tahap2->instansi ?? '{}', true) ?? [];
+$instansiArray = $tahap2->instansi ?? [];
             @endphp
 
 
@@ -120,11 +121,31 @@
                         </select>
                     </div>
 
+                    {{-- Tanda Daftar Merek --}}
+                    <div class="col-md-6">
+                        <label class="form-label">Tanda Daftar Merek</label>
+                        <select name="tanda_daftar_merk" class="form-control">
+                            <option value="">-- Pilih Tanda Daftar Merek --</option>
+                            <option value="Terdaftar di Kemenkumham"
+                                {{ old('tanda_daftar_merk', $tahap1->tanda_daftar_merk ?? '') == 'Terdaftar di Kemenkumham' ? 'selected' : '' }}>
+                                Terdaftar di Kemenkumham
+                            </option>
+                            <option value="Belum Terdaftar"
+                                {{ old('tanda_daftar_merk', $tahap1->tanda_daftar_merk ?? '') == 'Belum Terdaftar' ? 'selected' : '' }}>
+                                Belum Terdaftar
+                            </option>
+                        </select>
+                    </div>
+
                     {{-- Riwayat Pembinaan --}}
                     <div class="col-md-12">
                         <label class="form-label">Riwayat Pembinaan</label>
-                        <textarea name="riwayat_pembinaan" class="form-control" rows="4">{{ old('riwayat_pembinaan', $tahap1->riwayat_pembinaan ?? '') }}</textarea>
+                        <textarea name="riwayat_pembinaan" class="form-control" rows="4">
+                            {{ old('riwayat_pembinaan', is_array($tahap1->riwayat_pembinaan ?? null) ? implode(', ', $tahap1->riwayat_pembinaan) : ($tahap1->riwayat_pembinaan ?? '') ) }}
+                        </textarea>
+
                     </div>
+
                 </div>
             </div>
             
@@ -140,13 +161,6 @@
                     <i class="fas fa-industry me-2 text-secondary"></i> Detail Usaha & Produksi
                 </div>
                 <div class="card-body row g-3">
-
-                    {{-- ID Pelaku Usaha --}}
-                    <div class="col-md-6">
-                        <label class="form-label">ID Pelaku Usaha</label>
-                        <input type="text" name="pelaku_usaha_id" class="form-control"
-                            value="{{ old('pelaku_usaha_id', $tahap2->pelaku_usaha_id ?? '') }}">
-                    </div>
 
                     {{-- Omzet --}}
                     <div class="col-md-6">
@@ -178,15 +192,18 @@
                         <label class="form-label">Alamat Kantor</label>
                         <textarea name="alamat_kantor" class="form-control" rows="2">{{ old('alamat_kantor', $tahap2->alamat_kantor ?? '') }}</textarea>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Provinsi Kantor</label>
-                        <input type="text" name="provinsi_kantor" class="form-control"
-                            value="{{ old('provinsi_kantor', $tahap2->provinsi_kantor ?? '') }}">
+                    {{-- Provinsi & Kota Kantor --}}
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label fw-bold">Provinsi Kantor</label>
+                        <select name="provinsi_kantor" id="provinsi_kantor" class="form-control">
+                            <option value="">-- Pilih Provinsi --</option>
+                        </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Kota Kantor</label>
-                        <input type="text" name="kota_kantor" class="form-control"
-                            value="{{ old('kota_kantor', $tahap2->kota_kantor ?? '') }}">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label fw-bold">Kota Kantor</label>
+                        <select name="kota_kantor" id="kota_kantor" class="form-control">
+                            <option value="">-- Pilih Kota --</option>
+                        </select>
                     </div>
 
                     <div class="col-12">
@@ -194,15 +211,18 @@
                         <textarea name="alamat_pabrik" class="form-control" rows="2">{{ old('alamat_pabrik', $tahap2->alamat_pabrik ?? '') }}</textarea>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Provinsi Pabrik</label>
-                        <input type="text" name="provinsi_pabrik" class="form-control"
-                            value="{{ old('provinsi_pabrik', $tahap2->provinsi_pabrik ?? '') }}">
+                    {{-- Provinsi & Kota Pabrik --}}
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label fw-bold">Provinsi Pabrik</label>
+                        <select name="provinsi_pabrik" id="provinsi_pabrik" class="form-control">
+                            <option value="">-- Pilih Provinsi --</option>
+                        </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Kota Pabrik</label>
-                        <input type="text" name="kota_pabrik" class="form-control"
-                            value="{{ old('kota_pabrik', $tahap2->kota_pabrik ?? '') }}">
+                    <div class="mb-3 col-md-6">
+                        <label class="form-label fw-bold">Kota Pabrik</label>
+                        <select name="kota_pabrik" id="kota_pabrik" class="form-control">
+                            <option value="">-- Pilih Kota --</option>
+                        </select>
                     </div>
 
                     {{-- Tahun Pendirian --}}
@@ -267,39 +287,13 @@
                             @endforeach
                         </div>
                     </div>
-                    {{-- Foto Produk --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
-                        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
-
-                        {{-- Preview Foto Lama --}}
-                        <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
-                            @if (is_array($foto_produk) && count($foto_produk) > 0)
-                                @foreach ($foto_produk as $foto)
-                                    <div class="position-relative me-2 mb-2 old-foto-produk">
-                                        <img src="{{ asset('storage/app/public/uploads/foto_produk' . $foto) }}" width="100" class="rounded">
-                                        <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
-                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
-                                    </div>
-                                @endforeach
-                            @else
-                                <p class="text-muted">Belum ada foto produk.</p>
-                            @endif
-                        </div>
-                        <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
-                    </div>
-
-                    {{-- Foto Tempat Produksi --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
-                        <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
-
-                        {{-- Preview Foto Lama --}}
-                        <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
+                     <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
                             @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
                                 @foreach ($foto_tempat_produksi as $foto)
                                     <div class="position-relative me-2 mb-2 old-foto-tempat">
-                                        <img src="{{ asset('storage/app/public/uploads/foto_tempat_produksi' . $foto) }}" width="100" class="rounded">
+                                    <img src="{{ asset('storage/uploads/foto_tempat_produksi/' . $foto) }}"
+                                        class="me-2 mb-2"
+                                        style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                                         <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
                                         <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
                                     </div>
@@ -313,7 +307,65 @@
                     </div>
 
                     {{-- Tombol Submit dan Kembali --}}
-                    <div class="col-12 d-flex justify-content-end gap-3 mb-4">
+                    @php
+    $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
+    $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
+@endphp
+
+{{-- Foto Produk --}}
+<div class="col-md-6 mb-3">
+    <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+    <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
+
+    <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
+        @if (is_array($foto_produk) && count($foto_produk) > 0)
+            @foreach ($foto_produk as $foto)
+                <div class="position-relative me-2 mb-2 old-foto-produk">
+                    <img src="{{ asset('storage/' . $foto) }}"
+                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
+                         class="img-thumbnail">
+
+                    <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
+
+                    <button type="button"
+                            class="btn btn-sm btn-danger p-1 btn-remove-old"
+                            style="position: absolute; top: 0; right: 0;">
+                        &times;
+                    </button>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted">Belum ada foto produk.</p>
+        @endif
+    </div>
+    <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
+</div>
+
+{{-- Foto Tempat Produksi --}}
+<div class="col-md-6 mb-3">
+    <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
+    <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
+
+    <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
+        @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
+            @foreach ($foto_tempat_produksi as $foto)
+                <div class="position-relative me-2 mb-2 old-foto-tempat">
+                    <img src="{{ asset('storage/' . $foto) }}"
+                         class="me-2 mb-2"
+                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                    <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
+                    <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted">Belum ada foto tempat produksi.</p>
+        @endif
+    </div>
+    <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
+</div>
+
+                        {{-- Preview Foto Lama --}}
+                      col-12 d-flex justify-content-end gap-3 mb-4">
                         <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
@@ -330,48 +382,95 @@
     @endsection
 
     @push('scripts')
+     <!-- Jquery CDN (cukup satu kali saja) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function () {
+    // Ambil semua provinsi saat halaman siap
+    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (data) {
+        console.log('Data provinsi:', data); // Debugging
+        $.each(data, function (index, provinsi) {
+            $('#provinsi_kantor, #provinsi_pabrik').append(`<option value="${provinsi.id}">${provinsi.nama}</option>`);
+        });
+    }).fail(function(xhr, status, error) {
+        console.error('Gagal ambil provinsi:', xhr.responseText);
+    });
+
+    // Event saat provinsi kantor berubah
+    $('#provinsi_kantor').on('change', function () {
+        const id = $(this).val();
+        $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
+        if (id) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                $.each(data, function (index, kota) {
+                    $('#kota_kantor').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                });
+            }).fail(function(xhr, status, error) {
+                console.error('Gagal ambil kota kantor:', xhr.responseText);
+            });
+        }
+    });
+
+    // Event saat provinsi pabrik berubah
+    $('#provinsi_pabrik').on('change', function () {
+        const id = $(this).val();
+        $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
+        if (id) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                $.each(data, function (index, kota) {
+                    $('#kota_pabrik').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                });
+            }).fail(function(xhr, status, error) {
+                console.error('Gagal ambil kota pabrik:', xhr.responseText);
+            });
+        }
+    });
+});
+</script>
     <script>
-    function previewImages(input, targetId) {
-        const target = document.getElementById(targetId);
-        target.innerHTML = "";
+    function previewImages(input, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
 
         const files = Array.from(input.files);
+        const dt = new DataTransfer();
 
         files.forEach((file, index) => {
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const wrapper = document.createElement('div');
+            reader.onload = function (e) {
+                const wrapper = document.createElement("div");
                 wrapper.className = "position-relative me-2 mb-2";
 
-                const img = document.createElement('img');
+                const img = document.createElement("img");
                 img.src = e.target.result;
-                img.width = 100;
+                img.style.width = "100px";
                 img.className = "rounded";
 
-                const btn = document.createElement('button');
-                btn.type = "button";
-                btn.innerHTML = "&times;";
+                const btn = document.createElement("button");
                 btn.className = "btn btn-sm btn-danger p-1";
                 btn.style.position = "absolute";
                 btn.style.top = "0";
                 btn.style.right = "0";
+                btn.innerHTML = "&times;";
 
-                btn.onclick = () => {
+                btn.addEventListener("click", function () {
                     files.splice(index, 1);
-                    const dt = new DataTransfer();
-                    files.forEach(f => dt.items.add(f));
-                    input.files = dt.files;
-                    previewImages(input, targetId);
-                };
+                    const newDt = new DataTransfer();
+                    files.forEach(f => newDt.items.add(f));
+                    input.files = newDt.files;
+                    previewImages(input, containerId);
+                });
 
                 wrapper.appendChild(img);
                 wrapper.appendChild(btn);
-                target.appendChild(wrapper);
+                container.appendChild(wrapper);
             };
             reader.readAsDataURL(file);
         });
     }
-
+    </script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Hapus gambar lama dari DOM dan form
         document.querySelectorAll('.btn-remove-old').forEach(button => {
@@ -398,25 +497,4 @@
         });
     });
     </script>
-    <script>
-    function previewImages(input, containerId) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = ""; // clear sebelumnya
-
-        if (input.files) {
-            Array.from(input.files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const img = document.createElement("img");
-                    img.src = e.target.result;
-                    img.className = "rounded me-2 mb-2";
-                    img.style.width = "100px";
-                    container.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-    }
-</script>
-
     @endpush

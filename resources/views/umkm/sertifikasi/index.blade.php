@@ -34,17 +34,32 @@
                   @endif
                 </td>
                 <td>
-                  <a href="{{ route('umkm.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm">
+                @php
+                  $role = optional(Auth::user()->role)->name;
+                @endphp
+                @php
+                  $role = optional(Auth::user()->role)->name;
+                @endphp
+
+                @if($role === 'user')
+                  <a href="{{ route('user.umkm.showuser', $item->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                      <i class="fa fa-eye"></i>
+                  </a>
+                @endif
+                @if(optional(Auth::user()->role)->name === 'admin')
+                  <a href="{{ route('admin.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm">
                       <i class="fa fa-edit"></i> Edit
                   </a>
-
-                  <form action="{{ route('umkm.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
+                @endif
+                @if(optional(Auth::user()->role)->name === 'admin')
+                  <form action="{{ route('admin.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
                     @csrf
                     @method('DELETE')
                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
                       <i class="fa fa-trash"></i> Hapus
                     </button>
                   </form>
+                @endif
                 </td>
               </tr>
             @empty

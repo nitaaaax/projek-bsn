@@ -32,4 +32,15 @@ protected $casts = [
     'foto_tempat_produksi' => 'array',
 ];
 
+    public function tahap1()
+    {
+        return $this->belongsTo(Tahap1::class, 'tahap1_id', 'id'); // foreign_key, owner_key
+    }
+
+    public function tahap2()
+    {
+        return $this->belongsTo(Tahap2::class, 'tahap2_id', 'id');
+    }
+
+
 }

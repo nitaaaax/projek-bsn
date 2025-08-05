@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 use App\Models\Tahap1;
 use App\Models\Tahap2;
+use App\Models\Sertifikasi;
 
 class ContcreateUmkm extends Controller
 {
@@ -22,6 +24,7 @@ class ContcreateUmkm extends Controller
             'data' => $data
         ]);
     }
+    
 
     public function create()
     {
@@ -34,12 +37,42 @@ class ContcreateUmkm extends Controller
             abort(404, 'Tahap tidak valid.');
         }
 
+        $foto_produk = [];
+        $foto_tempat_produksi = [];
         $data = null;
 
         if ($tahap === 1) {
             $data = Tahap1::find($id);
         } elseif ($tahap === 2) {
-            $data = Tahap2::where('pelaku_usaha_id', $id)->first();
+            $tahap1 = Tahap1::find($id);
+            $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+
+            if ($tahap2) {
+                // Jika sudah ada Tahap 2
+                $data = $tahap2;
+                $foto_produk = json_decode($tahap2->foto_produk ?? '[]', true);
+                $foto_tempat_produksi = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
+            } else {
+                // Kalau belum ada Tahap 2, buat data default dari Tahap 1
+                $data = new \stdClass();
+                $data->alamat_kantor = $tahap1->alamat_kantor ?? '';
+                $data->provinsi_kantor = $tahap1->provinsi ?? '';
+                $data->kota_kantor = $tahap1->kota ?? '';
+                $data->alamat_pabrik = $tahap1->alamat_pabrik ?? '';
+                $data->provinsi_pabrik = $tahap1->provinsi ?? '';
+                $data->kota_pabrik = $tahap1->kota ?? '';
+                $data->legalitas_usaha = $tahap1->legalitas ?? '';
+                $data->tahun_pendirian = $tahap1->tahun_dibina ?? '';
+                $data->omzet = '';
+                $data->volume_per_tahun = '';
+                $data->jumlah_tenaga_kerja = '';
+                $data->jangkauan_pemasaran = json_encode([]);
+                $data->link_dokumen = '';
+                $data->instansi = json_encode([]);
+                $data->sertifikat = '';
+                $data->sni_yang_diterapkan = '';
+                $data->gruping = '';
+            }
         }
 
         return view('tahap.create', [
@@ -48,14 +81,13 @@ class ContcreateUmkm extends Controller
             'data' => $data,
             'id' => $id,
             'pelaku_usaha_id' => $id,
+            'foto_produk' => $foto_produk,
+            'foto_tempat_produksi' => $foto_tempat_produksi,
         ]);
     }
 
     public function store(Request $request, int $tahap, $id = null)
     {
-
-        //dd($request->all());
-
         if (!in_array($tahap, [1, 2])) {
             abort(404, 'Tahap tidak valid.');
         }
@@ -81,22 +113,57 @@ class ContcreateUmkm extends Controller
                 'nama_merek' => 'nullable|string|max:255',
                 'lspro' => 'nullable|string|max:255',
                 'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
-                'tanda_daftar_merk' => 'nullable|string|max:255',
+                'tanda_daftar_merk' => 'nullable|in:Terdaftar di Kemenkumham,Belum Terdaftar',
             ]);
 
             $tahap1 = Tahap1::create($validated);
 
-            return redirect()->route('admin.umkm.create.tahap', [
-                'tahap' => 2,
-                'id' => $tahap1->id,
-            ])->with('success', 'Tahap 1 berhasil disimpan.');
+            if ($request->status_pembinaan === 'SPPT SNI (Tersertifikasi)') {
+                Sertifikasi::updateOrCreate(
+                    ['pelaku_usaha_id' => $tahap1->id],
+                    [
+                        'pelaku_usaha_id' => $tahap1->id,
+                        'tahap1_id' => $tahap1->id,
+
+                        'nama_pelaku' => $tahap1->nama_pelaku,
+                        'produk' => $tahap1->produk,
+                        'klasifikasi' => $tahap1->klasifikasi,
+                        'pembina_1' => $tahap1->pembina_1,
+                        'pembina_2' => $tahap1->pembina_2,
+                        'status_pembinaan' => $tahap1->status_pembinaan,
+                        'sinergi' => $tahap1->sinergi,
+                        'nama_kontak_person' => $tahap1->nama_kontak_person,
+                        'no_hp' => $tahap1->no_hp,
+                        'bulan_pertama_pembinaan' => $tahap1->bulan_pertama_pembinaan,
+                        'tahun_dibina' => $tahap1->tahun_dibina,
+                        'riwayat_pembinaan' => $tahap1->riwayat_pembinaan,
+                        'email' => $tahap1->email,
+                        'media_sosial' => $tahap1->media_sosial,
+                        'nama_merek' => $tahap1->nama_merek,
+                        'lspro' => $tahap1->lspro,
+                        'jenis_usaha' => $tahap1->jenis_usaha,
+                        'tanda_daftar_merk' => $tahap1->tanda_daftar_merk,
+                        'gruping' => $tahap1->gruping,
+                        'status' => 'Tersertifikasi',
+                        'data_tahap1' => json_encode($tahap1->getAttributes(), JSON_PARTIAL_OUTPUT_ON_ERROR),
+                    ]
+                );
+
+                return redirect()->route('admin.sertifikasi.index')->with('success', 'Data langsung masuk ke sertifikasi!');
+            }
+                // redirect ke tahap 2
+                return redirect()->route('admin.umkm.create.tahap', [
+                    'tahap' => 2,
+                    'id' => $tahap1->id,
+                ])->with('success', 'Data Tahap 1 berhasil disimpan. Lanjut ke Tahap 2.');
         }
 
         // === Tahap 2 ===
-       if ($tahap === 2) {
+        if ($tahap === 2) {
             if (!$id || !Tahap1::find($id)) {
-            abort(404, 'ID Tahap1 tidak ditemukan.');
-            }              
+                abort(404, 'ID Tahap1 tidak ditemukan.');
+            }
+
             $validated = $request->validate([
                 'omzet' => 'nullable|numeric',
                 'volume_per_tahun' => 'nullable|string|max:255',
@@ -123,6 +190,56 @@ class ContcreateUmkm extends Controller
                 'gruping' => 'nullable|string',
             ]);
 
+            if ($request->status_pembinaan === 'SPPT SNI (Tersertifikasi)') {
+            // Upload foto produk
+            $foto_produk = [];
+            if ($request->hasFile('foto_produk')) {
+                foreach ($request->file('foto_produk') as $file) {
+                    $foto_produk[] = $file->store('uploads/foto_produk', 'public');
+                }
+            }
+
+            // Upload foto tempat produksi
+            $foto_tempat_produksi = [];
+            if ($request->hasFile('foto_tempat_produksi')) {
+                foreach ($request->file('foto_tempat_produksi') as $file) {
+                    $foto_tempat_produksi[] = $file->store('uploads/foto_tempat_produksi', 'public');
+                }
+            }
+
+            // Simpan langsung ke sertifikasi
+            $sertifikasi = Sertifikasi::create([
+                'nama_pelaku' => $request->nama_pelaku,
+                'produk' => $request->produk,
+                'klasifikasi' => $request->klasifikasi,
+                'pembina_1' => $request->pembina_1,
+                'pembina_2' => $request->pembina_2,
+                'status_pembinaan' => $request->status_pembinaan,
+                'bulan_pertama_pembinaan' => $request->bulan_pertama_pembinaan ?? 'Januari',
+                'tahun_dibina' => $request->tahun_dibina,
+                'riwayat_pembinaan' => $request->riwayat_pembinaan,
+                'tanda_daftar_merk' => $request->tanda_daftar_merk,
+
+                // Tambahan data dari tahap 2
+                'alamat_kantor' => $request->alamat_kantor,
+                'alamat_pabrik' => $request->alamat_pabrik,
+                'no_telp' => $request->no_telp,
+                'website' => $request->website,
+                'email' => $request->email,
+                'instagram' => $request->instagram,
+                'facebook' => $request->facebook,
+                'omzet' => $request->omzet,
+                'kapasitas_produksi' => $request->kapasitas_produksi,
+                'jangkauan_pemasaran' => json_encode($request->jangkauan_pemasaran ?? []),
+                'foto_produk' => json_encode($foto_produk),
+                'foto_tempat_produksi' => json_encode($foto_tempat_produksi),
+                'sni_yang_diterapkan' => $request->sni_yang_diterapkan,
+                'gruping' => $request->gruping,
+                'status' => 'Tersertifikasi',
+            ]);
+
+            return redirect()->route('admin.sertifikasi.index')->with('success', 'Data langsung masuk ke sertifikasi!');
+        }
             // Upload foto
             $foto_produk_paths = [];
             $foto_tempat_produksi_paths = [];
@@ -131,7 +248,7 @@ class ContcreateUmkm extends Controller
                 foreach ($request->file('foto_produk') as $file) {
                     if ($file->isValid()) {
                         $filename = 'produk_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
-                        $path = $file->storeAs('public/uploads/gambar_produk/', $filename);
+                        $path = $file->storeAs('public/uploads/foto_produk/', $filename);
                         $foto_produk_paths[] = str_replace('public/', '', $path);
                     }
                 }
@@ -154,39 +271,89 @@ class ContcreateUmkm extends Controller
                 }
             }
             $validated['instansi'] = json_encode($instansi);
-
             $validated['foto_produk'] = json_encode($foto_produk_paths);
             $validated['foto_tempat_produksi'] = json_encode($foto_tempat_produksi_paths);
+            $validated['pelaku_usaha_id'] = $id;
 
-            $validated['pelaku_usaha_id'] = $id; 
+            $tahap2 = Tahap2::create($validated);
+            $tahap1 = Tahap1::findOrFail($id);
 
-            Tahap2::create($validated);
+            // ===== Auto Masuk ke Sertifikasi jika SPPT SNI =====
+            if (Str::contains($tahap1->status_pembinaan, 'SPPT SNI')) {
+                Sertifikasi::updateOrCreate(
+                ['pelaku_usaha_id' => $tahap1->id],
+                [
+                'pelaku_usaha_id' => $tahap1->id,
+                'tahap1_id' => $tahap1->id,
+                'tahap2_id' => $tahap2->id,
 
-            return redirect()->route('umkm.proses.index')->with('success', 'Data Tahap 2 berhasil disimpan.');
+                // Dari Tahap 1
+                'nama_pelaku' => $tahap1->nama_pelaku,
+                'produk' => $tahap1->produk,
+                'klasifikasi' => $tahap1->klasifikasi,
+                'pembina_1' => $tahap1->pembina_1,
+                'pembina_2' => $tahap1->pembina_2,
+                'status_pembinaan' => $tahap1->status_pembinaan,
+                'sinergi' => $tahap1->sinergi,
+                'nama_kontak_person' => $tahap1->nama_kontak_person,
+                'no_hp' => $tahap1->no_hp,
+                'bulan_pertama_pembinaan' => $tahap1->bulan_pertama_pembinaan,
+                'tahun_dibina' => $tahap1->tahun_dibina,
+                'riwayat_pembinaan' => $tahap1->riwayat_pembinaan,
+                'email' => $tahap1->email,
+                'media_sosial' => $tahap1->media_sosial,
+                'nama_merek' => $tahap1->nama_merek,
+                'lspro' => $tahap1->lspro,
+                'jenis_usaha' => $tahap1->jenis_usaha,
+                'tanda_daftar_merk' => $tahap1->tanda_daftar_merk,
+
+                // Dari Tahap 2
+                'alamat_kantor' => $tahap2->alamat_kantor,
+                'provinsi_kantor' => $tahap2->provinsi_kantor,
+                'kota_kantor' => $tahap2->kota_kantor,
+                'alamat_pabrik' => $tahap2->alamat_pabrik,
+                'provinsi_pabrik' => $tahap2->provinsi_pabrik,
+                'kota_pabrik' => $tahap2->kota_pabrik,
+                'legalitas_usaha' => $tahap2->legalitas_usaha,
+                'tahun_pendirian' => $tahap2->tahun_pendirian,
+                'omzet' => $tahap2->omzet,
+                'volume_per_tahun' => $tahap2->volume_per_tahun,
+                'jumlah_tenaga_kerja' => $tahap2->jumlah_tenaga_kerja,
+                'jangkauan_pemasaran' => $tahap2->jangkauan_pemasaran,
+                'link_dokumen' => $tahap2->link_dokumen,
+                'foto_produk' => $tahap2->foto_produk,
+                'foto_tempat_produksi' => $tahap2->foto_tempat_produksi,
+                'instansi' => $tahap2->instansi,
+                'sertifikat' => $tahap2->sertifikat,
+                'sni_yang_diterapkan' => $tahap2->sni_yang_diterapkan,
+                'gruping' => $tahap2->gruping,
+
+                // Tambahan
+                'status' => 'Tersertifikasi',
+                'data_tahap1' => json_encode($tahap1->getAttributes(), JSON_PARTIAL_OUTPUT_ON_ERROR),
+                'data_tahap2' => json_encode($tahap2->getAttributes(), JSON_PARTIAL_OUTPUT_ON_ERROR),
+            ]
+        );
+
+        // Update status pembinaan tahap1 jadi SPPT SNI
+        $tahap1->update([
+            'status_pembinaan' => 'SPPT SNI'
+        ]);
+    }
         }
-    }
-    
-    public function destroy($id)
-    {
-        $tahap1 = Tahap1::findOrFail($id);
-        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+            return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil disimpan.');
+            }
 
-        if ($tahap2) {
-            $tahap2->delete();
+            
+    protected function handleUpload(Request $request, $key)
+    {
+        $files = [];
+        if ($request->hasFile($key)) {
+            foreach ($request->file($key) as $file) {
+                $files[] = $file->store("uploads/{$key}", 'public');
+            }
         }
-
-        $tahap1->delete();
-
-        return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil dihapus.');
+        return $files;
     }
 
-    public function show($id)
-    {
-        $tahap1 = Tahap1::findOrFail($id);
-        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
-
-        $jangkauan = ['Lokal', 'Regional', 'Nasional', 'Internasional'];
-
-        return view('umkm.show', compact('tahap1', 'tahap2', 'jangkauan'));
-    }
 }

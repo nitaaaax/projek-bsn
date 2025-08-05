@@ -23,7 +23,6 @@ class UMKMSertifikasiController extends Controller
         ]);
     }
 
-
     public function sertifikasi($id)
     {
         $umkm = Tahap1::with('tahap2')->findOrFail($id);
@@ -58,13 +57,14 @@ class UMKMSertifikasiController extends Controller
         return redirect()->route('umkm.sertifikasi.index')->with('success', 'UMKM berhasil disertifikasi dan dipindah ke tabel sertifikasi.');
     }
 
-    public function edit($id)
+   public function edit($id)
     {
-        $tahap1 = Tahap1::findOrFail($id); // ini benar
-        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();        
-        $umkm   = Sertifikasi::where('pelaku_usaha_id', $id)->first();
+         $sertifikasi = Sertifikasi::findOrFail($id);
 
-        return view('umkm.sertifikasi.edit', compact('umkm', 'tahap1', 'tahap2'));
+        $tahap1 = Tahap1::find($sertifikasi->pelaku_usaha_id); // kalau ada relasi ke tahap1
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $sertifikasi->pelaku_usaha_id)->first(); // jika perlu juga tahap2
+
+        return view('umkm.sertifikasi.edit', compact('sertifikasi', 'tahap1', 'tahap2'));
     }
 
 
@@ -73,7 +73,8 @@ class UMKMSertifikasiController extends Controller
         $umkm = Sertifikasi::findOrFail($id);
         $umkm->delete();
 
-        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data UMKM berhasil dihapus.');
+        return redirect()->route('admin.sertifikasi.index')
+        ->with('success', 'Data UMKM berhasil dihapus.');
     }
 
     public function update(Request $request, int $id)
@@ -145,6 +146,7 @@ class UMKMSertifikasiController extends Controller
             'nama_merek' => $request->nama_merek,
         ]);
 
+
         // === UPDATE TAHAP 2 ===
         if ($tahap2) {
             // Jangkauan pemasaran
@@ -191,6 +193,4 @@ class UMKMSertifikasiController extends Controller
 
         return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data proses berhasil diperbarui.');
     }
-
-
 }

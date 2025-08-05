@@ -1,4 +1,4 @@
-        <div class="row">            
+    <div class="row">            
             {{-- Alamat Kantor --}}
             <div class="mb-3 col-md-12">
                 <label class="form-label fw-bold">Alamat Kantor</label>
@@ -26,18 +26,18 @@
         </div>
 
         {{-- Provinsi & Kota Pabrik --}}
-        <div class="mb-3 col-md-6">
-            <label class="form-label fw-bold">Provinsi Pabrik</label>
-            <select name="provinsi_pabrik" id="provinsi_pabrik" class="form-control">
-                <option value="">-- Pilih Provinsi --</option>
-            </select>
-        </div>
-        <div class="mb-3 col-md-6">
-            <label class="form-label fw-bold">Kota Pabrik</label>
-            <select name="kota_pabrik" id="kota_pabrik" class="form-control">
-                <option value="">-- Pilih Kota --</option>
-            </select>
-        </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label fw-bold">Provinsi Pabrik</label>
+                <select name="provinsi_pabrik" id="provinsi_pabrik" class="form-control">
+                    <option value="">-- Pilih Provinsi --</option>
+                </select>
+            </div>
+            <div class="mb-3 col-md-6">
+                <label class="form-label fw-bold">Kota Pabrik</label>
+                <select name="kota_pabrik" id="kota_pabrik" class="form-control">
+                    <option value="">-- Pilih Kota --</option>
+                </select>
+            </div>
 
         {{-- Legalitas Usaha --}}
         <div class="mb-3 col-md-12">
@@ -133,139 +133,175 @@
         </div>
     </div>
     
-    {{-- Gruping --}}
-    <div class="mb-3">
-        <label for="gruping" class="form-label fw-bold">Gruping</label>
-        <input type="text" name="gruping" class="form-control" value="{{ old('gruping') }}" placeholder="Contoh: UMKM Pangan Lokal">
-        @error('gruping')
-            <div class="text-danger">{{ $message }}</div>
-        @enderror
+        {{-- Gruping --}}
+        <div class="mb-3">
+            <label for="gruping" class="form-label fw-bold">Gruping</label>
+<input type="text" name="gruping" class="form-control" value="{{ is_array(old('gruping')) ? '' : old('gruping', $data->gruping ?? '') }}" placeholder="Contoh: UMKM Pangan Lokal">
+            @error('gruping')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+ {{-- Foto Produk --}}
+<div class="col-md-6 mb-3">
+    <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+    <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewMultipleImages(this, 'preview-produk')">
+
+    {{-- Preview Gambar Lama --}}
+    <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
+        @php
+            $foto_produk = is_string($foto_produk) ? json_decode($foto_produk, true) : $foto_produk;
+        @endphp
+
+        @if (is_array($foto_produk) && count($foto_produk) > 0)
+            @foreach ($foto_produk as $foto)
+                <div class="position-relative me-2 mb-2">
+                    <img src="{{ Storage::url($foto) }}" width="100" class="rounded">
+                    <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
+                    <button type="button" class="btn btn-sm btn-danger p-1"
+                        style="position: absolute; top: 0; right: 0;"
+                        onclick="removeImage(this, 'foto_produk', '{{ $foto }}')">&times;</button>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted">Belum ada foto produk.</p>
+        @endif
     </div>
 
-    {{-- Preview Foto Produk Lama --}}
-    <div class="d-flex flex-wrap mt-2">
-        @foreach ($foto_produk as $foto)
-            <div class="me-2 mb-2 position-relative">
-                <img src="{{ asset('storage/uploads/gambar_produk' . $foto) }}" width="100" class="rounded">
-            </div>
-        @endforeach
+    {{-- Preview Gambar Baru --}}
+    <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
+</div>
+
+{{-- Foto Tempat Produksi --}}
+<div class="col-md-6 mb-3">
+    <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
+    <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewMultipleImages(this, 'preview-tempat')">
+
+    {{-- Preview Gambar Lama --}}
+    <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
+        @php
+            $foto_tempat_produksi = is_string($foto_tempat_produksi) ? json_decode($foto_tempat_produksi, true) : $foto_tempat_produksi;
+        @endphp
+
+        @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
+            @foreach ($foto_tempat_produksi as $foto)
+                <div class="position-relative me-2 mb-2">
+                    <img src="{{ Storage::url($foto) }}" width="100" class="rounded">
+                    <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
+                    <button type="button" class="btn btn-sm btn-danger p-1"
+                        style="position: absolute; top: 0; right: 0;"
+                        onclick="removeImage(this, 'foto_tempat_produksi', '{{ $foto }}')">&times;</button>
+                </div>
+            @endforeach
+        @else
+            <p class="text-muted">Belum ada foto tempat produksi.</p>
+        @endif
     </div>
 
-    {{-- Preview Foto Tempat Produksi Lama --}}
-    <div class="d-flex flex-wrap mt-2">
-        @foreach ($foto_tempat_produksi as $foto)
-            <div class="me-2 mb-2 position-relative">
-                <img src="{{ asset('storage/uploads/gambar_tempat_produksi' . $foto) }}" width="100" class="rounded">
-            </div>
-        @endforeach
-    </div>
+    {{-- Preview Gambar Baru --}}
+    <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
+</div>
 
+{{-- Hidden field untuk gambar yang dihapus --}}
+<input type="hidden" name="removed_foto_produk" id="removed_foto_produk" value="">
+<input type="hidden" name="removed_foto_tempat_produksi" id="removed_foto_tempat_produksi" value="">
 
-    <!-- Hidden fields to track removed images -->
-    <input type="hidden" name="removed_foto_produk" id="removed_foto_produk" value="">
-    <input type="hidden" name="removed_foto_tempat_produksi" id="removed_foto_tempat_produksi" value="">
 
     @push('scripts')
-    <!-- Jquery CDN (cukup satu kali saja) -->
-    <script>
-        const dataWilayah = {
-            "Riau": [
-                "Pekanbaru", "Dumai", "Bengkalis", "Siak", "Kampar", "Pelalawan", "Indragiri Hulu", "Indragiri Hilir", "Rokan Hulu", "Rokan Hilir"
-            ],
-            "Sumatra Barat": [
-                "Padang", "Bukittinggi", "Payakumbuh", "Solok", "Pariaman", "Sawahlunto", "Padang Panjang", "Pasaman", "Agam", "Tanah Datar"
-            ]
-        };
+   <!-- Jquery CDN (cukup satu kali saja) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-        function populateSelect(selectId, options, selected = "") {
-            const select = document.getElementById(selectId);
-            select.innerHTML = '<option value="">-- Pilih --</option>';
-            options.forEach(option => {
-                const opt = document.createElement('option');
-                opt.value = option;
-                opt.text = option;
-                if (option === selected) opt.selected = true;
-                select.appendChild(opt);
+<script>
+$(document).ready(function () {
+    // Ambil semua provinsi saat halaman siap
+    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (data) {
+        console.log('Data provinsi:', data); // Debugging
+        $.each(data, function (index, provinsi) {
+            $('#provinsi_kantor, #provinsi_pabrik').append(`<option value="${provinsi.id}">${provinsi.nama}</option>`);
+        });
+    }).fail(function(xhr, status, error) {
+        console.error('Gagal ambil provinsi:', xhr.responseText);
+    });
+
+    // Event saat provinsi kantor berubah
+    $('#provinsi_kantor').on('change', function () {
+        const id = $(this).val();
+        $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
+        if (id) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                $.each(data, function (index, kota) {
+                    $('#kota_kantor').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                });
+            }).fail(function(xhr, status, error) {
+                console.error('Gagal ambil kota kantor:', xhr.responseText);
             });
         }
+    });
 
-        // Populate provinsi
-        window.onload = function () {
-            const provinsiList = Object.keys(dataWilayah);
-            populateSelect("provinsi_kantor", provinsiList, "{{ old('provinsi_kantor', $data->provinsi_kantor ?? '') }}");
-            populateSelect("provinsi_pabrik", provinsiList, "{{ old('provinsi_pabrik', $data->provinsi_pabrik ?? '') }}");
+    // Event saat provinsi pabrik berubah
+    $('#provinsi_pabrik').on('change', function () {
+        const id = $(this).val();
+        $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
+        if (id) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                $.each(data, function (index, kota) {
+                    $('#kota_pabrik').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                });
+            }).fail(function(xhr, status, error) {
+                console.error('Gagal ambil kota pabrik:', xhr.responseText);
+            });
+        }
+    });
+});
+</script>
 
-            // Populate kota default jika sudah ada
-            if ("{{ old('provinsi_kantor', $data->provinsi_kantor ?? '') }}") {
-                populateSelect("kota_kantor", dataWilayah["{{ old('provinsi_kantor', $data->provinsi_kantor ?? '') }}"], "{{ old('kota_kantor', $data->kota_kantor ?? '') }}");
-            }
-            if ("{{ old('provinsi_pabrik', $data->provinsi_pabrik ?? '') }}") {
-                populateSelect("kota_pabrik", dataWilayah["{{ old('provinsi_pabrik', $data->provinsi_pabrik ?? '') }}"], "{{ old('kota_pabrik', $data->kota_pabrik ?? '') }}");
-            }
-        };
-
-        // Provinsi kantor onchange
-        document.getElementById('provinsi_kantor').addEventListener('change', function () {
-            const selectedProv = this.value;
-            const kotaList = dataWilayah[selectedProv] || [];
-            populateSelect("kota_kantor", kotaList);
-        });
-
-        // Provinsi pabrik onchange
-        document.getElementById('provinsi_pabrik').addEventListener('change', function () {
-            const selectedProv = this.value;
-            const kotaList = dataWilayah[selectedProv] || [];
-            populateSelect("kota_pabrik", kotaList);
-        });
-    </script>
 
     <script>
-    function previewMultipleImages(input, containerId) {
-        const container = document.getElementById(containerId);
-        const files = input.files;
-        container.innerHTML = '';
+    function previewMultipleImages(input, previewId) {
+        const preview = document.getElementById(previewId);
+        preview.innerHTML = '';
 
-        for (let i = 0; i < files.length; i++) {
+        Array.from(input.files).forEach((file) => {
             const reader = new FileReader();
-            reader.onload = function(e) {
+
+            reader.onload = function (e) {
                 const wrapper = document.createElement('div');
-                wrapper.style.position = 'relative';
-                wrapper.style.display = 'inline-block';
-                wrapper.style.width = '150px';
-                wrapper.style.marginRight = '10px';
+                wrapper.className = 'd-inline-block position-relative me-2 mb-2';
 
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.className = 'img-thumbnail';
-                img.style.width = '100%';
+                img.style.width = '100px';
 
-                const btnRemove = document.createElement('button');
-                btnRemove.type = 'button';
-                btnRemove.innerText = '❌';
-                btnRemove.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
-                btnRemove.style.zIndex = '5';
-                btnRemove.style.position = 'absolute';
-                btnRemove.style.top = '2px';
-                btnRemove.style.right = '2px';
-
-                btnRemove.onclick = () => wrapper.remove();
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'btn btn-sm btn-danger position-absolute top-0 end-0';
+                btn.innerHTML = '&times;';
+                btn.style.zIndex = 5;
+                btn.onclick = () => wrapper.remove();
 
                 wrapper.appendChild(img);
-                wrapper.appendChild(btnRemove);
-                container.appendChild(wrapper);
+                wrapper.appendChild(btn);
+                preview.appendChild(wrapper);
             };
-            reader.readAsDataURL(files[i]);
-        }
+
+            reader.readAsDataURL(file);
+        });
     }
 
     function removeImage(button, fieldType, imagePath) {
-        // Add to removed images list
         const hiddenField = document.getElementById(`removed_${fieldType}`);
-        const removedImages = hiddenField.value ? JSON.parse(hiddenField.value) : [];
+        let removedImages = [];
+
+        try {
+            removedImages = hiddenField.value ? JSON.parse(hiddenField.value) : [];
+        } catch {
+            removedImages = [];
+        }
+
         removedImages.push(imagePath);
         hiddenField.value = JSON.stringify(removedImages);
-        
-        // Remove from display
+
         button.parentElement.remove();
     }
     </script>

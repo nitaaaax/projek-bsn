@@ -23,6 +23,11 @@ class Tahap1 extends Model
     {
         return $this->hasOne(Tahap2::class, 'pelaku_usaha_id', 'id');
     }
+
+    public function sertifikasi()
+    {
+        return $this->hasOne(Sertifikasi::class, 'tahap1_id');
+    }
 }
 
 
