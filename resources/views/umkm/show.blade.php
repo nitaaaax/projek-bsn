@@ -183,6 +183,7 @@
                         <input type="text" name="volume_per_tahun" class="form-control"
                             value="{{ old('volume_per_tahun', $tahap2->volume_per_tahun ?? '') }}">
                     </div>
+
                     <div class="col-md-6">
                         <label class="form-label">Jumlah Tenaga Kerja</label>
                         <input type="text" name="jumlah_tenaga_kerja" class="form-control"
@@ -241,23 +242,73 @@
                             value="{{ old('tahun_pendirian', $tahap2->tahun_pendirian ?? '') }}">
                     </div>
 
-                    {{-- Legalitas & Sertifikat --}}
-                    <div class="col-md-6">
-                        <label class="form-label">Legalitas Usaha</label>
-                        <input type="text" name="legalitas_usaha" class="form-control"
-                            value="{{ old('legalitas_usaha', $tahap2->legalitas_usaha ?? '') }}">
-                    </div>
                     <div class="col-md-6">
                         <label class="form-label">SNI yang Akan Diterapkan</label>
                         <input type="text" name="sni_yang_diterapkan" class="form-control"
                             value="{{ old('sni_yang_diterapkan', $tahap2->sni_yang_diterapkan ?? '') }}">
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Sertifikat yang Dimiliki</label>
-                        <input type="text" name="sertifikat" class="form-control"
-                            value="{{ old('sertifikat', $tahap2->sertifikat ?? '') }}">
+                    {{-- Legalitas & Sertifikat --}}
+                    @php
+                        $legalitasOptions = ['NIB', 'SIUP', 'IUMK', 'Akta Perusahaan'];
+                        $selectedLegalitas = old('legalitas_usaha', json_decode($tahap2->legalitas_usaha ?? '[]', true));
+                        $selectedLegalitas = is_array($selectedLegalitas) ? $selectedLegalitas : explode(',', $selectedLegalitas);
+                        $lainnyaLegalitas = collect($selectedLegalitas)->filter(fn($l) => !in_array($l, $legalitasOptions))->values();
+                    @endphp
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Legalitas Usaha</label>
+                        @foreach ($legalitasOptions as $option)
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="legalitas_usaha[]"
+                                    value="{{ $option }}" id="legalitas_{{ $option }}"
+                                    {{ in_array($option, $selectedLegalitas) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="legalitas_{{ $option }}">{{ $option }}</label>
+                            </div>
+                        @endforeach
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="legalitas_lainnya_check"
+                                {{ $lainnyaLegalitas->isNotEmpty() ? 'checked' : '' }}
+                                onclick="document.getElementById('legalitas_lainnya_input').style.display = this.checked ? 'block' : 'none'">
+                            <label class="form-check-label">Lainnya</label>
+                        </div>
+                        <input type="text" name="legalitas_usaha_lainnya"
+                            class="form-control mt-1" placeholder="Sebutkan lainnya"
+                            value="{{ $lainnyaLegalitas->implode(', ') }}"
+                            id="legalitas_lainnya_input"
+                            style="{{ $lainnyaLegalitas->isNotEmpty() ? '' : 'display:none;' }}">
                     </div>
+
+                        @php
+                            $sertifikatOptions = ['PIRT', 'MD', 'Halal'];
+                            $selectedSertifikat = old('sertifikat', $tahap2->sertifikat ?? []);
+                            $selectedSertifikat = is_array($selectedSertifikat) ? $selectedSertifikat : explode(',', $selectedSertifikat);
+                            $lainnyaSertifikat = collect($selectedSertifikat)->filter(fn($s) => !in_array($s, $sertifikatOptions))->values();
+                        @endphp
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Sertifikat yang Dimiliki</label>
+                            @foreach ($sertifikatOptions as $option)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="sertifikat[]"
+                                        value="{{ $option }}" id="sertifikat_{{ $option }}"
+                                        {{ in_array($option, $selectedSertifikat) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="sertifikat_{{ $option }}">{{ $option }}</label>
+                                </div>
+                            @endforeach
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sertifikat_lainnya_check"
+                                    {{ $lainnyaSertifikat->isNotEmpty() ? 'checked' : '' }}
+                                    onclick="document.getElementById('sertifikat_lainnya_input').style.display = this.checked ? 'block' : 'none'">
+                                <label class="form-check-label">Lainnya</label>
+                            </div>
+                            <input type="text" name="sertifikat_lainnya"
+                                class="form-control mt-1" placeholder="Sebutkan lainnya"
+                                value="{{ $lainnyaSertifikat->implode(', ') }}"
+                                id="sertifikat_lainnya_input"
+                                style="{{ $lainnyaSertifikat->isNotEmpty() ? '' : 'display:none;' }}">
+                        </div>
+
 
                         {{-- Jangkauan Pemasaran --}}
                         <div class="col-md-6 mb-3">
@@ -316,7 +367,6 @@
                             </div>
                         @endforeach
                     </div>
-
  
                     </div>
                     @php

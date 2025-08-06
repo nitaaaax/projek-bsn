@@ -1,6 +1,17 @@
 @extends('layout.app')
 
 @section('content')
+<style>
+thead {
+  background-color: #d4edda; /* Hijau ringan */
+  color: #155724;
+}
+
+.table-responsive {
+  overflow-x: unset !important;
+}
+</style>
+
 <div class="container mt-4">
   <div class="card shadow-sm border-0">
     <div class="card-body">
@@ -10,8 +21,8 @@
 
       {{-- Tabel --}}
       <div class="table-responsive">
-        <table class="table table-hover table-bordered align-middle text-center">
-          <thead class="table-primary">
+        <table id="sertifikasiTable" class="table table-hover table-bordered align-middle text-center">
+          <thead class="table-success">
             <tr>
               <th>No</th>
               <th>Nama Pelaku</th>
@@ -78,7 +89,29 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
 <script>
+  $(document).ready(function() {
+    $('#sertifikasiTable').DataTable({
+      language: {
+        search: "Cari:",
+        lengthMenu: "Tampilkan _MENU_ entri",
+        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+        paginate: {
+          first: "Pertama",
+          last: "Terakhir",
+          next: "→",
+          previous: "←"
+        },
+        emptyTable: "Belum ada UMKM tersertifikasi.",
+        zeroRecords: "Tidak ditemukan data yang cocok."
+      },
+      responsive: true
+    });
+  });
+
   function confirmDelete(id) {
     Swal.fire({
       title: 'Yakin ingin menghapus?',
@@ -97,4 +130,5 @@
   }
 </script>
 @endpush
+
 

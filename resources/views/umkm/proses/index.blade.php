@@ -11,104 +11,86 @@
       </h3>
 
       {{-- Tombol Aksi --}}
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div class="d-flex gap-2 mt-2">
-    @if(optional(Auth::user()->role)->name === 'admin')
-        <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
-            <i class="fa fa-plus mr-1"></i>Tambah UMKM
-        </a>
-    @endif
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div class="d-flex gap-2">
+          @if(optional(Auth::user()->role)->name === 'admin')
+            <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
+              <i class="fa fa-plus me-1"></i> Tambah UMKM
+            </a>
+          @endif
 
-          
-          <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="fa fa-file-import mr-1"></i>Import Excel
+          <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fa fa-file-import me-1"></i> Import Excel
           </button>
         </div>
-
-        {{-- Search --}}
-      <form method="GET" action="{{ route('admin.umkm.index') }}" class="d-flex">
-          <input type="text" name="search" class="form-control me-2" placeholder="Cari UMKM..." value="{{ request('search') }}">
-          <button class="btn btn-outline-primary" type="submit">Cari</button>
-        </form>
       </div>
 
-  {{-- Tabel --}}
-  <div class="table-responsive">
-    <table class="table table-hover table-bordered text-center align-middle">
-      <thead class="table-primary">
-        <tr>
-          <th>No</th>
-          <th>Nama Pelaku</th>
-          <th>Produk</th>
-          <th>Status</th>
-          <th>Status Pembinaan</th> {{-- ✅ Tambahan kolom --}}
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        @forelse ($tahap1 as $t)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td class="text-start">{{ $t->nama_pelaku }}</td>
-            <td>{{ $t->produk }}</td>
-            <td>
-              @if (strtolower($t->status) == 'sudah')
-                <span class="badge bg-success">Sudah</span>
-              @elseif(strtolower($t->status) == 'belum')
-                <span class="badge bg-danger">Belum</span>
-              @else
-                <span class="badge bg-secondary">{{ $t->status }}</span>
-              @endif
-            </td>
-
-            {{-- ✅ Tambahan kolom status pembinaan --}}
-            <td>
-              @if(strtolower($t->status_pembinaan) == 'sppt sni (tersertifikasi)')
-                <span class="badge bg-success">Tersertifikasi</span>
-              @else
-                <span class="badge bg-secondary">{{ $t->status_pembinaan ?? '-' }}</span>
-              @endif
-            </td>
-
-            <td>
-              @php
-                $role = optional(Auth::user()->role)->name;
-              @endphp
-
-              @if($role === 'admin')
-                <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                  <i class="fa fa-eye"></i>
-                </a>
-              @elseif($role === 'user')
-                <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                  <i class="fa fa-eye"></i>
-                </a>
-              @endif
-
-              @if($role === 'admin')
-                <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
-                    <i class="fa fa-trash"></i>
-                  </button>
-                </form>
-              @endif
-
-              <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm">
-                <i class="fa fa-download"></i>
-              </a>
-            </td>
-          </tr>
-        @empty
-          <tr>
-            <td colspan="6" class="text-muted">Belum ada data.</td> {{-- ✅ Ubah colspan jadi 6 --}}
-          </tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
-
+      {{-- Tabel --}}
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center" id="tabelUMKM">
+          <thead class="table-primary">
+            <tr>
+              <th>No</th>
+              <th>Nama Pelaku</th>
+              <th>Produk</th>
+              <th>Status</th>
+              <th>Status Pembinaan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            @forelse ($tahap1 as $t)
+              <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td class="text-start">{{ $t->nama_pelaku }}</td>
+                <td>{{ $t->produk }}</td>
+                <td>
+                  @php $status = strtolower($t->status); @endphp
+                  @if ($status == 'sudah')
+                    <span class="badge bg-success">Sudah</span>
+                  @elseif ($status == 'belum')
+                    <span class="badge bg-danger">Belum</span>
+                  @else
+                    <span class="badge bg-secondary">{{ $t->status }}</span>
+                  @endif
+                </td>
+                <td>
+                  @php $pembinaan = strtolower($t->status_pembinaan); @endphp
+                  @if ($pembinaan == 'sppt sni (tersertifikasi)')
+                    <span class="badge bg-success">Tersertifikasi</span>
+                  @else
+                    <span class="badge bg-secondary">{{ $t->status_pembinaan ?? '-' }}</span>
+                  @endif
+                </td>
+                <td>
+                  @php $role = optional(Auth::user()->role)->name; @endphp
+                  @if($role === 'admin')
+                    <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                      <i class="fa fa-eye"></i>
+                    </a>
+                    <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </form>
+                  @elseif($role === 'user')
+                    <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                      <i class="fa fa-eye"></i>
+                    </a>
+                  @endif
+                  <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm" title="Download">
+                    <i class="fa fa-download"></i>
+                  </a>
+                </td>
+              </tr>
+            @empty
+              <tr><td colspan="6" class="text-muted">Belum ada data.</td></tr>
+            @endforelse
+          </tbody>
+        </table>
+      </div>
 
       {{-- Modal Import --}}
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -118,7 +100,7 @@
               @csrf
               <div class="modal-header">
                 <h5 class="modal-title" id="importModalLabel">Import Data UMKM</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <div class="modal-body">
                 <div class="mb-3">
@@ -140,24 +122,49 @@
 </div>
 @endsection
 
+@push('styles')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+@endpush
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>
-  document.querySelectorAll('.delete-form').forEach(form => {
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      Swal.fire({
-        title: 'Yakin ingin menghapus?',
-        text: "Data akan dihapus permanen!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Ya, hapus!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.submit();
-        }
+  $(document).ready(function () {
+    $('#tabelUMKM').DataTable({
+      language: {
+        search: "Cari:",
+        lengthMenu: "Tampilkan _MENU_ data",
+        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+        paginate: {
+          previous: "Sebelumnya",
+          next: "Berikutnya"
+        },
+        zeroRecords: "Tidak ada data ditemukan",
+        infoEmpty: "Menampilkan 0 data",
+      },
+      columnDefs: [
+        { orderable: false, targets: [5] } // kolom Aksi
+      ]
+    });
+
+    // SweetAlert untuk tombol hapus
+    document.querySelectorAll('.delete-form').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Yakin ingin menghapus?',
+          text: "Data akan dihapus permanen!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.submit();
+          }
+        });
       });
     });
   });

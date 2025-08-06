@@ -118,10 +118,9 @@
         </div>
 
         {{-- Media Sosial --}}
-        <div class="mb-3 col-md-6">
-            <label for="media_sosial" class="form-label fw-bold">Media Sosial</label>
-            <input type="text" name="media_sosial" id="media_sosial" class="form-control" 
-                value="{{ old('media_sosial', $data->media_sosial ?? '') }}">
+        <div class="mb-3 col-md-12">
+            <label class="form-label fw-bold">Media Sosial</label>
+            <input type="url" name="media_sosial" class="form-control" value="{{ old('media_sosial', $data->media_sosial ?? '') }}">
         </div>
 
         {{-- Lembaga Sertifikasi Produk (LSPro) --}}
