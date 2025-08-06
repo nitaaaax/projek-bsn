@@ -11,22 +11,18 @@ class SpjImport implements ToCollection
 {
     public function collection(Collection $rows)
     {
-        $spj = null;
-        $allowedStatuses = ['sudah dibayar', 'belum dibayar'];
-
         foreach ($rows as $index => $row) {
             if ($index === 0) continue; // skip header
 
-            $nama_spj = trim($row[1] ?? '');
-            $no_ukd = trim($row[2] ?? '');
-            $dokumen = trim($row[3] ?? '');
+            $nama_spj   = trim($row[1] ?? '');
+            $no_ukd     = trim($row[2] ?? '');
+            $dokumen    = trim($row[3] ?? '');
             $keterangan = trim($row[4] ?? '');
             $item_string = trim($row[5] ?? '');
 
-            // skip baris jika nama SPJ kosong
             if (empty($nama_spj)) continue;
 
-            // Buat SPJ utama
+            // Buat SPJ
             $spj = Spj::create([
                 'nama_spj'   => $nama_spj,
                 'no_ukd'     => $no_ukd,
@@ -34,20 +30,29 @@ class SpjImport implements ToCollection
                 'keterangan' => $keterangan,
             ]);
 
-            // Pecah detail berdasarkan koma jika ada banyak
+            // Mapping status agar sesuai enum database
+            $allowedStatuses = [
+                'sudah dibayar' => 'Sudah Dibayar',
+                'belum dibayar' => 'Belum Dibayar',
+            ];
+
+            // Pisahkan item per koma
             $items = explode(',', $item_string);
             foreach ($items as $itemData) {
                 $parts = explode('/', $itemData);
-                $item = $parts[0] ?? null;
-                $nominal = isset($parts[1]) && is_numeric($parts[1]) ? intval($parts[1]) : 0;
-                $status = isset($parts[2]) && in_array(strtolower(trim($parts[2])), $allowedStatuses)
-                            ? strtolower(trim($parts[2]))
-                            : null;
 
-                if ($item) {
+                $item = trim($parts[0] ?? '');
+                $nominal = isset($parts[1]) && is_numeric($parts[1]) ? intval($parts[1]) : 0;
+
+                // Ambil dan normalkan status
+                $raw_status = strtolower(trim($parts[2] ?? 'belum dibayar'));
+
+                $status = $allowedStatuses[$raw_status] ?? 'Belum Dibayar'; // fallback aman
+
+                if (!empty($item)) {
                     SpjDetail::create([
                         'spj_id'            => $spj->id,
-                        'item'              => trim($item),
+                        'item'              => $item,
                         'nominal'           => $nominal,
                         'status_pembayaran' => $status,
                         'keterangan'        => $keterangan,

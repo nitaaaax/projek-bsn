@@ -172,30 +172,23 @@
         
            {{-- Riwayat Pembinaan --}}
         <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Riwayat Pembinaan</label>
-            <textarea name="riwayat_pembinaan" class="form-control">{{ old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') }}</textarea>
+        <label class="form-label fw-bold">Riwayat Pembinaan</label>
+        <textarea id="editor_riwayat" name="riwayat_pembinaan" class="form-control">
+            {{ old('riwayat_pembinaan', $data->riwayat_pembinaan ?? '') }}
+        </textarea>
+        </div>
         </div>
 
-    </div>
-
  
-    @push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-<script>
-    let editorRiwayat;
+   @push('scripts')
+  {{-- CKEditor 5 CDN --}}
+  <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
+  <script>
     ClassicEditor
-        .create(document.querySelector('#riwayat_pembinaan'))
-        .then(editor => {
-            editorRiwayat = editor;
-        })
-        .catch(error => {
-            console.error(error);
-        });
-
-    // Ini wajib: isi kembali textarea sebelum form submit
-    document.querySelector('form').addEventListener('submit', function () {
-        document.querySelector('#riwayat_pembinaan').value = editorRiwayat.getData();
-    });
-</script>
-    @endpush
+      .create(document.querySelector('#editor_riwayat'))
+      .catch(error => {
+        console.error(error);
+      });
+  </script>
+@endpush

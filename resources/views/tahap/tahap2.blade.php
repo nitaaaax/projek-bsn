@@ -19,25 +19,25 @@
                 </select>
             </div>
 
-        {{-- Alamat Pabrik --}}
-        <div class="mb-3 col-md-12">
-            <label class="form-label fw-bold">Alamat Pabrik</label>
-            <textarea name="alamat_pabrik" class="form-control">{{ old('alamat_pabrik', $data->alamat_pabrik ?? '') }}</textarea>
-        </div>
+            {{-- Alamat Pabrik --}}
+            <div class="mb-3 col-md-12">
+                <label class="form-label fw-bold">Alamat Pabrik</label>
+                <textarea name="alamat_pabrik" class="form-control">{{ old('alamat_pabrik', $data->alamat_pabrik ?? '') }}</textarea>
+            </div>
 
-        {{-- Provinsi & Kota Pabrik --}}
-            <div class="mb-3 col-md-6">
-                <label class="form-label fw-bold">Provinsi Pabrik</label>
-                <select name="provinsi_pabrik" id="provinsi_pabrik" class="form-control">
-                    <option value="">-- Pilih Provinsi --</option>
-                </select>
-            </div>
-            <div class="mb-3 col-md-6">
-                <label class="form-label fw-bold">Kota Pabrik</label>
-                <select name="kota_pabrik" id="kota_pabrik" class="form-control">
-                    <option value="">-- Pilih Kota --</option>
-                </select>
-            </div>
+            {{-- Provinsi & Kota Pabrik --}}
+                <div class="mb-3 col-md-6">
+                    <label class="form-label fw-bold">Provinsi Pabrik</label>
+                    <select name="provinsi_pabrik" id="provinsi_pabrik" class="form-control">
+                        <option value="">-- Pilih Provinsi --</option>
+                    </select>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label class="form-label fw-bold">Kota Pabrik</label>
+                    <select name="kota_pabrik" id="kota_pabrik" class="form-control">
+                        <option value="">-- Pilih Kota --</option>
+                    </select>
+                </div>
 
         {{-- Legalitas Usaha --}}
         <div class="mb-3 col-md-12">
@@ -97,28 +97,33 @@
             <input type="url" name="link_dokumen" class="form-control" value="{{ old('link_dokumen', $data->link_dokumen ?? '') }}">
         </div>
 
-      {{-- Instansi --}}
-    <div class="col-md-6 mb-3">
-        <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
-        @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
-            @php
-                $isChecked = old('instansi_check') && in_array($item, old('instansi_check', []));
-                $inputValue = old("instansi_detail.$item", '');
-            @endphp
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
-                    {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
-                <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
-                <input type="text" class="form-control mt-1"
-                    name="instansi_detail[{{ $item }}]"
-                    id="input_{{ $item }}"
-                    placeholder="Isi nama {{ strtolower($item) }}"
-                    value="{{ $inputValue }}"
-                    {{ $isChecked ? '' : 'style=display:none;' }}>
-            </div>
-        @endforeach
-    </div>
-
+        @php
+            // Gabungkan old input dengan data lama dari controller
+            $instansiArray = old('instansi_detail', $instansiArray ?? []);
+            $checkedArray = old('instansi_check', array_keys($instansiArray));
+        @endphp
+        {{-- Instansi --}}
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
+            @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
+                @php
+                    $isChecked = in_array($item, $checkedArray);
+                    $rawValue = $instansiArray[$item] ?? '';
+                    $inputValue = is_array($rawValue) ? implode(', ', $rawValue) : $rawValue;
+                @endphp
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
+                        {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
+                    <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
+                    <input type="text" class="form-control mt-1"
+                        name="instansi_detail[{{ $item }}]"
+                        id="input_{{ $item }}"
+                        placeholder="Isi nama {{ strtolower($item) }}"
+                        value="{{ $inputValue }}"
+                        style="{{ $isChecked ? '' : 'display:none;' }}">
+                </div>
+            @endforeach
+        </div>
 
         {{-- sertifikat --}}
         <div class="mb-3 col-md-12">
@@ -136,16 +141,16 @@
         {{-- Gruping --}}
         <div class="mb-3">
             <label for="gruping" class="form-label fw-bold">Gruping</label>
-<input type="text" name="gruping" class="form-control" value="{{ is_array(old('gruping')) ? '' : old('gruping', $data->gruping ?? '') }}" placeholder="Contoh: UMKM Pangan Lokal">
+                <input type="text" name="gruping" class="form-control" value="{{ is_array(old('gruping')) ? '' : old('gruping', $data->gruping ?? '') }}" placeholder="Contoh: UMKM Pangan Lokal">
             @error('gruping')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
 
- {{-- Foto Produk --}}
-<div class="col-md-6 mb-3">
-    <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
-    <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewMultipleImages(this, 'preview-produk')">
+    {{-- Foto Produk --}}
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewMultipleImages(this, 'preview-produk')">
 
     {{-- Preview Gambar Lama --}}
     <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
@@ -169,11 +174,11 @@
     </div>
 
     {{-- Preview Gambar Baru --}}
-    <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
-</div>
+        <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
+    </div>
 
-{{-- Foto Tempat Produksi --}}
-<div class="col-md-6 mb-3">
+    {{-- Foto Tempat Produksi --}}
+    <div class="col-md-6 mb-3">
     <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
     <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewMultipleImages(this, 'preview-tempat')">
 
@@ -199,62 +204,104 @@
     </div>
 
     {{-- Preview Gambar Baru --}}
-    <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
-</div>
+        <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
+    </div>
 
-{{-- Hidden field untuk gambar yang dihapus --}}
-<input type="hidden" name="removed_foto_produk" id="removed_foto_produk" value="">
-<input type="hidden" name="removed_foto_tempat_produksi" id="removed_foto_tempat_produksi" value="">
+    {{-- Hidden field untuk gambar yang dihapus --}}
+    <input type="hidden" name="removed_foto_produk" id="removed_foto_produk" value="">
+    <input type="hidden" name="removed_foto_tempat_produksi" id="removed_foto_tempat_produksi" value="">
 
 
-    @push('scripts')
-   <!-- Jquery CDN (cukup satu kali saja) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@push('scripts')
 
-<script>
-$(document).ready(function () {
-    // Ambil semua provinsi saat halaman siap
-    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (data) {
-        console.log('Data provinsi:', data); // Debugging
-        $.each(data, function (index, provinsi) {
-            $('#provinsi_kantor, #provinsi_pabrik').append(`<option value="${provinsi.id}">${provinsi.nama}</option>`);
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Hapus gambar lama dari DOM dan form
+        document.querySelectorAll('.btn-remove-old').forEach(button => {
+            button.addEventListener('click', function () {
+                const wrapper = this.closest('.old-foto-produk') || this.closest('.old-foto-tempat');
+                wrapper.remove();
+            });
         });
-    }).fail(function(xhr, status, error) {
-        console.error('Gagal ambil provinsi:', xhr.responseText);
-    });
 
-    // Event saat provinsi kantor berubah
-    $('#provinsi_kantor').on('change', function () {
-        const id = $(this).val();
-        $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (id) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
-                $.each(data, function (index, kota) {
-                    $('#kota_kantor').append(`<option value="${kota.id}">${kota.nama}</option>`);
-                });
-            }).fail(function(xhr, status, error) {
-                console.error('Gagal ambil kota kantor:', xhr.responseText);
+        // Toggle input instansi
+        const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"][name="instansi_check[]"]');
+
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                const inputId = 'input_' + this.value;
+                const textInput = document.getElementById(inputId);
+                if (this.checked) {
+                    textInput.style.display = 'block';
+                } else {
+                    textInput.style.display = 'none';
+                    textInput.value = '';
+                }
             });
-        }
+        });
     });
+    </script>
 
-    // Event saat provinsi pabrik berubah
-    $('#provinsi_pabrik').on('change', function () {
-        const id = $(this).val();
-        $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (id) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
-                $.each(data, function (index, kota) {
-                    $('#kota_pabrik').append(`<option value="${kota.id}">${kota.nama}</option>`);
-                });
-            }).fail(function(xhr, status, error) {
-                console.error('Gagal ambil kota pabrik:', xhr.responseText);
+    <script>
+    function removeImage(button, fieldName, fileName) {
+        // Hapus elemen preview-nya
+        button.closest('.position-relative').remove();
+
+        // Ambil input hidden
+        let input = document.getElementById(`removed_${fieldName}`);
+        if (input) {
+            let current = input.value ? input.value.split(',') : [];
+            current.push(fileName.split('/').pop()); // hanya ambil nama file-nya
+            input.value = current.join(',');
+        }
+    }
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        // Ambil semua provinsi saat halaman siap
+        $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (data) {
+            console.log('Data provinsi:', data); // Debugging
+            $.each(data, function (index, provinsi) {
+                $('#provinsi_kantor, #provinsi_pabrik').append(`<option value="${provinsi.id}">${provinsi.nama}</option>`);
             });
-        }
-    });
-});
-</script>
+        }).fail(function(xhr, status, error) {
+            console.error('Gagal ambil provinsi:', xhr.responseText);
+        });
 
+        // Event saat provinsi kantor berubah
+        $('#provinsi_kantor').on('change', function () {
+            const id = $(this).val();
+            $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
+            if (id) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                    $.each(data, function (index, kota) {
+                        $('#kota_kantor').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                    });
+                }).fail(function(xhr, status, error) {
+                    console.error('Gagal ambil kota kantor:', xhr.responseText);
+                });
+            }
+        });
+
+        // Event saat provinsi pabrik berubah
+        $('#provinsi_pabrik').on('change', function () {
+            const id = $(this).val();
+            $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
+            if (id) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
+                    $.each(data, function (index, kota) {
+                        $('#kota_pabrik').append(`<option value="${kota.id}">${kota.nama}</option>`);
+                    });
+                }).fail(function(xhr, status, error) {
+                    console.error('Gagal ambil kota pabrik:', xhr.responseText);
+                });
+            }
+        });
+    });
+    </script>
 
     <script>
     function previewMultipleImages(input, previewId) {
@@ -356,7 +403,6 @@ $(document).ready(function () {
     }
     </script>
 
-    <!--INstansi yang pernah membina-->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const instansi = ['dinas', 'kementerian', 'pt', 'komunitas'];
@@ -384,4 +430,5 @@ $(document).ready(function () {
         input.style.display = checkbox.checked ? "block" : "none";
     }
     </script>
-    @endpush
+
+@endpush

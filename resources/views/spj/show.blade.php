@@ -39,10 +39,7 @@
       @endif
   </div>
 </div>
-
 </div>
-
-
       {{-- Tabel Detail Item --}}
       <div class="table-responsive">
         <table id="tabelSPJDetail" class="table table-bordered table-hover table-striped">

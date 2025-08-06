@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Exports\SpjExport;
 use App\Imports\SpjImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SpjController extends Controller
 {
@@ -27,6 +29,13 @@ class SpjController extends Controller
 
     public function export()
     {
+        $user = Auth::user();
+
+        // Cek role: hanya admin & user yang diizinkan
+        if (!in_array(optional($user->role)->name, ['admin', 'user'])) {
+            abort(403, 'Anda tidak memiliki akses untuk export data SPJ.');
+        }
+
         return Excel::download(new SpjExport, 'spj_cair.xlsx');
     }
 
@@ -143,8 +152,8 @@ class SpjController extends Controller
                 'item'              => $item,
                 'nominal'           => $request->nominal[$i],
                 'status_pembayaran' => $status,
-                'keterangan'        => $request->keterangan_detail[$i] ?? null,
-            ]);
+                'keterangan'        => $request->keterangan_detail[$i] ?? $request->keterangan,       
+             ]);
         }
 
         return redirect()->route('admin.spj.show', $spj->id)->with('success', 'SPJ berhasil diupdate.');

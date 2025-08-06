@@ -21,7 +21,7 @@
             </tr>
           </thead>
           <tbody>
-            @forelse($data as $item)
+            @forelse($items as $item)
               <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td>{{ $item->nama_pelaku }}</td>

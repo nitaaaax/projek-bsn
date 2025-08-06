@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tahap2 extends Model
 {
@@ -32,9 +31,9 @@ class Tahap2 extends Model
         return $this->belongsTo(Tahap1::class, 'pelaku_usaha_id', 'id');
     }
 
-    public function sertifikasi()
-    {
-        return $this->hasOne(Sertifikasi::class, 'tahap2_id');
-    }
+    // Relasi wilayah
+    public function provinsiKantor() { return $this->belongsTo(Provinsi::class, 'provinsi_kantor'); }
+    public function kotaKantor()     { return $this->belongsTo(Kota::class, 'kota_kantor'); }
+    public function provinsiPabrik() { return $this->belongsTo(Provinsi::class, 'provinsi_pabrik'); }
+    public function kotaPabrik()     { return $this->belongsTo(Kota::class, 'kota_pabrik'); }
 }
-    

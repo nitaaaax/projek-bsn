@@ -32,70 +32,83 @@
         </form>
       </div>
 
-      {{-- Tabel --}}
-      <div class="table-responsive">
-        <table class="table table-hover table-bordered text-center align-middle">
-          <thead class="table-primary">
-            <tr>
-              <th>No</th>
-              <th>Nama Pelaku</th>
-              <th>Produk</th>
-              <th>Status</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse ($tahap1 as $t)
-              <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td class="text-start">{{ $t->nama_pelaku }}</td>
-                <td>{{ $t->produk }}</td>
-                <td>
-                  @if (strtolower($t->status) == 'sudah')
-                    <span class="badge bg-success">Sudah</span>
-                  @elseif(strtolower($t->status) == 'belum')
-                    <span class="badge bg-danger">Belum</span>
-                  @else
-                    <span class="badge bg-secondary">{{ $t->status }}</span>
-                  @endif
-                </td>
-                <td>
+  {{-- Tabel --}}
+  <div class="table-responsive">
+    <table class="table table-hover table-bordered text-center align-middle">
+      <thead class="table-primary">
+        <tr>
+          <th>No</th>
+          <th>Nama Pelaku</th>
+          <th>Produk</th>
+          <th>Status</th>
+          <th>Status Pembinaan</th> {{-- ✅ Tambahan kolom --}}
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+        @forelse ($tahap1 as $t)
+          <tr>
+            <td>{{ $loop->iteration }}</td>
+            <td class="text-start">{{ $t->nama_pelaku }}</td>
+            <td>{{ $t->produk }}</td>
+            <td>
+              @if (strtolower($t->status) == 'sudah')
+                <span class="badge bg-success">Sudah</span>
+              @elseif(strtolower($t->status) == 'belum')
+                <span class="badge bg-danger">Belum</span>
+              @else
+                <span class="badge bg-secondary">{{ $t->status }}</span>
+              @endif
+            </td>
 
-                @php
-                  $role = optional(Auth::user()->role)->name;
+            {{-- ✅ Tambahan kolom status pembinaan --}}
+            <td>
+              @if(strtolower($t->status_pembinaan) == 'sppt sni (tersertifikasi)')
+                <span class="badge bg-success">Tersertifikasi</span>
+              @else
+                <span class="badge bg-secondary">{{ $t->status_pembinaan ?? '-' }}</span>
+              @endif
+            </td>
+
+            <td>
+              @php
+                $role = optional(Auth::user()->role)->name;
               @endphp
 
               @if($role === 'admin')
-                  <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                      <i class="fa fa-eye"></i>
-                  </a>
-              @elseif($role === 'user')
-                  <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                      <i class="fa fa-eye"></i>
-                  </a>
-              @endif
-             @if(optional(Auth::user()->role)->name === 'admin')
-                <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
-                <i class="fa fa-trash"></i>
-                </button>
-             </form>
-             @endif
-                <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm">
-                <i class="fa fa-download"></i> 
+                <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                  <i class="fa fa-eye"></i>
                 </a>
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="5" class="text-muted">Belum ada data.</td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
+              @elseif($role === 'user')
+                <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                  <i class="fa fa-eye"></i>
+                </a>
+              @endif
+
+              @if($role === 'admin')
+                <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger btn-sm btn-delete" title="Hapus">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </form>
+              @endif
+
+              <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm">
+                <i class="fa fa-download"></i>
+              </a>
+            </td>
+          </tr>
+        @empty
+          <tr>
+            <td colspan="6" class="text-muted">Belum ada data.</td> {{-- ✅ Ubah colspan jadi 6 --}}
+          </tr>
+        @endforelse
+      </tbody>
+    </table>
+  </div>
+
 
       {{-- Modal Import --}}
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Tahap1 extends Model
 {
@@ -12,7 +11,8 @@ class Tahap1 extends Model
     protected $fillable = [
         'nama_pelaku', 'produk', 'klasifikasi', 'status', 'pembina_1', 'pembina_2','lspro',
         'sinergi', 'nama_kontak_person', 'no_hp', 'bulan_pertama_pembinaan', 'tahun_dibina', 'jenis_usaha',
-        'riwayat_pembinaan', 'status_pembinaan', 'email', 'media_sosial', 'nama_merek','tanda_daftar_merk'
+        'riwayat_pembinaan', 'status_pembinaan', 'email', 'media_sosial', 'nama_merek','tanda_daftar_merk',
+        
     ];
 
     protected $casts = [
@@ -23,11 +23,4 @@ class Tahap1 extends Model
     {
         return $this->hasOne(Tahap2::class, 'pelaku_usaha_id', 'id');
     }
-
-    public function sertifikasi()
-    {
-        return $this->hasOne(Sertifikasi::class, 'tahap1_id');
-    }
 }
-
-

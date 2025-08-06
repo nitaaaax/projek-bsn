@@ -149,19 +149,43 @@
           </ul>
         </li>
 
-        {{-- HANYA UNTUK ADMIN --}}
+      {{-- HANYA UNTUK ADMIN --}}
       @if (Auth::check() && Auth::user()->role?->name === 'admin')
-        <li class="nav-item">
-          <a href="{{ route('admin.users.index') }}" class="nav-link">
+        <li class="nav-item has-treeview">
+          <a href="#" class="nav-link">
             <i class="nav-icon fas fa-user-shield"></i>
-            <p>Role Management</p>
+            <p>
+              Manajement
+              <i class="right fas fa-angle-left"></i>
+            </p>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{{ route('admin.users.index') }}" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Role</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Provinsi</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Kota</p>
+              </a>
+            </li>
+          </ul>
         </li>
-      @endif
+        @endif
       </ul>
     </nav>
     <!-- /.sidebar-menu -->
   </aside>
+      
 
   <script>
   function togglePopout() {

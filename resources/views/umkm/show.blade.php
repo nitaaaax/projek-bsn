@@ -32,7 +32,12 @@
                 }
 
                  // Instansi
-$instansiArray = $tahap2->instansi ?? [];
+                $instansi = [];
+                if (!empty($tahap2->instansi)) {
+                    $instansi = is_string($tahap2->instansi)
+                        ? json_decode($tahap2->instansi, true)
+                        : (array) $tahap2->instansi;
+                }
             @endphp
 
 
@@ -93,23 +98,28 @@ $instansiArray = $tahap2->instansi ?? [];
                         </select>
                     </div>
 
-                    {{-- Status Pembinaan --}}
-                    <div class="col-md-6">
-                        <label class="form-label">Status Pembinaan</label>
-                        <select name="status_pembinaan" class="form-control">
-                            <option value="">-- Pilih Status Pembinaan --</option>
-                            <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
-                            <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
-                            <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
-                            <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
-                            <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
-                            <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
-                            <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
-                            <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
-                            <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
-                        </select>
-                    </div>
+                   {{-- Status Pembinaan --}}
+<div class="col-md-6">
+    <label class="form-label">Status Pembinaan</label>
+    <select name="status_pembinaan" class="form-control"
+        {{ ($tahap1->status ?? '') == 'Tersertifikasi' ? 'disabled' : '' }}>
+        <option value="">-- Pilih Status Pembinaan --</option>
+        <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
+        <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
+        <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
+        <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
+        <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
+        <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
+        <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
+        <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
+        <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
+    </select>
 
+    {{-- supaya tetap terkirim walau select disabled --}}
+    @if(($tahap1->status ?? '') == 'Tersertifikasi')
+        <input type="hidden" name="status_pembinaan" value="{{ $tahap1->status_pembinaan }}">
+    @endif
+</div>
 
                     {{-- Jenis Usaha --}}
                     <div class="col-md-6">
@@ -140,12 +150,10 @@ $instansiArray = $tahap2->instansi ?? [];
                     {{-- Riwayat Pembinaan --}}
                     <div class="col-md-12">
                         <label class="form-label">Riwayat Pembinaan</label>
-                        <textarea name="riwayat_pembinaan" class="form-control" rows="4">
-                            {{ old('riwayat_pembinaan', is_array($tahap1->riwayat_pembinaan ?? null) ? implode(', ', $tahap1->riwayat_pembinaan) : ($tahap1->riwayat_pembinaan ?? '') ) }}
+                        <textarea id="editor" name="riwayat_pembinaan" class="form-control">
+                            {!! old('riwayat_pembinaan', $tahap1->riwayat_pembinaan ?? '') !!}
                         </textarea>
-
                     </div>
-
                 </div>
             </div>
             
@@ -187,11 +195,12 @@ $instansiArray = $tahap2->instansi ?? [];
                         <textarea name="link_dokumen" class="form-control" rows="2">{{ old('link_dokumen', $tahap2->link_dokumen ?? '') }}</textarea>
                     </div>
 
-                    {{-- Alamat Kantor & Pabrik --}}
-                    <div class="col-12">
-                        <label class="form-label">Alamat Kantor</label>
+                    {{-- Alamat Kantor --}}
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-bold">Alamat Kantor</label>
                         <textarea name="alamat_kantor" class="form-control" rows="2">{{ old('alamat_kantor', $tahap2->alamat_kantor ?? '') }}</textarea>
                     </div>
+
                     {{-- Provinsi & Kota Kantor --}}
                     <div class="mb-3 col-md-6">
                         <label class="form-label fw-bold">Provinsi Kantor</label>
@@ -206,8 +215,9 @@ $instansiArray = $tahap2->instansi ?? [];
                         </select>
                     </div>
 
-                    <div class="col-12">
-                        <label class="form-label">Alamat Pabrik</label>
+                    {{-- Alamat Pabrik --}}
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-bold">Alamat Pabrik</label>
                         <textarea name="alamat_pabrik" class="form-control" rows="2">{{ old('alamat_pabrik', $tahap2->alamat_pabrik ?? '') }}</textarea>
                     </div>
 
@@ -224,7 +234,6 @@ $instansiArray = $tahap2->instansi ?? [];
                             <option value="">-- Pilih Kota --</option>
                         </select>
                     </div>
-
                     {{-- Tahun Pendirian --}}
                     <div class="col-md-6">
                         <label class="form-label">Tahun Pendirian</label>
@@ -263,37 +272,98 @@ $instansiArray = $tahap2->instansi ?? [];
                             @endforeach
                         </div>
 
+                        @php
+                            $isOld = count(old()) > 0;
+
+                            // Ambil data dari DB dan decode sebagai array asosiatif
+                            $instansiData = json_decode($tahap1->instansi ?? '{}', true);
+
+                            // Inisialisasi data untuk input
+                            $checkedArray = $isOld ? old('instansi_check', []) : array_keys($instansiData);
+                            $instansiDetailArray = $isOld ? old('instansi_detail', []) : $instansiData;
+                        @endphp
+
 
                         {{-- Instansi --}}
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
-                            @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
-                                @php
-                                    $isChecked = !empty($instansiArray[$item]);
-                                    $rawValue = old("instansi_detail.$item", $instansiArray[$item] ?? '');
-                                    $inputValue = is_array($rawValue) ? implode(', ', $rawValue) : $rawValue;
-                                @endphp
-                                <div class="form-check mb-2">
-                                    <input class="form-check-input" type="checkbox" id="check_{{ $item }}" name="instansi_check[]" value="{{ $item }}"
-                                        {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
-                                    <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
-                                    <input type="text" class="form-control mt-1"
-                                        name="instansi_detail[{{ $item }}]"
-                                        id="input_{{ $item }}"
-                                        placeholder="Isi nama {{ strtolower($item) }}"
-                                        value="{{ $inputValue }}"
-                                        {{ $isChecked ? '' : 'style=display:none;' }}>
-                                </div>
-                            @endforeach
-                        </div>
+                        <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
+
+                        @php
+                            // Ambil data dari DB dan decode sebagai array asosiatif
+                            $instansiData = json_decode($tahap1->instansi ?? '{}', true);
+                            $checkedArray = array_keys($instansiData); // yang dicentang
+                            $instansiDetailArray = $instansiData; // isinya: ['Dinas' => 'Detail Dinas', dst]
+                        @endphp
+
+                        @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
+                            @php
+                                $isChecked = in_array($item, $checkedArray);
+                                $inputValue = $instansiDetailArray[$item] ?? '';
+                            @endphp
+
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="check_{{ $item }}"
+                                    name="instansi_check[]" value="{{ $item }}"
+                                    {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
+                                <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
+
+                                <input type="text" class="form-control mt-1"
+                                    name="instansi_detail[{{ $item }}]"
+                                    id="input_{{ $item }}"
+                                    placeholder="Isi nama {{ strtolower($item) }}"
+                                    value="{{ $inputValue }}"
+                                    {{ $isChecked ? '' : 'style=display:none;' }}>
+                            </div>
+                        @endforeach
                     </div>
-                     <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
+
+ 
+                    </div>
+                    @php
+                        $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
+                        $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
+                    @endphp
+                    {{-- Foto Produk --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+                        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
+
+                        <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
+                            @if (is_array($foto_produk) && count($foto_produk) > 0)
+                                @foreach ($foto_produk as $foto)
+                                    <div class="position-relative me-2 mb-2 old-foto-produk">
+                                        <img src="{{ asset('storage/' . $foto) }}"
+                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
+                                            class="img-thumbnail">
+
+                                        <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
+
+                                        <button type="button"
+                                                class="btn btn-sm btn-danger p-1 btn-remove-old"
+                                                style="position: absolute; top: 0; right: 0;">
+                                            &times;
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @else
+                                <p class="text-muted">Belum ada foto produk.</p>
+                            @endif
+                        </div>
+                        <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
+                    </div>
+
+                    {{-- Foto Tempat Produksi --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
+                        <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
+
+                        <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
                             @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
                                 @foreach ($foto_tempat_produksi as $foto)
                                     <div class="position-relative me-2 mb-2 old-foto-tempat">
-                                    <img src="{{ asset('storage/uploads/foto_tempat_produksi/' . $foto) }}"
-                                        class="me-2 mb-2"
-                                        style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                                        <img src="{{ asset('storage/' . $foto) }}"
+                                            class="me-2 mb-2"
+                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                                         <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
                                         <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
                                     </div>
@@ -303,75 +373,17 @@ $instansiArray = $tahap2->instansi ?? [];
                             @endif
                         </div>
                         <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
-                    </div>
-                    </div>
 
-                    {{-- Tombol Submit dan Kembali --}}
-                    @php
-    $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
-    $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-@endphp
-
-{{-- Foto Produk --}}
-<div class="col-md-6 mb-3">
-    <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
-    <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
-
-    <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
-        @if (is_array($foto_produk) && count($foto_produk) > 0)
-            @foreach ($foto_produk as $foto)
-                <div class="position-relative me-2 mb-2 old-foto-produk">
-                    <img src="{{ asset('storage/' . $foto) }}"
-                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
-                         class="img-thumbnail">
-
-                    <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
-
-                    <button type="button"
-                            class="btn btn-sm btn-danger p-1 btn-remove-old"
-                            style="position: absolute; top: 0; right: 0;">
-                        &times;
-                    </button>
-                </div>
-            @endforeach
-        @else
-            <p class="text-muted">Belum ada foto produk.</p>
-        @endif
-    </div>
-    <div id="preview-produk" class="mt-2 d-flex flex-wrap"></div>
-</div>
-
-{{-- Foto Tempat Produksi --}}
-<div class="col-md-6 mb-3">
-    <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
-    <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
-
-    <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
-        @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
-            @foreach ($foto_tempat_produksi as $foto)
-                <div class="position-relative me-2 mb-2 old-foto-tempat">
-                    <img src="{{ asset('storage/' . $foto) }}"
-                         class="me-2 mb-2"
-                         style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
-                    <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
-                    <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
-                </div>
-            @endforeach
-        @else
-            <p class="text-muted">Belum ada foto tempat produksi.</p>
-        @endif
-    </div>
-    <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
-</div>
-
-                        {{-- Preview Foto Lama --}}
-                      col-12 d-flex justify-content-end gap-3 mb-4">
+                         {{-- Tombol Submit dan Kembali --}}
                         <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                         <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" title="Simpan Perubahan">
                             <i class="fas fa-save"></i> Simpan
                         </button>
+                    </div>
+                    </div>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -382,52 +394,84 @@ $instansiArray = $tahap2->instansi ?? [];
     @endsection
 
     @push('scripts')
-     <!-- Jquery CDN (cukup satu kali saja) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+    let editorInstance;
 
+    ClassicEditor
+        .create(document.querySelector('#editor'))
+        .then(editor => {
+            editorInstance = editor;
+
+            // Ini WAJIB: sinkronkan data editor ke textarea saat form disubmit
+            document.querySelector('form').addEventListener('submit', function () {
+                document.querySelector('#editor').value = editorInstance.getData();
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
 $(document).ready(function () {
-    // Ambil semua provinsi saat halaman siap
-    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (data) {
-        console.log('Data provinsi:', data); // Debugging
-        $.each(data, function (index, provinsi) {
-            $('#provinsi_kantor, #provinsi_pabrik').append(`<option value="${provinsi.id}">${provinsi.nama}</option>`);
+    const selectedProvKantor = "{{ old('provinsi_kantor', $tahap2->provinsi_kantor ?? '') }}";
+    const selectedKotaKantor = "{{ old('kota_kantor', $tahap2->kota_kantor ?? '') }}";
+
+    const selectedProvPabrik = "{{ old('provinsi_pabrik', $tahap2->provinsi_pabrik ?? '') }}";
+    const selectedKotaPabrik = "{{ old('kota_pabrik', $tahap2->kota_pabrik ?? '') }}";
+
+    // Load semua provinsi
+    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (provinsiList) {
+        $.each(provinsiList, function (index, provinsi) {
+            const option = `<option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>`;
+            $('#provinsi_kantor').append(option);
+
+            const option2 = `<option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>`;
+            $('#provinsi_pabrik').append(option2);
         });
-    }).fail(function(xhr, status, error) {
-        console.error('Gagal ambil provinsi:', xhr.responseText);
+
+        if (selectedProvKantor) {
+            $('#provinsi_kantor').trigger('change');
+        }
+
+        if (selectedProvPabrik) {
+            $('#provinsi_pabrik').trigger('change');
+        }
     });
 
-    // Event saat provinsi kantor berubah
+    // Provinsi kantor berubah
     $('#provinsi_kantor').on('change', function () {
-        const id = $(this).val();
+        const provId = $(this).val();
         $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (id) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
-                $.each(data, function (index, kota) {
-                    $('#kota_kantor').append(`<option value="${kota.id}">${kota.nama}</option>`);
+        if (provId) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                $.each(kotaList, function (index, kota) {
+                    const selected = kota.id == selectedKotaKantor ? 'selected' : '';
+                    $('#kota_kantor').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
                 });
-            }).fail(function(xhr, status, error) {
-                console.error('Gagal ambil kota kantor:', xhr.responseText);
             });
         }
     });
 
-    // Event saat provinsi pabrik berubah
+    // Provinsi pabrik berubah
     $('#provinsi_pabrik').on('change', function () {
-        const id = $(this).val();
+        const provId = $(this).val();
         $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (id) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${id}`, function (data) {
-                $.each(data, function (index, kota) {
-                    $('#kota_pabrik').append(`<option value="${kota.id}">${kota.nama}</option>`);
+        if (provId) {
+            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                $.each(kotaList, function (index, kota) {
+                    const selected = kota.id == selectedKotaPabrik ? 'selected' : '';
+                    $('#kota_pabrik').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
                 });
-            }).fail(function(xhr, status, error) {
-                console.error('Gagal ambil kota pabrik:', xhr.responseText);
             });
         }
     });
 });
 </script>
+
     <script>
     function previewImages(input, containerId) {
         const container = document.getElementById(containerId);

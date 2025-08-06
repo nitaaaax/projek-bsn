@@ -21,10 +21,16 @@
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
           @endif
-            <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
-                <i class="fa fa-file-excel"></i> Dowload Data
-            </a>
-            <a href="{{ route('admin.spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
+            @if(optional(Auth::user()->role)->name === 'admin')
+              <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
+                <i class="fa fa-file-excel"></i> Download Data
+              </a>
+            @elseif(optional(Auth::user()->role)->name === 'user')
+              <a href="{{ route('user.spj.export') }}" class="btn btn-success">
+                <i class="fa fa-file-excel"></i> Download Data
+              </a>
+            @endif
+            <a href="{{ route('spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="fa fa-upload"></i>  Upload Data
             </a>
           </div>
@@ -168,16 +174,15 @@
             <span class="badge bg-warning text-dark px-3 py-2">Belum Dibayar</span>
           </td>
           <td class="text-center">
-             {{-- Tombol Detail, tampilkan berdasarkan role --}}
-                  @if(optional(Auth::user()->role)->name === 'admin')
-                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
-                      <i class="fa fa-eye"></i> Detail 
-                    </a>
-                  @elseif(optional(Auth::user()->role)->name === 'user')
-                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
-                      <i class="fa fa-eye"></i> Detail
-                    </a>
-                  @endif
+             @if(optional(Auth::user()->role)->name === 'admin')
+              <a href="{{ route('admin.spj.show', $item->spj_id) }}" class="btn btn-primary btn-sm">
+                <i class="fa fa-eye"></i> Detail
+              </a>
+            @elseif(optional(Auth::user()->role)->name === 'user')
+              <a href="{{ route('spj.show', $item->spj_id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa fa-eye"></i> Detail
+               </a> 
+            @endif
           </td>
         </tr>
         @empty
@@ -198,7 +203,7 @@
 <!-- Modal Import -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form action="{{ route('admin.spj.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
         <div class="modal-header">

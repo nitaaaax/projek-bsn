@@ -41,6 +41,8 @@ use App\Http\Controllers\{
         Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
         Route::get('/umkm-proses', [UMKMProsesController::class, 'index'])->name('umkm.proses.index');
         Route::get('/umkm-sertifikasi', [UMKMSertifikasiController::class, 'index'])->name('umkm.sertifikasi.index');
+        Route::get('/spj', [SpjController::class, 'index'])->name('spj.index');
+        Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
     });
 
     // ---------------------- USER ROUTES (READ-ONLY + SHOW) ----------------------
@@ -50,10 +52,15 @@ use App\Http\Controllers\{
             Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
             Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
             Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
+ Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
+
             Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.user');
             Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update.user');
             Route::get('/detail/{id}', [UMKMProsesController::class, 'showUser'])->name('showuser');
-        });
+                });
+             Route::prefix('spj')->name('spj.')->group(function () {
+                Route::get('export', [SpjController::class, 'export'])->name('export'); 
+            });
     });
 
     // ---------------------- ADMIN ROUTES ----------------------
@@ -86,26 +93,28 @@ use App\Http\Controllers\{
         Route::prefix('umkm-sertifikasi')->name('sertifikasi.')->group(function () {
             Route::get('/', [UMKMSertifikasiController::class, 'index'])->name('index');
             Route::get('/{id}/edit', [UMKMSertifikasiController::class, 'edit'])->name('edit');
-            Route::put('/tahap/update/{id}', [UMKMSertifikasiController::class, 'update'])->name('tahap.update');
+            Route::put('/update/{id}', [UMKMSertifikasiController::class, 'update'])->name('update');
             Route::delete('/{id}', [UMKMSertifikasiController::class, 'destroy'])->name('destroy');
         });
 
 
-        // SPJ
-        Route::prefix('spj')->name('spj.')->group(function () {
-            Route::get('/', [SpjController::class, 'index'])->name('index');
-            Route::get('/create', [SpjController::class, 'create'])->name('create');
-            Route::post('/store', [SpjController::class, 'store'])->name('store');
-            Route::get('/{id}/edit', [SpjController::class, 'edit'])->name('edit');
-            Route::get('/{id}', [SpjController::class, 'show'])->name('show');
-            Route::put('/{id}/update', [SpjController::class, 'update'])->name('update');
-            Route::delete('/{id}', [SpjController::class, 'destroy'])->name('destroy');
-            Route::get('/export', [SpjController::class, 'export'])->name('export');
-            Route::post('/import', [SpjController::class, 'import'])->name('import');
+        // SPJ (Admin)
+       Route::prefix('spj')->name('spj.')->group(function () {
+        Route::get('/', [SpjController::class, 'index'])->name('index');
+        Route::get('/create', [SpjController::class, 'create'])->name('create');
+        Route::post('/store', [SpjController::class, 'store'])->name('store');
+
+        //  TARUH EXPORT DI SINI SEBELUM /{id}
+        Route::get('/export', [SpjController::class, 'export'])->name('export');
+
+        Route::get('/{id}/edit', [SpjController::class, 'edit'])->name('edit');
+        Route::get('/{id}', [SpjController::class, 'show'])->name('show')->whereNumber('id');
+        Route::put('/{id}/update', [SpjController::class, 'update'])->name('update');
+        Route::delete('/{id}', [SpjController::class, 'destroy'])->name('destroy');
         });
     });
 
     // ---------------------- EXPORT / IMPORT ----------------------
     Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
     Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
-
+    Route::post('spj/import', [SpjController::class, 'import'])->name('spj.import');

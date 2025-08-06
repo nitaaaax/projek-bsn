@@ -117,40 +117,7 @@ class ContcreateUmkm extends Controller
             ]);
 
             $tahap1 = Tahap1::create($validated);
-
-            if ($request->status_pembinaan === 'SPPT SNI (Tersertifikasi)') {
-                Sertifikasi::updateOrCreate(
-                    ['pelaku_usaha_id' => $tahap1->id],
-                    [
-                        'pelaku_usaha_id' => $tahap1->id,
-                        'tahap1_id' => $tahap1->id,
-
-                        'nama_pelaku' => $tahap1->nama_pelaku,
-                        'produk' => $tahap1->produk,
-                        'klasifikasi' => $tahap1->klasifikasi,
-                        'pembina_1' => $tahap1->pembina_1,
-                        'pembina_2' => $tahap1->pembina_2,
-                        'status_pembinaan' => $tahap1->status_pembinaan,
-                        'sinergi' => $tahap1->sinergi,
-                        'nama_kontak_person' => $tahap1->nama_kontak_person,
-                        'no_hp' => $tahap1->no_hp,
-                        'bulan_pertama_pembinaan' => $tahap1->bulan_pertama_pembinaan,
-                        'tahun_dibina' => $tahap1->tahun_dibina,
-                        'riwayat_pembinaan' => $tahap1->riwayat_pembinaan,
-                        'email' => $tahap1->email,
-                        'media_sosial' => $tahap1->media_sosial,
-                        'nama_merek' => $tahap1->nama_merek,
-                        'lspro' => $tahap1->lspro,
-                        'jenis_usaha' => $tahap1->jenis_usaha,
-                        'tanda_daftar_merk' => $tahap1->tanda_daftar_merk,
-                        'gruping' => $tahap1->gruping,
-                        'status' => 'Tersertifikasi',
-                        'data_tahap1' => json_encode($tahap1->getAttributes(), JSON_PARTIAL_OUTPUT_ON_ERROR),
-                    ]
-                );
-
-                return redirect()->route('admin.sertifikasi.index')->with('success', 'Data langsung masuk ke sertifikasi!');
-            }
+            
                 // redirect ke tahap 2
                 return redirect()->route('admin.umkm.create.tahap', [
                     'tahap' => 2,
@@ -342,9 +309,8 @@ class ContcreateUmkm extends Controller
     }
         }
             return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil disimpan.');
-            }
-
-            
+    }
+         
     protected function handleUpload(Request $request, $key)
     {
         $files = [];
