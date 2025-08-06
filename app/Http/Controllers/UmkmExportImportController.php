@@ -69,6 +69,40 @@
             }, array_keys($instansiDecoded), $instansiDecoded));
         }
 
+        $legalitasList = [
+            'NIB' => 'a) NIB',
+            'IUMK' => 'b) IUMK',
+            'SIUP' => 'c) SIUP',
+            'TDP' => 'd) TDP',
+            'NPWP Pemilik' => 'e) NPWP Pemilik',
+            'NPWP Badan Usaha' => 'f) NPWP Badan Usaha',
+            'Akta Pendirian Usaha' => 'g) Akta Pendirian Usaha',
+        ];
+
+        // Ambil legalitas dari database
+        $legalitas = json_decode($tahap2->legalitas_usaha, true) ?? [];
+
+        // Siapkan hasil final
+        $legalitasFormatted = '';
+        foreach ($legalitasList as $key => $label) {
+            $tersedia = in_array($key, $legalitas) ? ' Tersedia' : '-';
+            $legalitasFormatted .= "$label : $tersedia\n";
+        }
+
+        // Tangani bagian "Lainnya"
+        $lainnya = collect($legalitas)->first(function ($item) {
+            return str_starts_with($item, 'Lainnya:');
+        });
+        if ($lainnya) {
+            $keterangan = trim(str_replace('Lainnya:', '', $lainnya));
+            $legalitasFormatted .= "h) Lainnya : $keterangan";
+        } else {
+            $legalitasFormatted .= "h) Lainnya : -";
+        }
+
+        $template->setValue('legalitas_usaha', $legalitasFormatted);
+
+
         // Set Data Tahap 1
         $template->setValue('nama_umk', $item->nama_pelaku ?? '-');
         $template->setValue('nama_kontak_person', $item->nama_kontak_person ?? '-');
@@ -86,8 +120,8 @@
         $template->setValue('kota_kantor', $tahap2->kotaKantor->nama ?? '-');
         $template->setValue('alamat_pabrik', $tahap2->alamat_pabrik ?? '-');
         $template->setValue('provinsi_pabrik', $tahap2->provinsiPabrik->nama ?? '-');
-    $template->setValue('kota_pabrik', $tahap2->kotaPabrik->nama ?? '-');
-        $template->setValue('legalitas_usaha', $tahap2->legalitas_usaha ?? '-');
+        $template->setValue('kota_pabrik', $tahap2->kotaPabrik->nama ?? '-');
+        $template->setValue('legalitas_usaha', $legalitasFormatted);
         $template->setValue('tahun_pendirian', $tahap2->tahun_pendirian ?? '-');
         $template->setValue('sni', $tahap2->sni_yang_diterapkan ?? '-');
         $template->setValue('omzet', $tahap2->omzet ?? '-');
