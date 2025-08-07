@@ -190,6 +190,13 @@
                             value="{{ old('jumlah_tenaga_kerja', $tahap2->jumlah_tenaga_kerja ?? '') }}">
                     </div>
 
+                     <div class="col-md-6">
+                        <label class="form-label">Gruping</label>
+                        <input type="text" name="gruping" class="form-control"
+                            value="{{ old('gruping', $tahap2->gruping ?? '') }}">
+                    </div>
+
+
                     {{-- Link Dokumen --}}
                     <div class="col-12">
                         <label class="form-label">Link Dokumen</label>
@@ -248,126 +255,236 @@
                             value="{{ old('sni_yang_diterapkan', $tahap2->sni_yang_diterapkan ?? '') }}">
                     </div>
 
-                    {{-- Legalitas & Sertifikat --}}
-                    @php
-                        $legalitasOptions = ['NIB', 'SIUP', 'IUMK', 'Akta Perusahaan'];
-                        $selectedLegalitas = old('legalitas_usaha', json_decode($tahap2->legalitas_usaha ?? '[]', true));
-                        $selectedLegalitas = is_array($selectedLegalitas) ? $selectedLegalitas : explode(',', $selectedLegalitas);
-                        $lainnyaLegalitas = collect($selectedLegalitas)->filter(fn($l) => !in_array($l, $legalitasOptions))->values();
-                    @endphp
+                 {{-- Legalitas Usaha --}}
+               @php
+                    $legalitasOptions = [
+                        'NIB', 'SIUP', 'NPWP Pemilik', 'Akta Pendirian Usaha',
+                        'IUMK', 'TDP', 'NPWP Badan usaha'
+                    ];
+                    
+                    $legalitasData = $tahap2->legalitas_usaha ?? '[]';
+                    $selectedLegalitas = is_array($legalitasData) 
+                        ? $legalitasData 
+                        : (str_starts_with($legalitasData, '[') 
+                            ? json_decode($legalitasData, true) 
+                            : explode(',', $legalitasData));
+                    
+                    // Check if there are any custom values
+                    $hasCustomLegalitas = !empty(array_diff($selectedLegalitas, $legalitasOptions));
+                    $customLegalitas = $hasCustomLegalitas 
+                        ? implode(', ', array_diff($selectedLegalitas, $legalitasOptions))
+                        : '';
 
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Legalitas Usaha</label>
-                        @foreach ($legalitasOptions as $option)
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="legalitas_usaha[]"
-                                    value="{{ $option }}" id="legalitas_{{ $option }}"
-                                    {{ in_array($option, $selectedLegalitas) ? 'checked' : '' }}>
-                                <label class="form-check-label" for="legalitas_{{ $option }}">{{ $option }}</label>
+                    $customLegalitas = $hasCustomLegalitas 
+                        ? str_replace('lainnya,', '', implode(', ', array_diff($selectedLegalitas, $legalitasOptions)))
+                        : '';
+                @endphp
+
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Legalitas Usaha</label>
+                    
+                    <!-- Standard Options -->
+                    <div class="row">
+                        @foreach(array_chunk($legalitasOptions, 4) as $chunk)
+                            <div class="col-md-6">
+                                @foreach($chunk as $option)
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                            type="checkbox" 
+                                            name="legalitas_usaha[]" 
+                                            value="{{ $option }}"
+                                            {{ in_array($option, $selectedLegalitas) ? 'checked' : '' }}>
+                                        <label class="form-check-label">{{ $option }}</label>
+                                    </div>
+                                @endforeach
                             </div>
                         @endforeach
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="legalitas_lainnya_check"
-                                {{ $lainnyaLegalitas->isNotEmpty() ? 'checked' : '' }}
-                                onclick="document.getElementById('legalitas_lainnya_input').style.display = this.checked ? 'block' : 'none'">
-                            <label class="form-check-label">Lainnya</label>
-                        </div>
-                        <input type="text" name="legalitas_usaha_lainnya"
-                            class="form-control mt-1" placeholder="Sebutkan lainnya"
-                            value="{{ $lainnyaLegalitas->implode(', ') }}"
-                            id="legalitas_lainnya_input"
-                            style="{{ $lainnyaLegalitas->isNotEmpty() ? '' : 'display:none;' }}">
                     </div>
 
-                        @php
-                            $sertifikatOptions = ['PIRT', 'MD', 'Halal'];
-                            $selectedSertifikat = old('sertifikat', $tahap2->sertifikat ?? []);
-                            $selectedSertifikat = is_array($selectedSertifikat) ? $selectedSertifikat : explode(',', $selectedSertifikat);
-                            $lainnyaSertifikat = collect($selectedSertifikat)->filter(fn($s) => !in_array($s, $sertifikatOptions))->values();
-                        @endphp
+                    <!-- Single Custom Field -->
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" 
+                            type="checkbox" 
+                            id="legalitas_lainnya_toggle"
+                            {{ !empty($customLegalitas) ? 'checked' : '' }}>
+                        <label class="form-check-label">Lainnya</label>
+                    </div>
+                    
+                    <div id="legalitas_lainnya_container" style="{{ !empty($customLegalitas) ? '' : 'display:none' }}" class="mt-2">
+                        <input type="text" 
+                            name="legalitas_lainnya" 
+                            class="form-control" 
+                            value="{{ trim($customLegalitas) }}"
+                            placeholder="Masukkan legalitas lainnya">
+                    </div>
+                </div>
+        
+                {{-- Sertifikat yang Dimiliki --}}
+                @php
+                    $sertifikatOptions = ['PIRT', 'MD', 'Halal'];
+                    
+                    $sertifikatData = $tahap2->sertifikat ?? '[]';
+                    $selectedSertifikat = is_array($sertifikatData) 
+                        ? $sertifikatData 
+                        : (str_starts_with($sertifikatData, '[') 
+                            ? json_decode($sertifikatData, true) 
+                            : explode(',', $sertifikatData));
+                    
+                    // Get first custom value (if any)
+                    $customSertifikat = '';
+                    foreach($selectedSertifikat as $item) {
+                        if(!in_array($item, $sertifikatOptions) && !empty(trim($item))) {
+                            $customSertifikat = $item;
+                            break;
+                        }
+                    }
+                @endphp
 
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Sertifikat yang Dimiliki</label>
-                            @foreach ($sertifikatOptions as $option)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="sertifikat[]"
-                                        value="{{ $option }}" id="sertifikat_{{ $option }}"
-                                        {{ in_array($option, $selectedSertifikat) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="sertifikat_{{ $option }}">{{ $option }}</label>
-                                </div>
-                            @endforeach
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="sertifikat_lainnya_check"
-                                    {{ $lainnyaSertifikat->isNotEmpty() ? 'checked' : '' }}
-                                    onclick="document.getElementById('sertifikat_lainnya_input').style.display = this.checked ? 'block' : 'none'">
-                                <label class="form-check-label">Lainnya</label>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Sertifikat yang Dimiliki</label>
+                    
+                    <!-- Standard Options -->
+                    <div class="row">
+                        @foreach(array_chunk($sertifikatOptions, 3) as $chunk)
+                            <div class="col-md-6">
+                                @foreach($chunk as $option)
+                                    <div class="form-check">
+                                        <input class="form-check-input" 
+                                            type="checkbox" 
+                                            name="sertifikat[]" 
+                                            value="{{ $option }}"
+                                            {{ in_array($option, $selectedSertifikat) ? 'checked' : '' }}>
+                                        <label class="form-check-label">{{ $option }}</label>
+                                    </div>
+                                @endforeach
                             </div>
-                            <input type="text" name="sertifikat_lainnya"
-                                class="form-control mt-1" placeholder="Sebutkan lainnya"
-                                value="{{ $lainnyaSertifikat->implode(', ') }}"
-                                id="sertifikat_lainnya_input"
-                                style="{{ $lainnyaSertifikat->isNotEmpty() ? '' : 'display:none;' }}">
-                        </div>
+                        @endforeach
+                    </div>
 
-
-                        {{-- Jangkauan Pemasaran --}}
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Jangkauan Pemasaran</label>
-                            @foreach (["Local", "Nasional", "Internasional"] as $option)
-                                <div class="form-check">
-                                    <input type="checkbox" name="jangkauan_pemasaran[]" class="form-check-input"
-                                        value="{{ $option }}" id="jangkauan_{{ $option }}"
-                                        {{ in_array($option, $jangkauan_pemasaran ?? []) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="jangkauan_{{ $option }}">{{ $option }}</label>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        @php
-                            $isOld = count(old()) > 0;
-
-                            // Ambil data dari DB dan decode sebagai array asosiatif
-                            $instansiData = json_decode($tahap1->instansi ?? '{}', true);
-
-                            // Inisialisasi data untuk input
-                            $checkedArray = $isOld ? old('instansi_check', []) : array_keys($instansiData);
-                            $instansiDetailArray = $isOld ? old('instansi_detail', []) : $instansiData;
-                        @endphp
-
-
-                        {{-- Instansi --}}
-                        <div class="col-md-6 mb-3">
-                        <label class="form-label fw-bold">Instansi yang Pernah/Sedang Membina</label>
-
-                        @php
-                            // Ambil data dari DB dan decode sebagai array asosiatif
-                            $instansiData = json_decode($tahap1->instansi ?? '{}', true);
-                            $checkedArray = array_keys($instansiData); // yang dicentang
-                            $instansiDetailArray = $instansiData; // isinya: ['Dinas' => 'Detail Dinas', dst]
-                        @endphp
-
-                        @foreach (['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'] as $item)
+                    <!-- Single Custom Field -->
+                    <div class="form-check mt-3">
+                        <input class="form-check-input" 
+                            type="checkbox" 
+                            id="sertifikat_lainnya_toggle"
+                            {{ !empty($customSertifikat) ? 'checked' : '' }}>
+                        <label class="form-check-label">Lainnya</label>
+                    </div>
+                    
+                    <div id="sertifikat_lainnya_container" style="{{ !empty($customSertifikat) ? '' : 'display:none' }}" class="mt-2">
+                        <input type="text" 
+                            name="sertifikat_lainnya" 
+                            class="form-control" 
+                            value="{{ $customSertifikat }}"
+                            placeholder="Masukkan sertifikat lainnya">
+                    </div>
+                </div>
+                    <div class="row">
+                            <!-- Left Column - Instansi -->
+                          <div class="col-md-6 mb-3 ps-3">
+                            <label class="form-label fw-bold">Instansi Pembina</label>
                             @php
-                                $isChecked = in_array($item, $checkedArray);
-                                $inputValue = $instansiDetailArray[$item] ?? '';
+                                // Ambil data instansi dari model
+                                $instansiData = [];
+                                if (!empty($tahap2->instansi)) {
+                                    $instansiData = is_array($tahap2->instansi)
+                                        ? $tahap2->instansi
+                                        : json_decode($tahap2->instansi, true);
+                                }
+
+                                $instansiData = is_array($instansiData) ? $instansiData : [];
+
+                                $standardInstansi = ['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'];
+                                $customInstansi = array_diff_key($instansiData, array_flip($standardInstansi));
+                                $hasCustomInstansi = !empty($customInstansi);
+                                $instansiLainnya = $hasCustomInstansi ? implode(', ', array_values($customInstansi)) : '';
                             @endphp
 
-                            <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="check_{{ $item }}"
-                                    name="instansi_check[]" value="{{ $item }}"
-                                    {{ $isChecked ? 'checked' : '' }} onchange="toggleInput('{{ $item }}')">
-                                <label class="form-check-label" for="check_{{ $item }}">{{ $item }}</label>
+                            @foreach($standardInstansi as $option)
+                                <div class="form-check mb-2 d-flex align-items-center">
+                                    <input class="form-check-input me-2"
+                                        type="checkbox"
+                                        name="instansi_check[]"
+                                        value="{{ $option }}"
+                                        {{ array_key_exists($option, $instansiData) ? 'checked' : '' }}>
+                                    <label class="form-check-label me-2" style="min-width: 150px">{{ $option }}</label>
+                                    <input type="text"
+                                        class="form-control form-control-sm"
+                                        name="instansi_detail[{{ $option }}]"
+                                        value="{{ $instansiData[$option] ?? '' }}"
+                                        placeholder="Detail {{ $option }}">
+                                </div>
+                            @endforeach
 
-                                <input type="text" class="form-control mt-1"
-                                    name="instansi_detail[{{ $item }}]"
-                                    id="input_{{ $item }}"
-                                    placeholder="Isi nama {{ strtolower($item) }}"
-                                    value="{{ $inputValue }}"
-                                    {{ $isChecked ? '' : 'style=display:none;' }}>
+                            <!-- Lainnya -->
+                            <div class="form-check mb-2 d-flex align-items-center">
+                                <input class="form-check-input me-2"
+                                    type="checkbox"
+                                    name="instansi_check[]"
+                                    value="Lainnya"
+                                    {{ $hasCustomInstansi ? 'checked' : '' }}>
+                                <label class="form-check-label me-2" style="min-width: 150px">Lainnya</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    name="instansi_detail[Lainnya]"
+                                    value="{{ $instansiLainnya }}"
+                                    placeholder="Instansi lainnya (pisahkan dengan koma)">
                             </div>
-                        @endforeach
+                        </div>
+
+                        <!-- Right Column - Jangkauan Pemasaran -->
+                        <div class="col-md-6 mb-3 ps-3">
+                            <label class="form-label fw-bold">Jangkauan Pemasaran</label>
+                            @php
+                                // Ambil data jangkauan dari model
+                                $jangkauanData = [];
+                                if (!empty($tahap2->jangkauan_pemasaran)) {
+                                    $jangkauanData = is_array($tahap2->jangkauan_pemasaran)
+                                        ? $tahap2->jangkauan_pemasaran
+                                        : json_decode($tahap2->jangkauan_pemasaran, true);
+                                }
+
+                                $jangkauanData = is_array($jangkauanData) ? $jangkauanData : [];
+
+                                $standardJangkauan = ['Local', 'Nasional', 'Internasional'];
+                                $customJangkauan = array_diff_key($jangkauanData, array_flip($standardJangkauan));
+                                $hasCustomJangkauan = !empty($customJangkauan);
+                                $jangkauanLainnya = $hasCustomJangkauan ? implode(', ', array_values($customJangkauan)) : '';
+                            @endphp
+
+                            @foreach($standardJangkauan as $option)
+                                <div class="form-check mb-2 d-flex align-items-center">
+                                    <input class="form-check-input me-2" 
+                                        type="checkbox" 
+                                        name="jangkauan_pemasaran[]" 
+                                        value="{{ $option }}"
+                                        {{ array_key_exists($option, $jangkauanData) ? 'checked' : '' }}>
+                                    <label class="form-check-label me-2" style="min-width: 100px">{{ $option }}</label>
+                                    <input type="text"
+                                        class="form-control form-control-sm"
+                                        name="jangkauan_detail[{{ $option }}]"
+                                        value="{{ $jangkauanData[$option] ?? '' }}"
+                                        placeholder="Detail {{ $option }}">
+                                </div>
+                            @endforeach
+
+                            <!-- Lainnya -->
+                            <div class="form-check mb-2 d-flex align-items-center">
+                                <input class="form-check-input me-2" 
+                                    type="checkbox" 
+                                    name="jangkauan_pemasaran[]" 
+                                    value="Lainnya"
+                                    {{ $hasCustomJangkauan ? 'checked' : '' }}>
+                                <label class="form-check-label me-2" style="min-width: 100px">Lainnya</label>
+                                <input type="text"
+                                    class="form-control form-control-sm"
+                                    name="jangkauan_pemasaran_lainnya"
+                                    value="{{ $jangkauanLainnya }}"
+                                    placeholder="Jangkauan lainnya (pisahkan dengan koma)">
+                            </div>
+                        </div>
+
                     </div>
- 
+
                     </div>
                     @php
                         $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
@@ -444,151 +561,329 @@
     @endsection
 
     @push('scripts')
-<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
-<script>
-    let editorInstance;
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <script>
+        let editorInstance;
 
-    ClassicEditor
-        .create(document.querySelector('#editor'))
-        .then(editor => {
-            editorInstance = editor;
+        ClassicEditor
+            .create(document.querySelector('#editor'))
+            .then(editor => {
+                editorInstance = editor;
 
-            // Ini WAJIB: sinkronkan data editor ke textarea saat form disubmit
-            document.querySelector('form').addEventListener('submit', function () {
-                document.querySelector('#editor').value = editorInstance.getData();
+                // Ini WAJIB: sinkronkan data editor ke textarea saat form disubmit
+                document.querySelector('form').addEventListener('submit', function () {
+                    document.querySelector('#editor').value = editorInstance.getData();
+                });
+            })
+            .catch(error => {
+                console.error(error);
             });
-        })
-        .catch(error => {
-            console.error(error);
-        });
-</script>
+    </script>
 
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-$(document).ready(function () {
-    const selectedProvKantor = "{{ old('provinsi_kantor', $tahap2->provinsi_kantor ?? '') }}";
-    const selectedKotaKantor = "{{ old('kota_kantor', $tahap2->kota_kantor ?? '') }}";
-
-    const selectedProvPabrik = "{{ old('provinsi_pabrik', $tahap2->provinsi_pabrik ?? '') }}";
-    const selectedKotaPabrik = "{{ old('kota_pabrik', $tahap2->kota_pabrik ?? '') }}";
-
-    // Load semua provinsi
-    $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (provinsiList) {
-        $.each(provinsiList, function (index, provinsi) {
-            const option = `<option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>`;
-            $('#provinsi_kantor').append(option);
-
-            const option2 = `<option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>`;
-            $('#provinsi_pabrik').append(option2);
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle instansi detail inputs
+        document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
+            const target = document.getElementById(`instansi_input_${checkbox.value.toLowerCase()}`);
+            checkbox.addEventListener('change', function() {
+                target.style.display = this.checked ? 'block' : 'none';
+            });
         });
 
-        if (selectedProvKantor) {
-            $('#provinsi_kantor').trigger('change');
-        }
+        // Toggle jangkauan detail inputs
+        document.querySelectorAll('[name^="jangkauan_pemasaran"]').forEach(checkbox => {
+            const targetId = checkbox.dataset.target;
+            const target = document.getElementById(targetId);
+            checkbox.addEventListener('change', function() {
+                target.style.display = this.checked ? 'block' : 'none';
+            });
+        });
 
-        if (selectedProvPabrik) {
-            $('#provinsi_pabrik').trigger('change');
-        }
+        // Toggle lainnya inputs
+        ['instansi', 'jangkauan'].forEach(section => {
+            const toggle = document.getElementById(`${section}_lainnya_toggle`);
+            const input = document.getElementById(`${section}_lainnya_input`);
+            
+            toggle.addEventListener('change', function() {
+                input.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked) input.value = '';
+            });
+        });
+    });
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Toggle instansi detail inputs
+    document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
+        const target = document.getElementById(`instansi_input_${checkbox.value.toLowerCase()}`);
+        checkbox.addEventListener('change', function() {
+            target.style.display = this.checked ? 'block' : 'none';
+        });
     });
 
-    // Provinsi kantor berubah
-    $('#provinsi_kantor').on('change', function () {
-        const provId = $(this).val();
-        $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (provId) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
-                $.each(kotaList, function (index, kota) {
-                    const selected = kota.id == selectedKotaKantor ? 'selected' : '';
-                    $('#kota_kantor').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
-                });
-            });
-        }
+    // Toggle jangkauan detail inputs
+    document.querySelectorAll('[name^="jangkauan_pemasaran"]').forEach(checkbox => {
+        const targetId = checkbox.dataset.target;
+        const target = document.getElementById(targetId);
+        checkbox.addEventListener('change', function() {
+            target.style.display = this.checked ? 'block' : 'none';
+        });
     });
 
-    // Provinsi pabrik berubah
-    $('#provinsi_pabrik').on('change', function () {
-        const provId = $(this).val();
-        $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
-        if (provId) {
-            $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
-                $.each(kotaList, function (index, kota) {
-                    const selected = kota.id == selectedKotaPabrik ? 'selected' : '';
-                    $('#kota_pabrik').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
-                });
-            });
-        }
+    // Toggle lainnya inputs
+    ['instansi', 'jangkauan'].forEach(type => {
+        const toggle = document.getElementById(`${type}_lainnya_toggle`);
+        const input = document.getElementById(`${type}_lainnya_input`);
+        toggle.addEventListener('change', function() {
+            input.style.display = this.checked ? 'block' : 'none';
+            if (!this.checked) input.value = '';
+        });
     });
 });
 </script>
 
     <script>
-    function previewImages(input, containerId) {
-        const container = document.getElementById(containerId);
-        container.innerHTML = "";
+    $(document).ready(function () {
+        const selectedProvKantor = "{{ old('provinsi_kantor', $tahap2->provinsi_kantor ?? '') }}";
+        const selectedKotaKantor = "{{ old('kota_kantor', $tahap2->kota_kantor ?? '') }}";
 
-        const files = Array.from(input.files);
-        const dt = new DataTransfer();
+        const selectedProvPabrik = "{{ old('provinsi_pabrik', $tahap2->provinsi_pabrik ?? '') }}";
+        const selectedKotaPabrik = "{{ old('kota_pabrik', $tahap2->kota_pabrik ?? '') }}";
 
-        files.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const wrapper = document.createElement("div");
-                wrapper.className = "position-relative me-2 mb-2";
+        // Load semua provinsi
+        $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (provinsiList) {
+            $.each(provinsiList, function (index, provinsi) {
+                const option = `<option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>`;
+                $('#provinsi_kantor').append(option);
 
-                const img = document.createElement("img");
-                img.src = e.target.result;
-                img.style.width = "100px";
-                img.className = "rounded";
+                const option2 = `<option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>`;
+                $('#provinsi_pabrik').append(option2);
+            });
 
-                const btn = document.createElement("button");
-                btn.className = "btn btn-sm btn-danger p-1";
-                btn.style.position = "absolute";
-                btn.style.top = "0";
-                btn.style.right = "0";
-                btn.innerHTML = "&times;";
+            if (selectedProvKantor) {
+                $('#provinsi_kantor').trigger('change');
+            }
 
-                btn.addEventListener("click", function () {
-                    files.splice(index, 1);
-                    const newDt = new DataTransfer();
-                    files.forEach(f => newDt.items.add(f));
-                    input.files = newDt.files;
-                    previewImages(input, containerId);
+            if (selectedProvPabrik) {
+                $('#provinsi_pabrik').trigger('change');
+            }
+        });
+
+        // Provinsi kantor berubah
+        $('#provinsi_kantor').on('change', function () {
+            const provId = $(this).val();
+            $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
+            if (provId) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                    $.each(kotaList, function (index, kota) {
+                        const selected = kota.id == selectedKotaKantor ? 'selected' : '';
+                        $('#kota_kantor').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
+                    });
                 });
-
-                wrapper.appendChild(img);
-                wrapper.appendChild(btn);
-                container.appendChild(wrapper);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-    </script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Hapus gambar lama dari DOM dan form
-        document.querySelectorAll('.btn-remove-old').forEach(button => {
-            button.addEventListener('click', function () {
-                const wrapper = this.closest('.old-foto-produk') || this.closest('.old-foto-tempat');
-                wrapper.remove();
-            });
+            }
         });
 
-        // Toggle input instansi
-        const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"][name="instansi_check[]"]');
-
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', function () {
-                const inputId = 'input_' + this.value;
-                const textInput = document.getElementById(inputId);
-                if (this.checked) {
-                    textInput.style.display = 'block';
-                } else {
-                    textInput.style.display = 'none';
-                    textInput.value = '';
-                }
-            });
+        // Provinsi pabrik berubah
+        $('#provinsi_pabrik').on('change', function () {
+            const provId = $(this).val();
+            $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
+            if (provId) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                    $.each(kotaList, function (index, kota) {
+                        const selected = kota.id == selectedKotaPabrik ? 'selected' : '';
+                        $('#kota_pabrik').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
+                    });
+                });
+            }
         });
     });
     </script>
+
+        <script>
+        function previewImages(input, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = "";
+
+            const files = Array.from(input.files);
+            const dt = new DataTransfer();
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const wrapper = document.createElement("div");
+                    wrapper.className = "position-relative me-2 mb-2";
+
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.style.width = "100px";
+                    img.className = "rounded";
+
+                    const btn = document.createElement("button");
+                    btn.className = "btn btn-sm btn-danger p-1";
+                    btn.style.position = "absolute";
+                    btn.style.top = "0";
+                    btn.style.right = "0";
+                    btn.innerHTML = "&times;";
+
+                    btn.addEventListener("click", function () {
+                        files.splice(index, 1);
+                        const newDt = new DataTransfer();
+                        files.forEach(f => newDt.items.add(f));
+                        input.files = newDt.files;
+                        previewImages(input, containerId);
+                    });
+
+                    wrapper.appendChild(img);
+                    wrapper.appendChild(btn);
+                    container.appendChild(wrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Hapus gambar lama dari DOM dan form
+            document.querySelectorAll('.btn-remove-old').forEach(button => {
+                button.addEventListener('click', function () {
+                    const wrapper = this.closest('.old-foto-produk') || this.closest('.old-foto-tempat');
+                    wrapper.remove();
+                });
+            });
+
+            // Toggle input instansi
+            const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"][name="instansi_check[]"]');
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', function () {
+                    const inputId = 'input_' + this.value;
+                    const textInput = document.getElementById(inputId);
+                    if (this.checked) {
+                        textInput.style.display = 'block';
+                    } else {
+                        textInput.style.display = 'none';
+                        textInput.value = '';
+                    }
+                });
+            });
+        });
+        </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize toggle functionality
+            initToggleSection('legalitas');
+            initToggleSection('sertifikat');
+            
+            function initToggleSection(type) {
+                const toggle = document.getElementById(`${type}_lainnya_toggle`);
+                const container = document.getElementById(`custom_${type}_container`);
+                const addBtn = document.getElementById(`add_custom_${type}`);
+                
+                if (toggle && container) {
+                    // Toggle visibility
+                    toggle.addEventListener('change', function() {
+                        container.style.display = this.checked ? 'block' : 'none';
+                    });
+                    
+                    // Add new field
+                    addBtn?.addEventListener('click', function() {
+                        const newField = document.createElement('div');
+                        newField.className = 'input-group mb-2';
+                        newField.innerHTML = `
+                            <input type="text" name="${type}_custom[]" 
+                                class="form-control form-control-sm" 
+                                placeholder="Masukkan ${type} lainnya">
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-custom-item">
+                                &times;
+                            </button>
+                        `;
+                        container.insertBefore(newField, this);
+                    });
+                }
+            }
+            
+            // Remove fields
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-custom-item') || 
+                    e.target.classList.contains('remove-custom-legalitas') ||
+                    e.target.classList.contains('remove-custom-sertifikat')) {
+                    e.target.closest('.input-group').remove();
+                }
+            });
+        });
+        </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle Sertifikat lainnya toggle
+            const sertifikatToggle = document.getElementById('sertifikat_lainnya_toggle');
+            const sertifikatContainer = document.getElementById('sertifikat_lainnya_container');
+            const sertifikatInput = sertifikatContainer.querySelector('input');
+            
+            sertifikatToggle.addEventListener('change', function() {
+                sertifikatContainer.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked) {
+                    sertifikatInput.value = '';
+                }
+            });
+            
+            sertifikatInput.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    sertifikatToggle.checked = false;
+                    sertifikatContainer.style.display = 'none';
+                }
+            });
+        });
+        </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('legalitas_lainnya_toggle');
+            const container = document.getElementById('legalitas_lainnya_container');
+            const inputField = container.querySelector('input');
+            
+            // Toggle visibility
+            toggle.addEventListener('change', function() {
+                container.style.display = this.checked ? 'block' : 'none';
+                if (!this.checked) {
+                    inputField.value = '';
+                }
+            });
+            
+            // Hide container if input is empty
+            inputField.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    toggle.checked = false;
+                    container.style.display = 'none';
+                }
+            });
+        });
+        </script>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to handle checkbox toggles
+            function setupToggle(checkboxSelector, inputSelector) {
+                document.querySelectorAll(checkboxSelector).forEach(checkbox => {
+                    const input = checkbox.closest('.form-check').querySelector(inputSelector);
+                    
+                    // Set initial state
+                    input.disabled = !checkbox.checked;
+                    
+                    // Add change event
+                    checkbox.addEventListener('change', function() {
+                        input.disabled = !this.checked;
+                        if (!this.checked) {
+                            input.value = '';
+                        }
+                    });
+                });
+            }
+        });
+        </script>
+    
     @endpush

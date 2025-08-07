@@ -5,37 +5,35 @@
     .small-box {
         position: relative;
         display: block;
-        background: #2EC6DF;
+        background: linear-gradient(135deg, #1FB2C9, #2EC6DF);
         color: #fff;
-        border-radius: 10px;
-        padding: 20px;
+        border-radius: 16px;
+        padding: 25px;
         overflow: hidden;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: 0.3s ease;
     }
 
     .small-box:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-6px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     }
 
     .small-box .inner h3 {
-        font-size: 2.2rem;
+        font-size: 2.4rem;
         font-weight: 700;
-        margin: 0 0 10px 0;
-        color: #fff;
+        margin-bottom: 10px;
     }
 
     .small-box .inner p {
-        font-size: 1.2rem;
-        color: #fff;
+        font-size: 1.15rem;
         margin: 0;
     }
 
     .small-box .icon {
         position: absolute;
-        top: 15px;
-        right: 20px;
-        font-size: 3rem;
+        top: 20px;
+        right: 25px;
+        font-size: 3.2rem;
         color: rgba(255, 255, 255, 0.4);
     }
 
@@ -47,54 +45,73 @@
         text-decoration: underline;
     }
 
-    .trivia-box {
-        border-left: 6px solid #2EC6DF;
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 10px;
+    .motivasi-box {
+        border-left: 6px solid #00BFA6;
+        background-color: #f1fdfc;
+        padding: 25px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 10px;
-        box-shadow: 0 5px 15px rgba(46, 198, 223, 0.08);
+        margin-top: 30px;
+        box-shadow: 0 6px 20px rgba(0, 191, 166, 0.1);
     }
 
-    .trivia-text {
+    .motivasi-text {
         max-width: 65%;
     }
 
-    .trivia-text h5 {
+    .motivasi-text h5 {
         font-weight: bold;
-        margin-bottom: 8px;
-        color: #2EC6DF;
+        margin-bottom: 12px;
+        color: #00BFA6;
     }
 
-    .trivia-text p {
+    .motivasi-text p {
         margin: 0;
         color: #333;
-        font-size: 0.95rem;
-        line-height: 1.4;
+        font-size: 1rem;
+        line-height: 1.5;
     }
 
-    .trivia-img {
+    .motivasi-img {
         max-width: 30%;
     }
 
-    .trivia-img img {
+    .motivasi-img img {
         max-width: 100%;
         height: auto;
-        border-radius: 8px;
+        border-radius: 10px;
     }
 </style>
 
 <div class="container-fluid">
     <!-- Sapaan -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h2 class="text-dark">Selamat Datang, {{ Auth::user()->name }} 👋</h2>
-            <p class="text-muted">Semoga harimu produktif! Yuk, cek data SPJ & UMKM hari ini.</p>
+    <div class="row mb-3">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-4 px-4 py-3" style="background: linear-gradient(90deg, #f0f8ff, #ffffff);">
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-primary">
+                    <i class="fas fa-seedling fa-2x"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1 fw-semibold text-dark">
+                        Hai, {{ Auth::user()->username }}! 👋
+                    </h5>
+                    <p class="mb-1 text-muted small">
+                        {{ Auth::user()->email }}
+                    </p>
+
+                    <p class="mb-0 text-muted small">
+                        Semangat hari ini! Setiap langkah kecil adalah kemajuan besar ke depan 💪
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
+</div>
+
+
 
     <!-- Data Card -->
     <div class="row mt-2">
@@ -114,7 +131,7 @@
         </div>
 
         <div class="col-lg-6 col-12 mb-4">
-            <div class="small-box" style="background-color: #B9375D;">
+            <div class="small-box" style="background: linear-gradient(135deg, #b92151ff, #B9375D);">
                 <div class="inner">
                     <h3>{{ $jumlahUmkm }}</h3>
                     <p>Jumlah UMKM</p>
@@ -128,27 +145,8 @@
             </div>
         </div>
 
-        <!-- Fakta UMKM -->
-        <div class="col-12">
-            <div class="trivia-box">
-                <div class="trivia-text">
-                    <h5 class="fw-bold text-info">Fakta UMKM</h5>
-                    <p>
-                        UMKM (Usaha Mikro, Kecil, dan Menengah) memegang peran vital dalam perekonomian Indonesia
-                        dengan kontribusi lebih dari <strong>60% terhadap Produk Domestik Bruto (PDB)</strong> dan
-                        menyerap hampir <strong>97% tenaga kerja nasional</strong>.
-                    </p>
-                    <p>
-                        Badan Standardisasi Nasional (BSN) hadir untuk menjembatani kebutuhan tersebut melalui penerapan
-                        <strong>Standar Nasional Indonesia (SNI)</strong>, pelatihan mutu, dan sertifikasi untuk
-                        meningkatkan daya saing UMKM.
-                    </p>
-                </div>
-                <div class="trivia-img">
-                    <img src="{{ asset('public/asset/dist/img/fakta-dashboard.jpg') }}" alt="Fakta UMKM">
-                </div>
-            </div>
-        </div>
+
+
     </div>
 </div>
 @endsection

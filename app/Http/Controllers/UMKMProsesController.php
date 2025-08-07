@@ -69,7 +69,11 @@ class UMKMProsesController extends Controller
             ]);
 
             // Handle array fields → JSON
-            $validated2['legalitas_usaha'] = json_encode($request->input('legalitas_usaha', []));
+            $legalitas = $request->input('legalitas_usaha', []);
+            if ($request->filled('legalitas_usaha_lainnya')) {
+                $legalitas[] = $request->legalitas_usaha_lainnya;
+            }
+            $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
             $validated2['sertifikat'] = json_encode($request->input('sertifikat', []));
             $validated2['jangkauan_pemasaran'] = json_encode($request->input('jangkauan_pemasaran', []));
             $validated1['instansi'] = json_encode($request->input('instansi', []));
@@ -99,7 +103,7 @@ class UMKMProsesController extends Controller
 
         return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil diperbarui.');
     }
-
+    
     public function edit($id)
     {
         $tahap1 = Tahap1::with('tahap2')->findOrFail($id);
@@ -118,9 +122,9 @@ class UMKMProsesController extends Controller
             $jangkauanArray = json_decode($tahap2->jangkauan_pemasaran ?? '[]', true);
             $foto_produk = json_decode($tahap2->foto_produk ?? '[]', true);
             $foto_tempat_produksi = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-        }
+            $instansiArray = json_decode($tahap2->instansi ?? '[]', true);
 
-        $instansiArray = json_decode($tahap1->instansi ?? '[]', true);
+        }
 
         return view('admin.umkm.tahap.form', compact(
             'tahap1',

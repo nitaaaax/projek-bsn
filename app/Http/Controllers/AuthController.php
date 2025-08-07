@@ -20,7 +20,7 @@ class AuthController extends Controller
     {
         $jumlahSpj = Spj::count();
         $jumlahUmkm = Tahap1::count();
-        $role = auth()->user()->role->name; // 'admin' atau 'user'
+        $role = auth()->user()->role?->name; // pakai null-safe operator
 
         return view('home', compact('role', 'jumlahSpj', 'jumlahUmkm'));
     }

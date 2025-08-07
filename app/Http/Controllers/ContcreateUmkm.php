@@ -173,36 +173,43 @@ class ContcreateUmkm extends Controller
 
                 'jangkauan_detail' => 'nullable|array',
                 'jangkauan_detail.*' => 'nullable|string|max:255',
+                'jangkauan_pemasaran_lainnya' => 'nullable|string|max:255',
             ]);
 
             // === Handle legalitas_usaha (checkbox + optional "lainnya")
             $legalitas = $request->input('legalitas_usaha', []);
-            $validated['legalitas_usaha'] = implode(',', array_filter($legalitas));
+            // Add "lainnya" value if provided
+            if ($request->filled('legalitas_usaha_lainnya')) {
+                $legalitas[] = $request->legalitas_usaha_lainnya;
+            }
+            $validated['legalitas_usaha'] = json_encode(array_filter($legalitas));
 
-            // === Handle sertifikat
             $sertifikat = $request->input('sertifikat', []);
-            $validated['sertifikat'] = implode(',', array_filter($sertifikat));
+            $validated['sertifikat'] = json_encode(array_filter($sertifikat));
 
             // Normalisasi jangkauan_pemasaran menjadi array numerik
-            if ($request->has('jangkauan_pemasaran') && is_array($request->jangkauan_pemasaran)) {
-                $jangkauanKeys = array_keys($request->jangkauan_pemasaran);$jangkauanKeys = array_keys($request->jangkauan_pemasaran ?? []);
-                $allowed = ['Local', 'Nasional', 'Internasional'];
-                foreach ($jangkauanKeys as $key) {
-                    if (!in_array($key, $allowed)) {
-                        return back()->withErrors(['jangkauan_pemasaran' => "Pilihan jangkauan tidak valid: $key"]);
+            $jangkauanData = [];
+
+            $jangkauanPemasaran = $request->jangkauan_pemasaran ?? [];
+            $jangkauanDetail = $request->jangkauan_detail ?? [];
+            $jangkauanLainnya = $request->jangkauan_pemasaran_lainnya;
+
+            $finalJangkauan = [];
+
+            foreach ($jangkauanPemasaran as $key => $value) {
+                $finalJangkauan[$key] = $jangkauanDetail[$key] ?? '';
+            }
+
+            if (!empty($jangkauanLainnya)) {
+                $lainnyaList = array_map('trim', explode(',', $jangkauanLainnya));
+                foreach ($lainnyaList as $custom) {
+                    if (!empty($custom)) {
+                        $finalJangkauan[$custom] = $custom;
                     }
                 }
-                $isAssoc = array_keys($jangkauanKeys) !== $jangkauanKeys;
-                if ($isAssoc) {
-                    $request->merge([
-                        'jangkauan_pemasaran' => array_values(array_keys($request->jangkauan_pemasaran))
-                    ]);
-                } else {
-                    $request->merge([
-                        'jangkauan_pemasaran' => array_values($request->jangkauan_pemasaran)
-                    ]);
-                }
             }
+
+            $validated['jangkauan_pemasaran'] = json_encode($finalJangkauan);
 
             // === Handle instansi (checkbox + detail)
             $instansi = [];

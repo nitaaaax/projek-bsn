@@ -130,49 +130,48 @@
             <input type="number" name="jumlah_tenaga_kerja" class="form-control" value="{{ old('jumlah_tenaga_kerja', $data->jumlah_tenaga_kerja ?? '') }}">
         </div>
 
-        {{-- Jangkauan Pemasaran --}}
+       {{-- Jangkauan Pemasaran --}}
         @php
-            $opsi = ['Local', 'Nasional', 'Internasional'];
-            $terpilih = old('jangkauan_pemasaran', $data->jangkauan_pemasaran ?? []);
-            if (is_string($terpilih)) {
-                $terpilih = json_decode($terpilih, true) ?? [];
-            }
+            $jangkauanOptions = ['Local', 'Nasional', 'Internasional'];
         @endphp
+
         <div class="mb-3 col-md-12">
             <label class="form-label fw-bold">Jangkauan Pemasaran</label>
 
-            @foreach($opsi as $val)
-                @php
-                    $key = strtolower($val);
-                    $checked = array_key_exists($val, $terpilih);
-                    $text = $checked ? $terpilih[$val] : '';
-                @endphp
-
+            <!-- Standard Options -->
+            @foreach($jangkauanOptions as $option)
                 <div class="mb-3">
                     <div class="form-check mb-1">
-                        <input
-                            type="checkbox"
-                            id="jangkauan_{{ $key }}"
+                        <input type="checkbox"
+                            id="jangkauan_{{ strtolower($option) }}_create"
                             class="form-check-input toggle-jangkauan"
-                            name="jangkauan_pemasaran[{{ $val }}]"
-                            {{ $checked ? 'checked' : '' }}
-                            data-target="input_{{ $key }}"
-                        >
-                        <label class="form-check-label" for="jangkauan_{{ $key }}">
-                            {{ $val }}
-                        </label>
+                            name="jangkauan_pemasaran[{{ $option }}]"
+                            data-target="input_{{ strtolower($option) }}_create">
+                        <label class="form-check-label">{{ $option }}</label>
                     </div>
-                    <input
-                        type="text"
+                    <input type="text"
                         class="form-control form-control-sm"
-                        id="input_{{ $key }}"
-                        name="jangkauan_detail[{{ $val }}]"
-                        placeholder="Detail jangkauan {{ $val }}..."
-                        value="{{ $text }}"
-                        style="{{ $checked ? '' : 'display: none;' }}"
-                    >
+                        id="input_{{ strtolower($option) }}_create"
+                        name="jangkauan_detail[{{ $option }}]"
+                        placeholder="Detail jangkauan {{ $option }}..."
+                        style="display:none">
                 </div>
             @endforeach
+
+            <!-- Custom Jangkauan -->
+            <div class="form-check mt-3">
+                <input type="checkbox"
+                    id="jangkauan_lainnya_toggle_create"
+                    class="form-check-input">
+                <label class="form-check-label">Lainnya</label>
+            </div>
+            
+            <div id="jangkauan_lainnya_container_create" style="display:none" class="mt-2">
+                <input type="text"
+                    name="jangkauan_pemasaran_lainnya"
+                    class="form-control form-control-sm"
+                    placeholder="Masukkan jangkauan pemasaran lainnya">
+            </div>
         </div>
 
         {{-- Link Dokumen --}}
@@ -185,7 +184,7 @@
         @php
             $instansiOptions = ['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas', 'Lainnya'];
 
-            // Gabungkan old input dengan data dari controller
+            // Combine old input (from validation fail) or fallback to from DB (from controller)
             $instansiArray = old('instansi_detail', $instansiArray ?? []);
             $checkedArray = old('instansi_check', array_keys($instansiArray));
         @endphp
@@ -194,8 +193,7 @@
             @foreach ($instansiOptions as $item)
                 @php
                     $isChecked = in_array($item, $checkedArray);
-                    $rawValue = $instansiArray[$item] ?? '';
-                    $inputValue = is_array($rawValue) ? implode(', ', $rawValue) : $rawValue;
+                    $inputValue = $instansiArray[$item] ?? '';
                 @endphp
                 <div class="form-check mb-2">
                     <input class="form-check-input" type="checkbox"
@@ -208,7 +206,7 @@
                         name="instansi_detail[{{ $item }}]"
                         id="input_{{ $item }}"
                         placeholder="{{ $item == 'Lainnya' ? 'Isi instansi lainnya' : 'Isi nama ' . strtolower($item) }}"
-                        value="{{ $inputValue }}"
+                        value="{{ old("instansi_detail.$item", $inputValue) }}"
                         style="{{ $isChecked ? '' : 'display:none;' }}">
                 </div>
             @endforeach
@@ -334,6 +332,32 @@
 @push('scripts')
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Toggle standard jangkauan detail inputs (Create Form)
+    document.querySelectorAll('.toggle-jangkauan').forEach(checkbox => {
+        const targetId = checkbox.dataset.target;
+        checkbox.addEventListener('change', function() {
+            document.getElementById(targetId).style.display = this.checked ? 'block' : 'none';
+            if (!this.checked) {
+                document.getElementById(targetId).value = '';
+            }
+        });
+    });
+
+    // Handle custom jangkauan toggle (Create Form)
+    const jangkauanToggleCreate = document.getElementById('jangkauan_lainnya_toggle_create');
+    const jangkauanContainerCreate = document.getElementById('jangkauan_lainnya_container_create');
+    
+    jangkauanToggleCreate.addEventListener('change', function() {
+        jangkauanContainerCreate.style.display = this.checked ? 'block' : 'none';
+        if (!this.checked) {
+            jangkauanContainerCreate.querySelector('input').value = '';
+        }
+    });
+});
+</script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

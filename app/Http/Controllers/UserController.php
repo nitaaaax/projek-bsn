@@ -81,13 +81,13 @@ class UserController extends Controller
 
     public function profile()
     {
-        $user = auth()->user(); // Ambil user yang sedang login
+        $user = auth()->user(); 
         return view('partial.profile', compact('user'));
     }
 
     public function updateProfile(Request $request)
     {
-        $user = auth()->user(); // Tidak butuh ID dari route
+        $user = auth()->user();
 
         $request->validate([
             'username' => 'required',
@@ -95,11 +95,19 @@ class UserController extends Controller
             'password' => 'nullable|min:6',
         ]);
 
+        // Update username dan email
         $user->username = $request->username;
         $user->email = $request->email;
 
+        // Validasi jika password diisi
         if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
+            // Cek apakah password baru sama dengan yang lama
+            if (Hash::check($request->password, $user->password)) {
+                return back()->withErrors(['password' => 'Password baru tidak boleh sama dengan password lama.'])->withInput();
+            }
+
+            // Simpan password baru
+            $user->password = Hash::make($request->password);
         }
 
         $user->save();
@@ -107,4 +115,14 @@ class UserController extends Controller
         return redirect()->route('profile.view')->with('success', 'Profil berhasil diperbarui.');
     }
 
+    public function resetPassword($id)
+    {
+        $user = User::findOrFail($id);
+
+        
+        $user->password = Hash::make('123456');
+        $user->save();
+
+        return redirect()->route('admin.users.index')->with('success', 'Password berhasil direset ke default.');
+    }
 }

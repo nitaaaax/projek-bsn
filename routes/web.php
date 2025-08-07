@@ -10,6 +10,8 @@ use App\Http\Controllers\{
     SpjController,
     UmkmExportImportController,
     UserController,
+   WilayahController,
+
 };
 
     // ---------------------- GUEST ----------------------
@@ -68,6 +70,8 @@ use App\Http\Controllers\{
 
         Route::resource('users', UserController::class);
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
+        Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
+
 
         // UMKM Proses (Admin full akses Tahap 1 & 2)
         Route::prefix('umkm-proses')->name('umkm.')->group(function () {
@@ -118,3 +122,15 @@ use App\Http\Controllers\{
     Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
     Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
     Route::post('spj/import', [SpjController::class, 'import'])->name('spj.import');
+
+
+
+// Halaman daftar wilayah (misalnya daftar provinsi/kota)
+Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+
+// Proses penyimpanan data wilayah
+Route::post('/wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
+
+// AJAX untuk ambil provinsi dan kota
+Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
+Route::resource('wilayah', WilayahController::class);

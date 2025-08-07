@@ -166,18 +166,13 @@
                 <p>Role</p>
               </a>
             </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Provinsi</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>Kota</p>
-              </a>
-            </li>
+           <li class="nav-item">
+  <a href="{{ route('wilayah.index') }}" class="nav-link {{ request()->routeIs('wilayah.index') ? 'active' : '' }}">
+    <i class="far fa-circle nav-icon"></i>
+    <p>Provinsi & Kota</p>
+  </a>
+</li>
+
           </ul>
         </li>
         @endif
