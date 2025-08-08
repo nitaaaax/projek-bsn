@@ -21,15 +21,9 @@
               <i class="fa fa-plus"></i> Tambah SPJ
             </a>
           @endif
-            @if(optional(Auth::user()->role)->name === 'admin')
-              <a href="{{ route('admin.spj.export') }}" class="btn btn-success">
+              <a href="{{ route('spj.export', Auth::id()) }}" class="btn btn-success">
                 <i class="fa fa-file-excel"></i> Download Data
               </a>
-            @elseif(optional(Auth::user()->role)->name === 'user')
-              <a href="{{ route('user.spj.export') }}" class="btn btn-success">
-                <i class="fa fa-file-excel"></i> Download Data
-              </a>
-            @endif
             @if(optional(Auth::user()->role)->name === 'admin')
             <a href="{{ route('admin.spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="fa fa-upload"></i>  Upload Data
@@ -88,7 +82,7 @@
                 @endif
 
                     {{-- Tombol Download Word --}}
-                    <a href="{{ route('admin.spj.downloadWord', $item->id) }}" 
+                    <a href="{{ route('downloadWord.spj', $item->id) }}" 
                   class="btn btn-success btn-sm" 
                   title="Download Word">
                 <i class="fas fa-receipt"></i>

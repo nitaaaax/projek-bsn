@@ -22,8 +22,7 @@ class ContcreateUmkm extends Controller
             'tahapNumber' => $tahap,
             'data' => $data
         ]);
-    }
-    
+    } 
 
     public function create()
     {

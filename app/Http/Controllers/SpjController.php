@@ -54,10 +54,12 @@ class SpjController extends Controller
 
     public function store(Request $request)
     {
+        //dd($request->all());
+
         $request->validate([
             'nama_spj'             => 'required|string|max:255',
             'no_ukd'               => 'nullable|string|max:255',
-            'ls'                  => 'nullable|string',
+            'lembaga_sertifikasi'  => 'nullable|string',
             'keterangan'           => 'nullable|string',
             'dokumen'              => 'nullable|string|max:255',
             'item.*'               => 'required|string',
@@ -67,11 +69,11 @@ class SpjController extends Controller
         ]);
 
         $spj = Spj::create([
-            'nama_spj'   => $request->nama_spj,
-            'no_ukd'     => $request->no_ukd,
-            'ls'         => $request->ls,
-            'keterangan' => $request->keterangan,
-            'dokumen'    => $request->dokumen,
+            'nama_spj'             => $request->nama_spj,
+            'no_ukd'               => $request->no_ukd,
+            'lembaga_sertifikasi'  => $request->lembaga_sertifikasi, // perbaiki typo di sini
+            'keterangan'           => $request->keterangan,
+            'dokumen'              => $request->dokumen,
         ]);
 
         foreach ($request->item as $i => $item) {
@@ -85,7 +87,7 @@ class SpjController extends Controller
                 case 'belum dibayar':
                 case 'Belum Dibayar':
                 default:
-                    $status = 'Belum Dibayar'; // fallback biar tidak null
+                    $status = 'Belum Dibayar';
                     break;
             }
 
@@ -98,7 +100,7 @@ class SpjController extends Controller
             ]);
         }
 
-        return redirect()->route(route: 'spj.index')->with('success', 'Data SPJ berhasil disimpan.');
+        return redirect()->route('spj.index')->with('success', 'Data SPJ berhasil disimpan.');
     }
 
     public function show($id)
@@ -115,16 +117,18 @@ class SpjController extends Controller
 
     public function update(Request $request, $id)
     {
+        //dd($request->all());
+
         $request->validate([
-            'nama_spj'             => 'required|string|max:255',
-            'no_ukd'               => 'nullable|string|max:255',
-            'ls'                   => 'nullable|string',
-            'keterangan'           => 'nullable|string',
-            'dokumen'              => 'nullable|string|max:255',
-            'item.*'               => 'required|string',
-            'nominal.*'            => 'required|numeric|min:0',
-            'status_pembayaran.*'  => 'required|string',
-            'keterangan_detail.*'  => 'nullable|string',
+            'nama_spj'               => 'required|string|max:255',
+            'no_ukd'                 => 'nullable|string|max:255',
+            'lembaga_sertifikasi'    => 'nullable|string',
+            'keterangan'             => 'nullable|string',
+            'dokumen'                => 'nullable|string|max:255',
+            'item.*'                 => 'required|string',
+            'nominal.*'              => 'required|numeric|min:0',
+            'status_pembayaran.*'    => 'required|string',
+            'keterangan_detail.*'    => 'nullable|string',
         ]);
 
         $spj = Spj::findOrFail($id);
@@ -173,86 +177,95 @@ class SpjController extends Controller
 
         return redirect()->route('spj.index')->with('success', 'Data berhasil dihapus.');
     }
-public function downloadWord($id)
-{
-    $spj = Spj::with('details')->findOrFail($id);
 
-    $templatePath = public_path('template/template_ekspor_spj.docx');
-    if (!file_exists($templatePath)) {
-        abort(404, 'Template Word tidak ditemukan di: ' . $templatePath);
-    }
+    public function downloadWord($id)
+    {
+        $spj = Spj::with('details')->findOrFail($id);
 
-    $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
-
-    // Fungsi konversi angka ke terbilang
-    function angkaToTerbilang($angka) {
-        $angka = (float)$angka;
-        $bilangan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
-        
-        if ($angka < 12) {
-            return $bilangan[$angka];
-        } elseif ($angka < 20) {
-            return $bilangan[$angka - 10] . ' belas';
-        } elseif ($angka < 100) {
-            return $bilangan[(int)($angka / 10)] . ' puluh ' . $bilangan[$angka % 10];
-        } elseif ($angka < 200) {
-            return 'seratus ' . angkaToTerbilang($angka - 100);
-        } elseif ($angka < 1000) {
-            return $bilangan[(int)($angka / 100)] . ' ratus ' . angkaToTerbilang($angka % 100);
-        } elseif ($angka < 2000) {
-            return 'seribu ' . angkaToTerbilang($angka - 1000);
-        } elseif ($angka < 1000000) {
-            return angkaToTerbilang((int)($angka / 1000)) . ' ribu ' . angkaToTerbilang($angka % 1000);
+        $templatePath = public_path('template/template_ekspor_spj.docx');
+        if (!file_exists($templatePath)) {
+            abort(404, 'Template Word tidak ditemukan di: ' . $templatePath);
         }
-        
-        return 'Angka terlalu besar';
+
+        $templateProcessor = new TemplateProcessor($templatePath);
+
+        // Fungsi konversi angka ke terbilang (rekursif)
+        $angkaToTerbilang = function($angka) use (&$angkaToTerbilang) {
+            $angka = (int)$angka;
+            $bilangan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
+
+            if ($angka == 0) {
+                return "nol";
+            } elseif ($angka < 12) {
+                return $bilangan[$angka];
+            } elseif ($angka < 20) {
+                return $angkaToTerbilang($angka - 10) . ' belas';
+            } elseif ($angka < 100) {
+                return $angkaToTerbilang(intval($angka / 10)) . ' puluh ' . $angkaToTerbilang($angka % 10);
+            } elseif ($angka < 200) {
+                return 'seratus ' . $angkaToTerbilang($angka - 100);
+            } elseif ($angka < 1000) {
+                return $angkaToTerbilang(intval($angka / 100)) . ' ratus ' . $angkaToTerbilang($angka % 100);
+            } elseif ($angka < 2000) {
+                return 'seribu ' . $angkaToTerbilang($angka - 1000);
+            } elseif ($angka < 1000000) {
+                return $angkaToTerbilang(intval($angka / 1000)) . ' ribu ' . $angkaToTerbilang($angka % 1000);
+            } elseif ($angka < 1000000000) {
+                return $angkaToTerbilang(intval($angka / 1000000)) . ' juta ' . $angkaToTerbilang($angka % 1000000);
+            } else {
+                return 'angka terlalu besar';
+            }
+        };
+
+        // Fungsi mendapatkan nama hari bahasa Indonesia
+        $hariIndonesia = function($date) {
+            $days = [
+                'Sunday'    => 'Minggu',
+                'Monday'    => 'Senin',
+                'Tuesday'   => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday'  => 'Kamis',
+                'Friday'    => 'Jumat',
+                'Saturday'  => 'Sabtu',
+            ];
+            $hariInggris = $date->format('l');
+            return $days[$hariInggris] ?? $hariInggris;
+        };
+
+        // Fungsi format tanggal bahasa Indonesia
+        $formatTanggalID = function($date) {
+            $bulan = [
+                1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April', 5 => 'Mei', 6 => 'Juni',
+                7 => 'Juli', 8 => 'Agustus', 9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember'
+            ];
+            $d = $date->day;
+            $m = $bulan[(int)$date->month] ?? $date->format('F');
+            $y = $date->year;
+            return "$d $m $y";
+        };
+
+        // Data umum
+        $totalNominal = $spj->details->sum('nominal') ?? 0;
+
+        $templateProcessor->setValue('No_UKD', $spj->no_ukd ?? '-');
+        $templateProcessor->setValue('nominal', number_format($totalNominal, 0, ',', '.'));
+        $templateProcessor->setValue('terbilang_nominal', trim($angkaToTerbilang($totalNominal)) . ' rupiah');
+        $templateProcessor->setValue('item', ($spj->details->first()->item ?? '-') . ' dalam rangka Penguatan Penerapan Standardisasi dan Penilaian Kesesuaian');
+
+        $tanggalSekarang = now();
+        $templateProcessor->setValue('tanggal_ekspor', $formatTanggalID($tanggalSekarang));
+        $templateProcessor->setValue('hari', $hariIndonesia($tanggalSekarang));
+
+        // Lembaga Sertifikasi
+        $templateProcessor->setValue('lembaga_sertifikasi', $spj->lembaga_sertifikasi ?? '-');
+
+        // Nama file dan simpan
+        $fileName = 'SPJ_' . ($spj->no_ukd ?: 'unknown') . '_' . $tanggalSekarang->format('YmdHis') . '.docx';
+        $savePath = storage_path('app/public/' . $fileName);
+
+        $templateProcessor->saveAs($savePath);
+
+        return response()->download($savePath)->deleteFileAfterSend(true);
     }
-
-    // Data umum
-    $templateProcessor->setValue('No_UKD', $spj->no_ukd ?? '-');
-    $templateProcessor->setValue('nominal', number_format($spj->details->sum('nominal') ?? 0, 0, ',', '.'));
-    $templateProcessor->setValue('item', ($spj->details->first()->item ?? '-') . ' dalam rangka Penguatan Penerapan Standardisasi dan Penilaian Kesesuaian');
-    $templateProcessor->setValue('tanggal_ekspor', now()->format('d F Y'));
-    
-    // Konversi nominal ke terbilang
-    $totalNominal = $spj->details->sum('nominal') ?? 0;
-    $terbilang = angkaToTerbilang($totalNominal) . ' rupiah';
-    $templateProcessor->setValue('terbilang', $terbilang);
-
-    $fileName = 'SPJ_' . $spj->no_ukd . '_' . now()->format('YmdHis') . '.docx';
-    $savePath = storage_path('app/public/' . $fileName);
-    $templateProcessor->saveAs($savePath);
-
-    return response()->download($savePath)->deleteFileAfterSend(true);
-}
-
-
-private function terbilang($number)
-{
-    $angka = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
-
-    if ($number == 0) {
-        return "nol";
-    } elseif ($number < 12) {
-        return $angka[$number];
-    } elseif ($number < 20) {
-        return $this->terbilang($number - 10) . " belas";
-    } elseif ($number < 100) {
-        return $this->terbilang(floor($number / 10)) . " puluh " . $this->terbilang($number % 10);
-    } elseif ($number < 200) {
-        return "seratus " . $this->terbilang($number - 100);
-    } elseif ($number < 1000) {
-        return $this->terbilang(floor($number / 100)) . " ratus " . $this->terbilang($number % 100);
-    } elseif ($number < 2000) {
-        return "seribu " . $this->terbilang($number - 1000);
-    } elseif ($number < 1000000) {
-        return $this->terbilang(floor($number / 1000)) . " ribu " . $this->terbilang($number % 1000);
-    } elseif ($number < 1000000000) {
-        return $this->terbilang(floor($number / 1000000)) . " juta " . $this->terbilang($number % 1000000);
-    } else {
-        return $this->terbilang(floor($number / 1000000000)) . " miliar " . $this->terbilang($number % 1000000000);
-    }
-}
-
 
 }

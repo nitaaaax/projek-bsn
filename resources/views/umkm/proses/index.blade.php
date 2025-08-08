@@ -47,30 +47,24 @@
                 <td>{{ $loop->iteration }}</td>
                 <td class="text-start">{{ $t->nama_pelaku }}</td>
                 <td>{{ $t->produk }}</td>
-                <td>
-                  @php $status = strtolower($t->status); @endphp
-                  @if ($status == 'sudah')
-                    <span class="badge bg-success">Sudah</span>
-                  @elseif ($status == 'belum')
-                    <span class="badge bg-danger">Belum</span>
-                  @else
-                    <span class="badge bg-secondary">{{ $t->status }}</span>
-                  @endif
-                </td>
-                <td>
-                  @php $pembinaan = strtolower($t->status_pembinaan); @endphp
-                  @if ($pembinaan == 'sppt sni (tersertifikasi)')
-                    <span class="badge bg-success">Tersertifikasi</span>
-                  @else
-                    <span class="badge bg-secondary">{{ $t->status_pembinaan ?? '-' }}</span>
-                  @endif
-                </td>
+                <td><span class="badge bg-secondary">{{ $t->status }}</span></td>
+                <td><span class="badge bg-secondary">{{ $t->status_pembinaan }}</span></td>
                 <td>
                   @php $role = optional(Auth::user()->role)->name; @endphp
                   @if($role === 'admin')
-                    <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                    <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-warning btn-sm" title="Detail">
+                      <i class="fa fa-edit"></i>
+                    </a>
+                  @endif
+                  @if($role === 'user')
+                    <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
                       <i class="fa fa-eye"></i>
                     </a>
+                    @endif
+                  <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm" title="Download">
+                    <i class="fa fa-download"></i>
+                  </a>
+                  @if($role === 'admin')
                     <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
                       @csrf
                       @method('DELETE')
@@ -78,14 +72,7 @@
                         <i class="fa fa-trash"></i>
                       </button>
                     </form>
-                  @elseif($role === 'user')
-                    <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
-                      <i class="fa fa-eye"></i>
-                    </a>
                   @endif
-                  <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm" title="Download">
-                    <i class="fa fa-download"></i>
-                  </a>
                 </td>
               </tr>
             @empty
@@ -137,44 +124,46 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <script>
   $(document).ready(function () {
-    $('#tabelUMKM').DataTable({
-      language: {
-        search: "Cari:",
-        lengthMenu: "Tampilkan _MENU_ data",
-        info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
-        paginate: {
-          previous: "Sebelumnya",
-          next: "Berikutnya"
-        },
-        zeroRecords: "Tidak ada data ditemukan",
-        infoEmpty: "Menampilkan 0 data",
+  $('#tabelUMKM').DataTable({
+    language: {
+      search: "Cari:",
+      lengthMenu: "Tampilkan _MENU_ data",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      paginate: {
+        previous: '<i class="fa fa-chevron-left"></i>',  // panah kiri
+        next: '<i class="fa fa-chevron-right"></i>'      // panah kanan
       },
-      columnDefs: [
-        { orderable: false, targets: [5] }
-      ]
-    });
+      zeroRecords: "Tidak ada data ditemukan",
+      infoEmpty: "Menampilkan 0 data",
+    },
+    columnDefs: [
+      { orderable: false, targets: [5] }
+    ],
+    escape: false // penting supaya ikon bisa dirender
+  });
 
-    // SweetAlert untuk tombol hapus
-    document.querySelectorAll('.delete-form').forEach(form => {
-      form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        Swal.fire({
-          title: 'Yakin ingin menghapus?',
-          text: "Data akan dihapus permanen!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Ya, hapus!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.submit();
-          }
-        });
+  // SweetAlert untuk tombol hapus (tetap sama)
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.submit();
+        }
       });
     });
   });
+});
 </script>
 @endpush

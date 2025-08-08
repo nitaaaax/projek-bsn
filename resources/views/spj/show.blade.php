@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      {{-- Baris 3: LS  --}}
+      {{-- Baris 3: Lembaga Sertifikasi  --}}
       <div class="col-md-4 mb-3">
         <strong>Lembaga Sertifikasi</strong><br>
         {{ $spj->lembaga_sertifikasi }}

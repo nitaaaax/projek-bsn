@@ -10,8 +10,7 @@ use App\Http\Controllers\{
     SpjController,
     UmkmExportImportController,
     UserController,
-   WilayahController,
-
+    WilayahController,
 };
 
     // ---------------------- GUEST ----------------------
@@ -22,7 +21,7 @@ use App\Http\Controllers\{
         Route::post('/login', [AuthController::class, 'processLogin']);
     });
 
-        // ---------------------- PROFILE ----------------------
+    // ---------------------- PROFILE ----------------------
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [UserController::class, 'profile'])->name('view');
         Route::post('/', [UserController::class, 'updateProfile'])->name('update');
@@ -43,8 +42,6 @@ use App\Http\Controllers\{
         Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
         Route::get('/umkm-proses', [UMKMProsesController::class, 'index'])->name('umkm.proses.index');
         Route::get('/umkm-sertifikasi', [UMKMSertifikasiController::class, 'index'])->name('umkm.sertifikasi.index');
-        Route::get('/spj', [SpjController::class, 'index'])->name('spj.index');
-        Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
     });
 
     // ---------------------- USER ROUTES (READ-ONLY + SHOW) ----------------------
@@ -54,15 +51,17 @@ use App\Http\Controllers\{
             Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
             Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
             Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
-    Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
+            Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
 
             Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.user');
             Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update.user');
             Route::get('/detail/{id}', [UMKMProsesController::class, 'showUser'])->name('showuser');
-                });
-             Route::prefix('spj')->name('spj.')->group(function () {
-                Route::get('export', [SpjController::class, 'export'])->name('export'); 
-            });
+        });
+
+        Route::prefix('spj')->name('spj.')->group(function () {
+            // Tidak perlu export di sini jika mau mandiri di luar prefix
+            Route::get('/{id}', [SpjController::class, 'show'])->name('show');
+        });
     });
 
     // ---------------------- ADMIN ROUTES ----------------------
@@ -72,12 +71,11 @@ use App\Http\Controllers\{
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
 
-
         // UMKM Proses (Admin full akses Tahap 1 & 2)
         Route::prefix('umkm-proses')->name('umkm.')->group(function () {
             Route::get('/get-provinsi', [UMKMProsesController::class, 'getProvinsi'])->name('get.provinsi');
             Route::get('/get-kota/{provinsi_id}', [UMKMProsesController::class, 'getKota'])->name('get.kota');
-            
+
             Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
             Route::get('/create', [ContcreateUmkm::class, 'create'])->name('create');
             Route::get('umkm/create/tahap/{tahap}/{id?}', [ContcreateUmkm::class, 'showTahap'])->name('create.tahap');
@@ -90,11 +88,9 @@ use App\Http\Controllers\{
             Route::get('/tahap-form/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.form');
             Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
 
-            //import excel
+            // import excel
             Route::post('/import', [UmkmExportImportController::class, 'importExcel'])->name('import');
-
         });
-
 
         // UMKM Sertifikasi
         Route::prefix('umkm-sertifikasi')->name('sertifikasi.')->group(function () {
@@ -104,32 +100,30 @@ use App\Http\Controllers\{
             Route::delete('/{id}', [UMKMSertifikasiController::class, 'destroy'])->name('destroy');
         });
 
-
         // SPJ (Admin)
-       Route::prefix('spj')->name('spj.')->group(function () {
-        Route::get('/', [SpjController::class, 'index'])->name('index');
-        Route::get('/create', [SpjController::class, 'create'])->name('create');
-        Route::post('/store', [SpjController::class, 'store'])->name('store');
-        Route::post('/import', [SpjController::class, 'import'])->name('import');
+        Route::prefix('spj')->name('spj.')->group(function () {
+            Route::get('/', [SpjController::class, 'index'])->name('index');
+            Route::get('/create', [SpjController::class, 'create'])->name('create');
+            Route::post('/store', [SpjController::class, 'store'])->name('store');
+            Route::post('/import', [SpjController::class, 'import'])->name('import');
 
-        //  TARUH EXPORT DI SINI SEBELUM /{id}
-        Route::get('/export', [SpjController::class, 'export'])->name('export');
-        
-         // Download Word per SPJ (tambah di sini sebelum /{id})
-    Route::get('/{id}/download-word', [SpjController::class, 'downloadWord'])
-        ->name('downloadWord')
-        ->whereNumber('id');
-
-        Route::get('/{id}/edit', [SpjController::class, 'edit'])->name('edit');
-        Route::get('/{id}', [SpjController::class, 'show'])->name('show')->whereNumber('id');
-        Route::put('/{id}/update', [SpjController::class, 'update'])->name('update');
-        Route::delete('/{id}', [SpjController::class, 'destroy'])->name('destroy');
+            Route::get('/{id}/edit', [SpjController::class, 'edit'])->name('edit');
+            Route::get('/{id}', [SpjController::class, 'show'])->name('show');
+            Route::put('/{id}/update', [SpjController::class, 'update'])->name('update');
+            Route::delete('/{id}', [SpjController::class, 'destroy'])->name('destroy');
         });
     });
 
-    // ---------------------- EXPORT / IMPORT ----------------------
+    // ---------------------- EXPORT SPJ MANDIRI ----------------------
+    Route::middleware('auth')->group(function () {
+        Route::get('/spj/export/{id}', [SpjController::class, 'export'])->name('spj.export');
+    });
+
+    // ---------------------- EXPORT UMKM ----------------------
     Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
 
+    // ---------------------- EXPORT WORD SPJ ----------------------
+    Route::get('/spj/downloadWord/{id}', [SpjController::class, 'downloadWord'])->name('downloadWord.spj');
 
     // Halaman daftar wilayah (misalnya daftar provinsi/kota)
     Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
@@ -139,4 +133,5 @@ use App\Http\Controllers\{
 
     // AJAX untuk ambil provinsi dan kota
     Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
+
     Route::resource('wilayah', WilayahController::class);

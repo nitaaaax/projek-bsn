@@ -21,19 +21,11 @@
     {
         $item = Tahap1::findOrFail($id);
         $tahap2 = Tahap2::with(['provinsiKantor', 'kotaKantor', 'provinsiPabrik', 'kotaPabrik'])
-        ->where('pelaku_usaha_id', $item->id)
-        ->first();
+            ->where('pelaku_usaha_id', $item->id)
+            ->first();
 
-
-        // Jika tidak ada tahap2, maka isi dengan default kosong
-        $jangkauan = '-';
-        $foto_produk = [];
-        $foto_tempat_produksi = [];
-        $instansiFormatted = '-';
-
-        if ($tahap2) {
-            // Jangkauan Pemasaran
-        
+        if (!$tahap2) {
+            abort(404, 'Data Tahap 2 tidak ditemukan.');
         }
 
         $templatePath = public_path('template/template_eksporumkm.docx');
@@ -45,62 +37,113 @@
 
         $template = new TemplateProcessor($templatePath);
 
-        // Jangkauan Pemasaran
-        $jangkauan = $tahap2->jangkauan_pemasaran ?? '-';
-        if (is_array($jangkauan)) {
-            $jangkauan = implode(', ', $jangkauan);
-        } elseif (is_string($jangkauan)) {
-            $decoded = json_decode($jangkauan, true);
+        // --- Jangkauan Pemasaran ---
+        $jangkauanRaw = $tahap2->jangkauan_pemasaran ?? '[]';
+        $jangkauanArr = [];
+        if (is_array($jangkauanRaw)) {
+            $jangkauanArr = $jangkauanRaw;
+        } else {
+            $decoded = json_decode($jangkauanRaw, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $jangkauan = implode(', ', $decoded);
+                $jangkauanArr = $decoded;
             }
         }
+        $jangkauanKeys = ['Local', 'Nasional', 'Internasional', 'Lainnya'];
+        foreach ($jangkauanKeys as $key) {
+            if (!array_key_exists($key, $jangkauanArr)) {
+                $jangkauanArr[$key] = null;
+            }
+        }
+        $jangkauanFormatted = "a. Local\n" .
+            (trim($jangkauanArr['Local']) !== '' ? $jangkauanArr['Local'] : "-") . "\n\n" .
+            "b. Nasional\n" .
+            (trim($jangkauanArr['Nasional']) !== '' ? $jangkauanArr['Nasional'] : "-") . "\n\n" .
+            "c. Internasional\n" .
+            (trim($jangkauanArr['Internasional']) !== '' ? $jangkauanArr['Internasional'] : "-") . "\n\n" .
+            "d. Lainnya\n" .
+            (trim($jangkauanArr['Lainnya']) !== '' ? $jangkauanArr['Lainnya'] : "-") . "\n\n";
 
-        // Decode foto
-        $foto_produk = json_decode($tahap2->foto_produk ?? '[]', true);
-        $foto_tempat_produksi = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-
-        // Instansi
-        $instansiFormatted = '-';
-        $instansiDecoded = json_decode($tahap2->instansi ?? '{}', true);
-        if (is_array($instansiDecoded) && !empty($instansiDecoded)) {
-            $instansiFormatted = implode("\n", array_map(function ($label, $detail) {
-                return '• ' . $label . ($detail ? ": $detail" : '');
-            }, array_keys($instansiDecoded), $instansiDecoded));
+        // --- Instansi ---
+        $instansiRaw = $tahap2->instansi ?? '{}';
+        $instansiArr = [];
+        $decoded = json_decode($instansiRaw, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $instansiArr = $decoded;
+        }
+        $instansiKeys = ['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas', 'Lainnya'];
+        $instansiLabels = ['a. Dinas', 'b. Kementerian', 'c. Perguruan Tinggi', 'd. Komunitas', 'e. Lainnya'];
+        $instansiFormatted = '';
+        foreach ($instansiKeys as $index => $key) {
+            $value = $instansiArr[$key] ?? null;
+            $instansiFormatted .= $instansiLabels[$index] . "\n" .
+                (trim($value) !== '' ? $value : '-') . "\n\n";
         }
 
+        // --- Legalitas Usaha ---
         $legalitasList = [
-            'NIB' => 'a) NIB',
-            'IUMK' => 'b) IUMK',
-            'SIUP' => 'c) SIUP',
-            'TDP' => 'd) TDP',
-            'NPWP Pemilik' => 'e) NPWP Pemilik',
-            'NPWP Badan Usaha' => 'f) NPWP Badan Usaha',
-            'Akta Pendirian Usaha' => 'g) Akta Pendirian Usaha',
+            'nib' => 'a) NIB',
+            'iumk' => 'b) IUMK',
+            'siup' => 'c) SIUP',
+            'tdp' => 'd) TDP',
+            'npwp pemilik' => 'e) NPWP Pemilik',
+            'npwp badan usaha' => 'f) NPWP Badan Usaha',
+            'akta pendirian usaha' => 'g) Akta Pendirian Usaha',
         ];
 
-        // Ambil legalitas dari database
-        $legalitas = json_decode($tahap2->legalitas_usaha, true) ?? [];
+        $legalitasRaw = json_decode($tahap2->legalitas_usaha ?? '[]', true) ?: [];
+        $legalitasNormalized = array_map(function ($item) {
+            return strtolower(trim($item));
+        }, $legalitasRaw);
+        $legalitasKeys = array_map('strtolower', array_keys($legalitasList));
 
-        // Siapkan hasil final
         $legalitasFormatted = '';
         foreach ($legalitasList as $key => $label) {
-            $tersedia = in_array($key, $legalitas) ? ' Tersedia' : '-';
-            $legalitasFormatted .= "$label : $tersedia\n";
+            $tersedia = in_array(strtolower($key), $legalitasNormalized) ? 'Tersedia' : '-';
+            $legalitasFormatted .= "$label : $tersedia\n\n";
         }
 
-        // Tangani bagian "Lainnya"
-        $lainnya = collect($legalitas)->first(function ($item) {
-            return str_starts_with($item, 'Lainnya:');
-        });
-        if ($lainnya) {
-            $keterangan = trim(str_replace('Lainnya:', '', $lainnya));
-            $legalitasFormatted .= "h) Lainnya : $keterangan";
-        } else {
-            $legalitasFormatted .= "h) Lainnya : -";
+        // Ambil isi "Lainnya" yang bukan checkbox standar
+        $lainnyaIsi = null;
+        foreach ($legalitasNormalized as $itemLainnya) {
+            if (!in_array($itemLainnya, $legalitasKeys)) {
+                $lainnyaIsi = $itemLainnya;
+                break;
+            }
+        }
+        $legalitasFormatted .= "h) Lainnya : " . ($lainnyaIsi ? ucfirst($lainnyaIsi) : '-') . "\n\n";
+
+        // --- Sertifikat ---
+        $sertifikatList = [
+            'pirt' => 'a) PIRT',
+            'md' => 'b) MD',
+            'halal' => 'c) Halal',
+        ];
+
+        $sertifikatDataRaw = json_decode($tahap2->sertifikat ?? '[]', true) ?: [];
+        $sertifikatNormalized = array_map(function ($item) {
+            return strtolower(trim($item));
+        }, $sertifikatDataRaw);
+        $sertifikatKeys = array_map('strtolower', array_keys($sertifikatList));
+
+        $sertifikatFormatted = '';
+        foreach ($sertifikatList as $key => $label) {
+            $tersedia = in_array(strtolower($key), $sertifikatNormalized) ? 'Tersedia' : '-';
+            $sertifikatFormatted .= "$label : $tersedia\n\n";
         }
 
-        $template->setValue('legalitas_usaha', $legalitasFormatted);
+        // Ambil isi "Lainnya" yang bukan checkbox standar
+        $sertLainnyaIsi = null;
+        foreach ($sertifikatNormalized as $itemLainnya) {
+            if (!in_array($itemLainnya, $sertifikatKeys)) {
+                $sertLainnyaIsi = $itemLainnya;
+                break;
+            }
+        }
+        $sertifikatFormatted .= "d) Lainnya : " . ($sertLainnyaIsi ? ucfirst($sertLainnyaIsi) : '-') . "\n\n";
+
+        // --- Foto Produk dan Tempat Produksi ---
+        $foto_produk = json_decode($tahap2->foto_produk ?? '[]', true) ?: [];
+        $foto_tempat_produksi = json_decode($tahap2->foto_tempat_produksi ?? '[]', true) ?: [];
 
         // Set Data Tahap 1
         $template->setValue('nama_umk', $item->nama_pelaku ?? '-');
@@ -120,20 +163,40 @@
         $template->setValue('alamat_pabrik', $tahap2->alamat_pabrik ?? '-');
         $template->setValue('provinsi_pabrik', $tahap2->provinsiPabrik->nama ?? '-');
         $template->setValue('kota_pabrik', $tahap2->kotaPabrik->nama ?? '-');
-        $template->setValue('legalitas_usaha', $legalitasFormatted);
+        $template->setValue('legalitas_usaha', trim($legalitasFormatted));
         $template->setValue('tahun_pendirian', $tahap2->tahun_pendirian ?? '-');
         $template->setValue('sni', $tahap2->sni_yang_diterapkan ?? '-');
         $template->setValue('omzet', $tahap2->omzet ?? '-');
         $template->setValue('volume_per_tahun', $tahap2->volume_per_tahun ?? '-');
         $template->setValue('jumlah_tenaga_kerja', $tahap2->jumlah_tenaga_kerja ?? '-');
-        $template->setValue('sertifikat', $tahap2->sertifikat ?? '-');
-        $template->setValue('jangkauan_pemasaran', $jangkauan);
-        $template->setValue('instansi', $instansiFormatted);
+        $template->setValue('sertifikat', trim($sertifikatFormatted));
+        $template->setValue('jangkauan_pemasaran', trim($jangkauanFormatted));
+        $template->setValue('instansi', trim($instansiFormatted));
+
+        // Helper nama hari bahasa Indonesia
+        $hariIndonesia = function($date) {
+            $days = [
+                'Sunday'    => 'Minggu',
+                'Monday'    => 'Senin',
+                'Tuesday'   => 'Selasa',
+                'Wednesday' => 'Rabu',
+                'Thursday'  => 'Kamis',
+                'Friday'    => 'Jumat',
+                'Saturday'  => 'Sabtu',
+            ];
+            return $days[$date->format('l')] ?? $date->format('l');
+        };
+
+        // Ambil tanggal sekarang
+        $tanggalSekarang = now();
+
+        // Set placeholder hari dengan nama hari bahasa Indonesia
+        $template->setValue('hari', $hariIndonesia($tanggalSekarang));
 
         // Tanggal
         $template->setValue('tanggal_export', Carbon::now()->format('d-m-Y'));
 
-        // --- Foto Produk
+        // --- Foto Produk ---
         $foto_produk = array_values($foto_produk);
         if (!empty($foto_produk)) {
             $template->cloneRow('foto_produk', count($foto_produk));
@@ -156,7 +219,7 @@
             $template->setValue('foto_produk#1', '[Tidak ada foto]');
         }
 
-        // --- Foto Tempat Produksi
+        // --- Foto Tempat Produksi ---
         $foto_tempat_produksi = array_values($foto_tempat_produksi);
         if (!empty($foto_tempat_produksi)) {
             $template->cloneRow('foto_tempat', count($foto_tempat_produksi));
@@ -180,7 +243,7 @@
         }
 
         // Simpan dan kirim file
-        $filename = 'UMKM_' . preg_replace('/[^A-Za-z0-9]/', '_', $item->nama_pelaku) . '.docx';
+        $filename = 'UMKM_' . preg_replace('/[^A-Za-z0-9]/', '_', $item->nama_pelaku ?? 'unknown') . '.docx';
         $filePath = $exportPath . '/' . $filename;
         $template->saveAs($filePath);
 

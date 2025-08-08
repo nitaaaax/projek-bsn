@@ -2,7 +2,7 @@
 
     @section('content')
     <div class="container mt-4">
-    <form action="{{ route('admin.sertifikasi.update', $tahap1->id) }}" method="POST"></form>
+    <form action="{{ route('admin.sertifikasi.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -98,28 +98,25 @@
                         </select>
                     </div>
 
-                  
-                       {{-- Status Pembinaan --}}
+                    {{-- Status Pembinaan --}}
+                    @php
+                        $statusPembinaan = old('status_pembinaan', $tahap1->status_pembinaan ?? $sertifikasi->status_pembinaan ?? '');
+                        $isDisabled = ($statusPembinaan === 'SPPT SNI');
+                    @endphp
                     <div class="col-md-6">
                         <label class="form-label">Status Pembinaan</label>
-                    <select name="status_pembinaan" class="form-control hide-arrow" disabled>
+                        <select name="status_pembinaan" class="form-control hide-arrow" {{ $isDisabled ? 'disabled' : '' }}>
                             <option value="">-- Pilih Status Pembinaan --</option>
-                            <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
-                            <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
-                            <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
-                            <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
-                            <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
-                            <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
-                            <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
-                            <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
-                            <option value="SPPT SNI" {{ old('status_pembinaan', $sertifikasi->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
+                            <option value="Identifikasi awal dan Gap" {{ $statusPembinaan == 'Identifikasi awal dan Gap' ? 'selected' : '' }}> Identifikasi awal dan Gap</option>
+                            <option value="Set up Sistem" {{ $statusPembinaan == 'Set up Sistem' ? 'selected' : '' }}> Set up Sistem</option>
+                            <option value="Implementasi" {{ $statusPembinaan == 'Implementasi' ? 'selected' : '' }}> Implementasi</option>
+                            <option value="Review Sistem & Audit Internal" {{ $statusPembinaan == 'Review Sistem & Audit Internal' ? 'selected' : '' }}> Review Sistem & Audit Internal</option>
+                            <option value="Pengajuan Sertifikasi" {{ $statusPembinaan == 'Pengajuan Sertifikasi' ? 'selected' : '' }}> Pengajuan Sertifikasi</option>
+                            <option value="Perbaikan Temuan Audit" {{ $statusPembinaan == 'Perbaikan Temuan Audit' ? 'selected' : '' }}> Perbaikan Temuan Audit</option>
+                            <option value="Perbaikan Lokasi" {{ $statusPembinaan == 'Perbaikan Lokasi' ? 'selected' : '' }}> Perbaikan Lokasi</option>
+                            <option value="Monitoring Pasca Sertifikasi" {{ $statusPembinaan == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}> Monitoring Pasca Sertifikasi</option>
+                            <option value="SPPT SNI" {{ $statusPembinaan == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;"> SPPT SNI (TERSERTIFIKASI)</option>
                         </select>
-                    </div>
-
-                        {{-- supaya tetap terkirim walau select disabled --}}
-                        @if(($tahap1->status ?? '') == 'Tersertifikasi')
-                            <input type="hidden" name="status_pembinaan" value="{{ $tahap1->status_pembinaan }}">
-                        @endif
                     </div>
 
                     {{-- Jenis Usaha --}}
@@ -471,9 +468,14 @@
                         </div>
                     </div>
 
-                    {{-- Foto Produk --}}
-                    <div class="col-12 mb-3">
-                        <label class="form-label fw-bold">Foto Produk (bisa lebih dari satu)</label>
+                     {{-- Foto Produk --}}
+                    @php
+                        $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
+                        $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
+                    @endphp
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
                         <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
 
                         <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
@@ -483,7 +485,9 @@
                                         <img src="{{ asset('storage/' . $foto) }}"
                                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
                                             class="img-thumbnail">
+
                                         <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
+
                                         <button type="button"
                                                 class="btn btn-sm btn-danger p-1 btn-remove-old"
                                                 style="position: absolute; top: 0; right: 0;">
@@ -499,8 +503,8 @@
                     </div>
 
                     {{-- Foto Tempat Produksi --}}
-                    <div class="col-12 mb-3">
-                        <label class="form-label fw-bold">Foto Tempat Produksi (bisa lebih dari satu)</label>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
                         <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
 
                         <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
@@ -508,14 +512,10 @@
                                 @foreach ($foto_tempat_produksi as $foto)
                                     <div class="position-relative me-2 mb-2 old-foto-tempat">
                                         <img src="{{ asset('storage/' . $foto) }}"
-                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
-                                            class="img-thumbnail">
+                                            class="me-2 mb-2"
+                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
                                         <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
-                                        <button type="button" 
-                                                class="btn btn-sm btn-danger p-1 btn-remove-old" 
-                                                style="position: absolute; top: 0; right: 0;">
-                                            &times;
-                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
                                     </div>
                                 @endforeach
                             @else
@@ -571,7 +571,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle instansi detail inputs
         document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
-            const target = document.getElementById(instansi_input_${checkbox.value.toLowerCase()});
+           const target = document.getElementById('instansi_input_' + checkbox.value.toLowerCase());
             checkbox.addEventListener('change', function() {
                 target.style.display = this.checked ? 'block' : 'none';
             });
@@ -605,7 +605,7 @@
     document.addEventListener('DOMContentLoaded', function() {
     // Toggle instansi detail inputs
     document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
-        const target = document.getElementById(instansi_input_${checkbox.value.toLowerCase()});
+       const target = document.getElementById('instansi_input_' + checkbox.value.toLowerCase());
         checkbox.addEventListener('change', function() {
             target.style.display = this.checked ? 'block' : 'none';
         });
@@ -643,11 +643,13 @@
         // Load semua provinsi
         $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (provinsiList) {
             $.each(provinsiList, function (index, provinsi) {
-                const option = <option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>;
-                $('#provinsi_kantor').append(option);
+                $('#provinsi_kantor').append(
+                    `<option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>`
+                );
 
-                const option2 = <option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>;
-                $('#provinsi_pabrik').append(option2);
+                $('#provinsi_pabrik').append(
+                    `<option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>`
+                );
             });
 
             if (selectedProvKantor) {
@@ -664,10 +666,10 @@
             const provId = $(this).val();
             $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
             if (provId) {
-                $.get({{ url('admin/umkm-proses/get-kota') }}/${provId}, function (kotaList) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
                     $.each(kotaList, function (index, kota) {
                         const selected = kota.id == selectedKotaKantor ? 'selected' : '';
-                        $('#kota_kantor').append(<option value="${kota.id}" ${selected}>${kota.nama}</option>);
+                        $('#kota_kantor').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
                     });
                 });
             }
@@ -678,10 +680,10 @@
             const provId = $(this).val();
             $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
             if (provId) {
-                $.get({{ url('admin/umkm-proses/get-kota') }}/${provId}, function (kotaList) {
+                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
                     $.each(kotaList, function (index, kota) {
                         const selected = kota.id == selectedKotaPabrik ? 'selected' : '';
-                        $('#kota_pabrik').append(<option value="${kota.id}" ${selected}>${kota.nama}</option>);
+                        $('#kota_pabrik').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
                     });
                 });
             }

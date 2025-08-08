@@ -106,7 +106,7 @@
                 <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}> Pengajuan Sertifikasi</option>
                 <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}> Perbaikan Temuan Audit</option>
                 <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}> Perbaikan Lokasi</option>
-                <option value="SPPT SNI" style="font-weight:bold; color:green;" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }}>SPPT SNI (Tersertifikasi)</option>
+                <option value="SPPT SNI (TERSERTIFIKASI)" style="font-weight:bold; color:green;" {{ old('status_pembinaan', $data->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }}>SPPT SNI (Tersertifikasi)</option>
             </select>
         </div>
 

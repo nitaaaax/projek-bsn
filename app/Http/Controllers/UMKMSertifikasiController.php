@@ -6,6 +6,7 @@ use App\Models\Tahap1;
 use App\Models\Tahap2;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use App\Models\Provinsi;
 use App\Models\Kota;
 
@@ -16,17 +17,6 @@ class UMKMSertifikasiController extends Controller
         $items= Tahap1::where('status_pembinaan','=','SPPT SNI')->get(); 
 
         return view('umkm.sertifikasi.index', compact('items'));
-    }
-
-    public function sertifikasi($id)
-    {
-        $umkm = Tahap1::with('tahap2')->findOrFail($id);
-
-        $umkm->update([
-            'status' => 'Tersertifikasi'
-        ]);
-
-        return redirect()->route('umkm.sertifikasi.index')->with('success', 'UMKM berhasil disertifikasi.');
     }
 
     public function edit($id)
@@ -175,7 +165,7 @@ class UMKMSertifikasiController extends Controller
             $tahap2->update($validated2);
         });
 
-        return redirect()->route('umkm.sertifikasi.edit')->with('success', 'Data UMKM berhasil diperbarui.');
+        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data UMKM berhasil diperbarui.');
     }
 
     public function getProvinsi()
@@ -193,11 +183,37 @@ class UMKMSertifikasiController extends Controller
     public function destroy($id)
     {
         $tahap1 = Tahap1::findOrFail($id);
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
 
-        DB::transaction(function () use ($tahap1) {
-            $tahap1->update(['status' => '']);
-        });
+        if ($tahap2) {
+            // Hapus file foto_produk
+            $fotoProduk = json_decode($tahap2->foto_produk, true);
+            if (is_array($fotoProduk)) {
+                foreach ($fotoProduk as $file) {
+                    $path = public_path("storage/" . $file);
+                    if (File::exists($path)) {
+                        File::delete($path);
+                    }
+                }
+            }
 
-        return redirect()->back()->with('success', 'Status sertifikasi dibatalkan dan data dikembalikan ke proses.');
+            // Hapus file foto_tempat_produksi
+            $fotoTempat = json_decode($tahap2->foto_tempat_produksi, true);
+            if (is_array($fotoTempat)) {
+                foreach ($fotoTempat as $file) {
+                    $path = public_path("storage/" . $file);
+                    if (File::exists($path)) {
+                        File::delete($path);
+                    }
+                }
+            }
+
+            $tahap2->delete();
+        }
+
+        $tahap1->delete();
+
+        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data berhasil dihapus.');
     }
+
 }

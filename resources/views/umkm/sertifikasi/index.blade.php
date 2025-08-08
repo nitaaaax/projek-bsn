@@ -27,7 +27,7 @@ thead {
               <th>No</th>
               <th>Nama Pelaku</th>
               <th>Produk</th>
-              <th>Status</th>
+              <th>Status Pembinaan</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -38,11 +38,9 @@ thead {
                 <td>{{ $item->nama_pelaku }}</td>
                 <td>{{ $item->produk }}</td>
                 <td>
-                  @if(strtolower($item->status) === 'tersertifikasi')
-                    <span class="badge bg-success">Tersertifikasi</span>
-                  @else
-                    <span class="badge bg-secondary">{{ $item->status }}</span>
-                  @endif
+                  <span class="badge {{ $item->status_pembinaan === 'SPPT SNI' ? 'bg-success' : 'bg-secondary' }}">
+                    {{ $item->status_pembinaan }}
+                  </span>
                 </td>
                 <td>
                 @php
@@ -59,15 +57,18 @@ thead {
                 @endif
                 @if(optional(Auth::user()->role)->name === 'admin')
                   <a href="{{ route('admin.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                      <i class="fa fa-edit"></i> Edit
+                      <i class="fa fa-edit"></i> 
                   </a>
                 @endif
+                  <a href="{{ route('umkm.export.word.single', $item->id) }}" class="btn btn-success btn-sm" title="Download">
+                    <i class="fa fa-download"></i>
+                  </a>
                 @if(optional(Auth::user()->role)->name === 'admin')
                   <form action="{{ route('admin.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
                     @csrf
                     @method('DELETE')
-                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
-                      <i class="fa fa-trash"></i> Hapus
+                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
+                      <i class="fa fa-trash"></i>
                     </button>
                   </form>
                 @endif

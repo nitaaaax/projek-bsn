@@ -177,7 +177,7 @@ class UMKMProsesController extends Controller
 
         $jangkauan = ['Lokal', 'Regional', 'Nasional', 'Internasional'];
 
-        return view('umkm.show', compact('tahap1', 'tahap2', 'jangkauan'));
+        return view('umkm.proses.show', compact('tahap1', 'tahap2', 'jangkauan'));
     }
 
     public function destroy($id)
