@@ -102,7 +102,6 @@
 
         $template->setValue('legalitas_usaha', $legalitasFormatted);
 
-
         // Set Data Tahap 1
         $template->setValue('nama_umk', $item->nama_pelaku ?? '-');
         $template->setValue('nama_kontak_person', $item->nama_kontak_person ?? '-');

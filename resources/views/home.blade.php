@@ -1,152 +1,110 @@
 @extends('layout.app')
 
 @section('content')
-<style>
-    .small-box {
-        position: relative;
-        display: block;
-        background: linear-gradient(135deg, #1FB2C9, #2EC6DF);
-        color: #fff;
-        border-radius: 16px;
-        padding: 25px;
-        overflow: hidden;
-        transition: 0.3s ease;
-    }
+<div class="container-fluid py-4">
 
-    .small-box:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-    }
+    {{-- Greeting Section --}}
+    <div class="card shadow-lg border-0 rounded-4 mb-4 position-relative" 
+     style="background: linear-gradient(135deg, rgba(67, 67, 185, 0.72), rgba(176, 105, 243, 0.43)); color: white;">
+    <div class="card-body">
+        <h4 class="fw-bold mb-1">Halo, {{ Auth::user()->username }} 👋</h4>
+        <p class="mb-2">{{ Auth::user()->email }}</p>
+        <span class="badge px-3 py-2 rounded-pill fw-semibold" 
+              style="background: rgba(255,255,255,0.2); font-size: 0.85rem;">
+            <i class="fas fa-user-shield me-1"></i> {{ Auth::user()->role->name }}
+        </span>
 
-    .small-box .inner h3 {
-        font-size: 2.4rem;
-        font-weight: 700;
-        margin-bottom: 10px;
-    }
+        <!-- Foto pojok kanan -->
+        <div class="rounded-circle shadow-sm d-flex align-items-center justify-content-center position-absolute" 
+             style="width: 80px; height: 80px; background-color: #f8f9fa; top: 15px; right: 15px;">
+            <i class="fas fa-user" style="font-size: 40px; color: #6c757d;"></i>
+        </div>
+    </div>
+</div>
 
-    .small-box .inner p {
-        font-size: 1.15rem;
-        margin: 0;
-    }
 
-    .small-box .icon {
-        position: absolute;
-        top: 20px;
-        right: 25px;
-        font-size: 3.2rem;
-        color: rgba(255, 255, 255, 0.4);
+    {{-- Statistik Cards --}}
+    <style>
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border: none;
     }
-
-    .small-box-footer {
-        display: block;
-        margin-top: 15px;
-        color: #fff;
-        font-weight: 500;
-        text-decoration: underline;
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.15);
     }
-
-    .motivasi-box {
-        border-left: 6px solid #00BFA6;
-        background-color: #f1fdfc;
-        padding: 25px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 30px;
-        box-shadow: 0 6px 20px rgba(0, 191, 166, 0.1);
+    .card-blue {
+        background: linear-gradient(135deg, #3b82f6, #1e3a8a);
     }
-
-    .motivasi-text {
-        max-width: 65%;
+    .card-pink {
+        background: linear-gradient(135deg, #ec4899, #9d174d);
     }
-
-    .motivasi-text h5 {
-        font-weight: bold;
-        margin-bottom: 12px;
-        color: #00BFA6;
-    }
-
-    .motivasi-text p {
-        margin: 0;
-        color: #333;
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-
-    .motivasi-img {
-        max-width: 30%;
-    }
-
-    .motivasi-img img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 10px;
+    .stat-card .icon {
+        font-size: 5rem;
+        opacity: 0.1;
+        pointer-events: none;
     }
 </style>
 
-<div class="container-fluid">
-    <!-- Sapaan -->
-    <div class="row mb-3">
-    <div class="col-12">
-        <div class="card shadow-sm border-0 rounded-4 px-4 py-3" style="background: linear-gradient(90deg, #f0f8ff, #ffffff);">
-            <div class="d-flex align-items-center gap-3">
-                <div class="text-primary">
-                    <i class="fas fa-seedling fa-2x"></i>
-                </div>
-                <div>
-                    <h5 class="mb-1 fw-semibold text-dark">
-                        Hai, {{ Auth::user()->username }}! 👋
-                    </h5>
-                    <p class="mb-1 text-muted small">
-                        {{ Auth::user()->email }}
-                    </p>
-
-                    <p class="mb-0 text-muted small">
-                        Semangat hari ini! Setiap langkah kecil adalah kemajuan besar ke depan 💪
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-    <!-- Data Card -->
-    <div class="row mt-2">
-        <div class="col-lg-6 col-12 mb-4">
-            <div class="small-box">
-                <div class="inner">
-                    <h3>{{ $jumlahSpj }}</h3>
-                    <p>Jumlah SPJ</p>
-                </div>
-                <div class="icon">
+<div class="row g-4">
+    <!-- SPJ -->
+    <div class="col-lg-6 col-md-6 col-12">
+        <a href="{{ route('spj.index') }}" class="text-decoration-none">
+            <div class="card stat-card card-blue rounded-4 shadow-sm h-100 text-white position-relative p-4">
+                <div class="icon position-absolute top-0 end-0 p-3">
                     <i class="fas fa-file-alt"></i>
                 </div>
-                <a href="{{ route('spj.index') }}" class="small-box-footer">
-                    Lihat Semua <i class="fas fa-arrow-circle-right"></i>
-                </a>
+                <h3 class="fw-bold mb-0">{{ $jumlahSpj }}</h3>
+                <p class="mb-2">Jumlah SPJ</p>
+                <div class="fw-semibold mt-3">Lihat Semua <i class="fas fa-arrow-right"></i></div>
             </div>
-        </div>
+        </a>
+    </div>
 
-        <div class="col-lg-6 col-12 mb-4">
-            <div class="small-box" style="background: linear-gradient(135deg, #b92151ff, #B9375D);">
-                <div class="inner">
-                    <h3>{{ $jumlahUmkm }}</h3>
-                    <p>Jumlah UMKM</p>
-                </div>
-                <div class="icon">
+    <!-- UMKM -->
+    <div class="col-lg-6 col-md-6 col-12">
+        <a href="{{ route('umkm.proses.index') }}" class="text-decoration-none">
+            <div class="card stat-card card-pink rounded-4 shadow-sm h-100 text-white position-relative p-4">
+                <div class="icon position-absolute top-0 end-0 p-3">
                     <i class="fas fa-users"></i>
                 </div>
-                <a href="{{ route('umkm.proses.index') }}" class="small-box-footer">
-                    Lihat Semua <i class="fas fa-arrow-circle-right"></i>
-                </a>
+                <h3 class="fw-bold mb-0">{{ $jumlahUmkm }}</h3>
+                <p class="mb-2">Jumlah UMKM</p>
+                <div class="fw-semibold mt-3">Lihat Semua <i class="fas fa-arrow-right"></i></div>
             </div>
-        </div>
-
-
-
+        </a>
     </div>
 </div>
+
+
+    {{-- Motivasi --}}
+    <div class="card mt-4 border-0 rounded-4 shadow-sm p-4" style="background: #f8fafc;">
+        <h5 class="fw-bold mb-2">💡 Daily Hype</h5>
+        <p class="mb-0 text-muted">
+        Don’t stop when you’re tired, stop when you’re done.        </p>
+    </div>
+
+</div>
+
+<style>
+    .stat-card {
+        transition: all 0.3s ease;
+    }
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    .icon {
+        pointer-events: none;
+    }
+    a.text-decoration-none:hover {
+        text-decoration: none !important;
+    }
+    .card-blue {
+        background: linear-gradient(135deg, #2476bdff, rgba(66, 186, 192, 1));
+    }
+    .card-pink {
+        background: linear-gradient(135deg, rgba(172, 41, 41, 1), rgba(211, 77, 77, 1));
+    }
+</style>
 @endsection

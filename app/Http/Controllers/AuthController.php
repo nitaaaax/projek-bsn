@@ -25,35 +25,23 @@ class AuthController extends Controller
         return view('home', compact('role', 'jumlahSpj', 'jumlahUmkm'));
     }
 
-    public function processLogin(Request $request)
-    {
-        // Validasi input email dan password
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+   public function processLogin(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        // Cari user berdasarkan email
-        $user = User::where('email', $request->email)->first();
+    $credentials = $request->only('email', 'password');
 
-        if (!$user) {
-            return back()->withErrors(['email' => 'User tidak ditemukan'])->withInput();
-        }
-
-        // Cek password menggunakan Hash::check()
-        if (!Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => 'Password salah'])->withInput();
-        }
-
-        // Login user secara manual
-        Auth::login($user);
-
-        // Regenerate session
+    if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-
-        // Redirect ke home dengan pesan sukses
         return redirect()->route('home')->with('success', 'Login berhasil!');
     }
+
+    return back()->with('error', 'Email atau password salah')->withInput();
+}
+
 
     public function logout(Request $request)
     {

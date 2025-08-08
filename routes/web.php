@@ -54,7 +54,7 @@ use App\Http\Controllers\{
             Route::get('/', [UMKMProsesController::class, 'index'])->name('index');
             Route::get('/spj/{id}', [SpjController::class, 'show'])->name('spj.show');
             Route::get('/{id}', [ContcreateUmkm::class, 'show'])->name('show');
- Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
+    Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
 
             Route::get('/tahap/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.user');
             Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update.user');
@@ -90,6 +90,9 @@ use App\Http\Controllers\{
             Route::get('/tahap-form/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.form');
             Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
 
+            //import excel
+            Route::post('/import', [UmkmExportImportController::class, 'importExcel'])->name('import');
+
         });
 
 
@@ -107,9 +110,15 @@ use App\Http\Controllers\{
         Route::get('/', [SpjController::class, 'index'])->name('index');
         Route::get('/create', [SpjController::class, 'create'])->name('create');
         Route::post('/store', [SpjController::class, 'store'])->name('store');
+        Route::post('/import', [SpjController::class, 'import'])->name('import');
 
         //  TARUH EXPORT DI SINI SEBELUM /{id}
         Route::get('/export', [SpjController::class, 'export'])->name('export');
+        
+         // Download Word per SPJ (tambah di sini sebelum /{id})
+    Route::get('/{id}/download-word', [SpjController::class, 'downloadWord'])
+        ->name('downloadWord')
+        ->whereNumber('id');
 
         Route::get('/{id}/edit', [SpjController::class, 'edit'])->name('edit');
         Route::get('/{id}', [SpjController::class, 'show'])->name('show')->whereNumber('id');
@@ -120,17 +129,14 @@ use App\Http\Controllers\{
 
     // ---------------------- EXPORT / IMPORT ----------------------
     Route::get('/umkm/export-word/{id}', [UmkmExportImportController::class, 'exportWord'])->name('umkm.export.word.single');
-    Route::post('/umkm/import-excel', [UmkmExportImportController::class, 'importExcel'])->name('umkm.import.excel');
-    Route::post('spj/import', [SpjController::class, 'import'])->name('spj.import');
 
 
+    // Halaman daftar wilayah (misalnya daftar provinsi/kota)
+    Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
 
-// Halaman daftar wilayah (misalnya daftar provinsi/kota)
-Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+    // Proses penyimpanan data wilayah
+    Route::post('/wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
 
-// Proses penyimpanan data wilayah
-Route::post('/wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
-
-// AJAX untuk ambil provinsi dan kota
-Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
-Route::resource('wilayah', WilayahController::class);
+    // AJAX untuk ambil provinsi dan kota
+    Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
+    Route::resource('wilayah', WilayahController::class);

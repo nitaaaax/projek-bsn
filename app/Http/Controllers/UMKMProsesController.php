@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Tahap1;
 use App\Models\Tahap2;
-use App\Models\Sertifikasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
@@ -76,7 +75,40 @@ class UMKMProsesController extends Controller
             $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
             $validated2['sertifikat'] = json_encode($request->input('sertifikat', []));
             $validated2['jangkauan_pemasaran'] = json_encode($request->input('jangkauan_pemasaran', []));
-            $validated1['instansi'] = json_encode($request->input('instansi', []));
+
+            // Legalitas
+            $legalitas = $request->input('legalitas_usaha', []);
+            if (in_array('lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
+                $legalitas = array_diff($legalitas, ['lainnya']);
+                $legalitas[] = $request->legalitas_usaha_lainnya;
+            }
+            $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
+
+            // Sertifikat
+            $sertifikat = $request->input('sertifikat', []);
+            if (in_array('lainnya', $sertifikat) && $request->filled('sertifikat_lainnya')) {
+                $sertifikat = array_diff($sertifikat, ['lainnya']);
+                $sertifikat[] = $request->sertifikat_lainnya;
+            }
+            $validated2['sertifikat'] = json_encode(array_filter($sertifikat));
+
+            // Instansi
+            $instansiFinal = [];
+            foreach ($request->input('instansi_check', []) as $key) {
+                $instansiFinal[$key] = $request->input("instansi_detail.$key", '');
+            }
+            $validated2['instansi'] = json_encode($instansiFinal);
+
+            // jangkauan pemsaran
+            $jangkauanFinal = [];
+            foreach ($request->input('jangkauan_pemasaran', []) as $key) {
+                if ($key === 'Lainnya' && $request->filled('jangkauan_pemasaran_lainnya')) {
+                    $jangkauanFinal[$key] = $request->jangkauan_pemasaran_lainnya;
+                } else {
+                    $jangkauanFinal[$key] = $request->input("jangkauan_detail.$key", '');
+                }
+            }
+            $validated2['jangkauan_pemasaran'] = json_encode($jangkauanFinal);
 
             // Foto Produk
             $fotoProduk = json_decode($tahap2->foto_produk ?? '[]', true);

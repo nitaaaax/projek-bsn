@@ -11,19 +11,22 @@
       </h3>
 
       {{-- Tombol Aksi --}}
-      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
-        <div class="d-flex gap-2">
-          @if(optional(Auth::user()->role)->name === 'admin')
-            <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary">
-              <i class="fa fa-plus me-1"></i> Tambah UMKM
-            </a>
-          @endif
+   <div class="d-flex flex-wrap mb-4">
+  @if(optional(Auth::user()->role)->name === 'admin')
+    <a href="{{ route('admin.umkm.create', ['tahap' => 1, 'id' => $id ?? null]) }}" class="btn btn-primary mb-2 me-2">
+      <i class="fa fa-plus me-1"></i> Tambah UMKM
+    </a>
+  @endif
 
-          <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#importModal">
-            <i class="fa fa-file-import me-1"></i> Import Excel
-          </button>
-        </div>
-      </div>
+  @if(optional(Auth::user()->role)->name === 'admin')
+    <button type="button" class="btn btn-warning text-dark mb-2" data-bs-toggle="modal" data-bs-target="#importModal">
+      <i class="fa fa-file-import me-1"></i> Import Excel
+    </button>
+  @endif
+</div>
+
+
+
 
       {{-- Tabel --}}
       <div class="table-responsive">
@@ -96,11 +99,16 @@
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
-            <form action="{{ route('umkm.import.excel') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.umkm.import') }}" method="POST" enctype="multipart/form-data">
               @csrf
               <div class="modal-header">
                 <h5 class="modal-title" id="importModalLabel">Import Data UMKM</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn btn-sm btn-danger rounded-circle d-flex align-items-center justify-content-center" 
+                    style="width: 32px; height: 32px;" 
+                    data-bs-dismiss="modal" 
+                    aria-label="Close">
+                <i class="fa fa-times text-white"></i>
+            </button>
               </div>
               <div class="modal-body">
                 <div class="mb-3">
@@ -144,7 +152,7 @@
         infoEmpty: "Menampilkan 0 data",
       },
       columnDefs: [
-        { orderable: false, targets: [5] } // kolom Aksi
+        { orderable: false, targets: [5] }
       ]
     });
 

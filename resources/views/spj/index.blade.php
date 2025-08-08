@@ -15,7 +15,7 @@
       <div class="row mb-4 align-items-center">
         <div class="col-md-6">
           <h2 class="fw-bold">Data SPJ</h2>
-          <div class="d-flex gap-2 mt-2">
+          <div class="d-flex gap-3 mt-4">
           @if(optional(Auth::user()->role)->name === 'admin')
             <a href="{{ route('admin.spj.create') }}" class="btn btn-primary">
               <i class="fa fa-plus"></i> Tambah SPJ
@@ -30,9 +30,11 @@
                 <i class="fa fa-file-excel"></i> Download Data
               </a>
             @endif
-            <a href="{{ route('spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
+            @if(optional(Auth::user()->role)->name === 'admin')
+            <a href="{{ route('admin.spj.import') }}" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#importModal">
                 <i class="fa fa-upload"></i>  Upload Data
             </a>
+            @endif
           </div>
         </div>
       </div>
@@ -73,27 +75,39 @@
                   <td class="text-end fw-bold">
                     Rp{{ number_format($item->details->sum('nominal'), 0, ',', '.') }}
                   </td>
-                  <td>
-                   {{-- Tombol Detail, tampilkan berdasarkan role --}}
-                  @if(optional(Auth::user()->role)->name === 'admin')
-                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
-                      <i class="fa fa-eye"></i> Detail 
+                 <td>
+                {{-- Tombol Detail, tampilkan berdasarkan role --}}
+                @if(optional(Auth::user()->role)->name === 'admin')
+                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm" title="Detail">
+                        <i class="fa fa-eye"></i>
                     </a>
-                  @elseif(optional(Auth::user()->role)->name === 'user')
-                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
-                      <i class="fa fa-eye"></i> Detail
+                @elseif(optional(Auth::user()->role)->name === 'user')
+                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm" title="Detail">
+                        <i class="fa fa-eye"></i>
                     </a>
-                  @endif
-                  @if(optional(Auth::user()->role)->name === 'admin')
-                    <a class="btn btn-sm btn-danger" onclick="confirmDelete({{ $item->id }})">
-                    <i class="fa fa-trash"></i> Hapus
+                @endif
+
+                    {{-- Tombol Download Word --}}
+                    <a href="{{ route('admin.spj.downloadWord', $item->id) }}" 
+                  class="btn btn-success btn-sm" 
+                  title="Download Word">
+                <i class="fas fa-receipt"></i>
+                </a>
+
+                {{-- Tombol Hapus (khusus admin) --}}
+                @if(optional(Auth::user()->role)->name === 'admin')
+                    <a class="btn btn-sm btn-danger" title="Hapus" onclick="confirmDelete({{ $item->id }})">
+                        <i class="fa fa-trash"></i>
                     </a>
-                  @endif
-                  <form id="delete-form-{{ $item->id }}" action="{{ route('admin.spj.destroy', $item->id) }}" method="POST" style="display: none;">
+                @endif
+
+                {{-- Form Hapus --}}
+                <form id="delete-form-{{ $item->id }}" action="{{ route('admin.spj.destroy', $item->id) }}" method="POST" style="display: none;">
                     @csrf
                     @method('DELETE')
-                  </form>
-                  </td>
+                </form>
+            </td>
+
                 </tr>
                 @empty
                 <tr><td colspan="4" class="text-center text-muted">Belum ada data.</td></tr>
@@ -203,13 +217,18 @@
 <!-- Modal Import -->
 <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
   <div class="modal-dialog">
-    <form action="{{ route('spj.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.spj.import') }}" method="POST" enctype="multipart/form-data">
       @csrf
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Import SPJ</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
+           <button type="button" class="btn btn-sm btn-danger rounded-circle d-flex align-items-center justify-content-center" 
+                style="width: 32px; height: 32px;" 
+                data-bs-dismiss="modal" 
+                aria-label="Close">
+            <i class="fa fa-times text-white"></i>
+            </button>
+          </div>
         <div class="modal-body">
           <div class="mb-3">
             <label for="file" class="form-label">Pilih File Excel</label>

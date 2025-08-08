@@ -6,40 +6,50 @@
     <div class="card-body">
       <h2 class="font-weight-bold mb-4">Detail SPJ</h2>
 
-      {{-- Informasi Umum --}}
-<div class="row">
-  <div class="col-md-4 mb-3">
-    <strong>Nama SPJ</strong><br>
-    {{ $spj->nama_spj }}
-  </div>
+    {{-- Informasi Umum --}}
+    <div class="row">
+      {{-- Baris 1 --}}
+      <div class="col-md-4 mb-3">
+        <strong>Nama SPJ</strong><br>
+        {{ $spj->nama_spj }}
+      </div>
 
-  <div class="col-md-4 mb-3">
-    <strong>No UKD</strong><br>
-    {{ $spj->no_ukd }}
-  </div>
+      <div class="col-md-4 mb-3">
+        <strong>No UKD</strong><br>
+        {{ $spj->no_ukd }}
+      </div>
 
-  <div class="col-md-4 mb-3">
-    <strong>Dokumen</strong><br>
-    @if ($spj->dokumen)
-      <a href="{{ $spj->dokumen }}" target="_blank" style="word-break: break-all;">
-        {{ $spj->dokumen }}
-      </a>
-    @else
-      -
-    @endif
-  </div>
+      <div class="col-md-4 mb-3">
+        <strong>Dokumen</strong><br>
+        @if ($spj->dokumen)
+          <a href="{{ $spj->dokumen }}" target="_blank" style="word-break: break-all;">
+            {{ $spj->dokumen }}
+          </a>
+        @else
+          -
+        @endif
+      </div>
 
- <div class="col-md-12 mt-3">
-  <strong>Keterangan</strong>
-  <div class="mt-0" style="white-space: pre-line;">
-  @if($spj->keterangan)
-        {!! nl2br($spj->keterangan) !!}
-      @else
-        -
-      @endif
-  </div>
-</div>
-</div>
+      {{-- Baris 2: Keterangan --}}
+      <div class="col-md-4 mb-3">
+        <strong>Keterangan</strong>
+        <div style="white-space: pre-line;">
+          @if($spj->keterangan)
+            {!! nl2br($spj->keterangan) !!}
+          @else
+            -
+          @endif
+        </div>
+      </div>
+
+      {{-- Baris 3: LS  --}}
+      <div class="col-md-4 mb-3">
+        <strong>Lembaga Sertifikasi</strong><br>
+        {{ $spj->lembaga_sertifikasi }}
+      </div>
+    </div>
+
+
       {{-- Tabel Detail Item --}}
       <div class="table-responsive">
         <table id="tabelSPJDetail" class="table table-bordered table-hover table-striped">

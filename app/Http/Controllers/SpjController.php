@@ -10,6 +10,8 @@ use App\Imports\SpjImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use PhpOffice\PhpWord\TemplateProcessor;
+use Carbon\Carbon;
 
 class SpjController extends Controller
 {
@@ -55,6 +57,7 @@ class SpjController extends Controller
         $request->validate([
             'nama_spj'             => 'required|string|max:255',
             'no_ukd'               => 'nullable|string|max:255',
+            'ls'                  => 'nullable|string',
             'keterangan'           => 'nullable|string',
             'dokumen'              => 'nullable|string|max:255',
             'item.*'               => 'required|string',
@@ -66,6 +69,7 @@ class SpjController extends Controller
         $spj = Spj::create([
             'nama_spj'   => $request->nama_spj,
             'no_ukd'     => $request->no_ukd,
+            'ls'         => $request->ls,
             'keterangan' => $request->keterangan,
             'dokumen'    => $request->dokumen,
         ]);
@@ -114,6 +118,7 @@ class SpjController extends Controller
         $request->validate([
             'nama_spj'             => 'required|string|max:255',
             'no_ukd'               => 'nullable|string|max:255',
+            'ls'                   => 'nullable|string',
             'keterangan'           => 'nullable|string',
             'dokumen'              => 'nullable|string|max:255',
             'item.*'               => 'required|string',
@@ -126,6 +131,7 @@ class SpjController extends Controller
         $spj->update([
             'nama_spj'   => $request->nama_spj,
             'no_ukd'     => $request->no_ukd,
+            'lembaga_sertifikasi'   => $request->lembaga_sertifikasi,
             'keterangan' => $request->keterangan,
             'dokumen'    => $request->dokumen,
         ]);
@@ -167,4 +173,86 @@ class SpjController extends Controller
 
         return redirect()->route('spj.index')->with('success', 'Data berhasil dihapus.');
     }
+public function downloadWord($id)
+{
+    $spj = Spj::with('details')->findOrFail($id);
+
+    $templatePath = public_path('template/template_ekspor_spj.docx');
+    if (!file_exists($templatePath)) {
+        abort(404, 'Template Word tidak ditemukan di: ' . $templatePath);
+    }
+
+    $templateProcessor = new \PhpOffice\PhpWord\TemplateProcessor($templatePath);
+
+    // Fungsi konversi angka ke terbilang
+    function angkaToTerbilang($angka) {
+        $angka = (float)$angka;
+        $bilangan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
+        
+        if ($angka < 12) {
+            return $bilangan[$angka];
+        } elseif ($angka < 20) {
+            return $bilangan[$angka - 10] . ' belas';
+        } elseif ($angka < 100) {
+            return $bilangan[(int)($angka / 10)] . ' puluh ' . $bilangan[$angka % 10];
+        } elseif ($angka < 200) {
+            return 'seratus ' . angkaToTerbilang($angka - 100);
+        } elseif ($angka < 1000) {
+            return $bilangan[(int)($angka / 100)] . ' ratus ' . angkaToTerbilang($angka % 100);
+        } elseif ($angka < 2000) {
+            return 'seribu ' . angkaToTerbilang($angka - 1000);
+        } elseif ($angka < 1000000) {
+            return angkaToTerbilang((int)($angka / 1000)) . ' ribu ' . angkaToTerbilang($angka % 1000);
+        }
+        
+        return 'Angka terlalu besar';
+    }
+
+    // Data umum
+    $templateProcessor->setValue('No_UKD', $spj->no_ukd ?? '-');
+    $templateProcessor->setValue('nominal', number_format($spj->details->sum('nominal') ?? 0, 0, ',', '.'));
+    $templateProcessor->setValue('item', ($spj->details->first()->item ?? '-') . ' dalam rangka Penguatan Penerapan Standardisasi dan Penilaian Kesesuaian');
+    $templateProcessor->setValue('tanggal_ekspor', now()->format('d F Y'));
+    
+    // Konversi nominal ke terbilang
+    $totalNominal = $spj->details->sum('nominal') ?? 0;
+    $terbilang = angkaToTerbilang($totalNominal) . ' rupiah';
+    $templateProcessor->setValue('terbilang', $terbilang);
+
+    $fileName = 'SPJ_' . $spj->no_ukd . '_' . now()->format('YmdHis') . '.docx';
+    $savePath = storage_path('app/public/' . $fileName);
+    $templateProcessor->saveAs($savePath);
+
+    return response()->download($savePath)->deleteFileAfterSend(true);
+}
+
+
+private function terbilang($number)
+{
+    $angka = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+
+    if ($number == 0) {
+        return "nol";
+    } elseif ($number < 12) {
+        return $angka[$number];
+    } elseif ($number < 20) {
+        return $this->terbilang($number - 10) . " belas";
+    } elseif ($number < 100) {
+        return $this->terbilang(floor($number / 10)) . " puluh " . $this->terbilang($number % 10);
+    } elseif ($number < 200) {
+        return "seratus " . $this->terbilang($number - 100);
+    } elseif ($number < 1000) {
+        return $this->terbilang(floor($number / 100)) . " ratus " . $this->terbilang($number % 100);
+    } elseif ($number < 2000) {
+        return "seribu " . $this->terbilang($number - 1000);
+    } elseif ($number < 1000000) {
+        return $this->terbilang(floor($number / 1000)) . " ribu " . $this->terbilang($number % 1000);
+    } elseif ($number < 1000000000) {
+        return $this->terbilang(floor($number / 1000000)) . " juta " . $this->terbilang($number % 1000000);
+    } else {
+        return $this->terbilang(floor($number / 1000000000)) . " miliar " . $this->terbilang($number % 1000000000);
+    }
+}
+
+
 }

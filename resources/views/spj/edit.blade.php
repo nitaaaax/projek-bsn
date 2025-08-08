@@ -30,6 +30,13 @@
             <input type="text" class="form-control" name="no_ukd" value="{{ old('no_ukd', $spj->no_ukd) }}">
           </div>
         </div>
+      
+        {{-- Lembaga Sertifikasi --}}
+        <div class="col-md-6 mb-3">
+            <label for="lembaga_sertifikasi" class="form-label">Lembaga Sertifikasi</label>
+            <input type="text" class="form-control" name="lembaga_sertifikasi" value="{{ old('lembaga_sertifikasi', $spj->lembaga_sertifikasi) }}">
+          </div>
+        </div>
 
         {{-- Keterangan --}}
         <div class="mb-3">

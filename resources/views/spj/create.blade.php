@@ -21,6 +21,12 @@
           </div>
         </div>
 
+         {{-- Lembaga Sertifikasi --}}
+        <div class="mb-4">
+          <label for="ls" class="form-label fw-semibold">Ls</label>
+          <input type="text" name="ls" class="form-control" placeholder="Masukkan Lembaga Sertifikasi">
+        </div>
+
         {{-- Keterangan --}}
         <div class="mb-4">
           <label for="keterangan" class="form-label fw-semibold">Keterangan</label>

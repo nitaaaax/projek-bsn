@@ -1,8 +1,8 @@
-    @extends('layout.app')
+  @extends('layout.app')
 
     @section('content')
     <div class="container mt-4">
-<form action="{{ route('admin.umkm.tahap.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.umkm.tahap.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -99,27 +99,27 @@
                     </div>
 
                    {{-- Status Pembinaan --}}
-<div class="col-md-6">
-    <label class="form-label">Status Pembinaan</label>
-    <select name="status_pembinaan" class="form-control"
-        {{ ($tahap1->status ?? '') == 'Tersertifikasi' ? 'disabled' : '' }}>
-        <option value="">-- Pilih Status Pembinaan --</option>
-        <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
-        <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
-        <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
-        <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
-        <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
-        <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
-        <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
-        <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
-        <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
-    </select>
+                    <div class="col-md-6">
+                        <label class="form-label">Status Pembinaan</label>
+                        <select name="status_pembinaan" class="form-control"
+                            {{ ($tahap1->status ?? '') == 'Tersertifikasi' ? 'disabled' : '' }}>
+                            <option value="">-- Pilih Status Pembinaan --</option>
+                            <option value="Identifikasi awal dan Gap" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Identifikasi awal dan Gap' ? 'selected' : '' }}>1. Identifikasi awal dan Gap</option>
+                            <option value="Set up Sistem" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Set up Sistem' ? 'selected' : '' }}>2. Set up Sistem</option>
+                            <option value="Implementasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Implementasi' ? 'selected' : '' }}>3. Implementasi</option>
+                            <option value="Review Sistem & Audit Internal" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Review Sistem & Audit Internal' ? 'selected' : '' }}>4. Review Sistem & Audit Internal</option>
+                            <option value="Pengajuan Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Pengajuan Sertifikasi' ? 'selected' : '' }}>5. Pengajuan Sertifikasi</option>
+                            <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
+                            <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
+                            <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
+                            <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
+                        </select>
 
-    {{-- supaya tetap terkirim walau select disabled --}}
-    @if(($tahap1->status ?? '') == 'Tersertifikasi')
-        <input type="hidden" name="status_pembinaan" value="{{ $tahap1->status_pembinaan }}">
-    @endif
-</div>
+                        {{-- supaya tetap terkirim walau select disabled --}}
+                        @if(($tahap1->status ?? '') == 'Tersertifikasi')
+                            <input type="hidden" name="status_pembinaan" value="{{ $tahap1->status_pembinaan }}">
+                        @endif
+                    </div>
 
                     {{-- Jenis Usaha --}}
                     <div class="col-md-6">
@@ -190,12 +190,11 @@
                             value="{{ old('jumlah_tenaga_kerja', $tahap2->jumlah_tenaga_kerja ?? '') }}">
                     </div>
 
-                     <div class="col-md-6">
+                    <div class="col-md-6">
                         <label class="form-label">Gruping</label>
                         <input type="text" name="gruping" class="form-control"
                             value="{{ old('gruping', $tahap2->gruping ?? '') }}">
                     </div>
-
 
                     {{-- Link Dokumen --}}
                     <div class="col-12">
@@ -242,6 +241,7 @@
                             <option value="">-- Pilih Kota --</option>
                         </select>
                     </div>
+                    
                     {{-- Tahun Pendirian --}}
                     <div class="col-md-6">
                         <label class="form-label">Tahun Pendirian</label>
@@ -255,244 +255,224 @@
                             value="{{ old('sni_yang_diterapkan', $tahap2->sni_yang_diterapkan ?? '') }}">
                     </div>
 
-                 {{-- Legalitas Usaha --}}
-               @php
-                    $legalitasOptions = [
-                        'NIB', 'SIUP', 'NPWP Pemilik', 'Akta Pendirian Usaha',
-                        'IUMK', 'TDP', 'NPWP Badan usaha'
-                    ];
-                    
-                    $legalitasData = $tahap2->legalitas_usaha ?? '[]';
-                    $selectedLegalitas = is_array($legalitasData) 
-                        ? $legalitasData 
-                        : (str_starts_with($legalitasData, '[') 
-                            ? json_decode($legalitasData, true) 
-                            : explode(',', $legalitasData));
-                    
-                    // Check if there are any custom values
-                    $hasCustomLegalitas = !empty(array_diff($selectedLegalitas, $legalitasOptions));
-                    $customLegalitas = $hasCustomLegalitas 
-                        ? implode(', ', array_diff($selectedLegalitas, $legalitasOptions))
-                        : '';
+                    {{-- legalitas usaha--}}
+                    @php
+                        $legalitasOptions = [
+                            'NIB', 'SIUP', 'NPWP Pemilik', 'Akta Pendirian Usaha',
+                            'IUMK', 'TDP', 'NPWP Badan usaha'
+                        ];
 
-                    $customLegalitas = $hasCustomLegalitas 
-                        ? str_replace('lainnya,', '', implode(', ', array_diff($selectedLegalitas, $legalitasOptions)))
-                        : '';
-                @endphp
+                        $legalitasData = $tahap2->legalitas_usaha ?? '[]';
+                        $selectedLegalitas = is_array($legalitasData) 
+                            ? $legalitasData 
+                            : (str_starts_with($legalitasData, '[') 
+                                ? json_decode($legalitasData, true) 
+                                : explode(',', $legalitasData));
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Legalitas Usaha</label>
-                    
-                    <!-- Standard Options -->
-                    <div class="row">
-                        @foreach(array_chunk($legalitasOptions, 4) as $chunk)
-                            <div class="col-md-6">
-                                @foreach($chunk as $option)
-                                    <div class="form-check">
-                                        <input class="form-check-input" 
-                                            type="checkbox" 
-                                            name="legalitas_usaha[]" 
-                                            value="{{ $option }}"
-                                            {{ in_array($option, $selectedLegalitas) ? 'checked' : '' }}>
-                                        <label class="form-check-label">{{ $option }}</label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Single Custom Field -->
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" 
-                            type="checkbox" 
-                            id="legalitas_lainnya_toggle"
-                            {{ !empty($customLegalitas) ? 'checked' : '' }}>
-                        <label class="form-check-label">Lainnya</label>
-                    </div>
-                    
-                    <div id="legalitas_lainnya_container" style="{{ !empty($customLegalitas) ? '' : 'display:none' }}" class="mt-2">
-                        <input type="text" 
-                            name="legalitas_lainnya" 
-                            class="form-control" 
-                            value="{{ trim($customLegalitas) }}"
-                            placeholder="Masukkan legalitas lainnya">
-                    </div>
-                </div>
-        
-                {{-- Sertifikat yang Dimiliki --}}
-                @php
-                    $sertifikatOptions = ['PIRT', 'MD', 'Halal'];
-                    
-                    $sertifikatData = $tahap2->sertifikat ?? '[]';
-                    $selectedSertifikat = is_array($sertifikatData) 
-                        ? $sertifikatData 
-                        : (str_starts_with($sertifikatData, '[') 
-                            ? json_decode($sertifikatData, true) 
-                            : explode(',', $sertifikatData));
-                    
-                    // Get first custom value (if any)
-                    $customSertifikat = '';
-                    foreach($selectedSertifikat as $item) {
-                        if(!in_array($item, $sertifikatOptions) && !empty(trim($item))) {
-                            $customSertifikat = $item;
-                            break;
+                        $customLegalitas = '';
+                        foreach ($selectedLegalitas as $item) {
+                            if (!in_array($item, $legalitasOptions) && !empty(trim($item))) {
+                                $customLegalitas = $item;
+                                break;
+                            }
                         }
-                    }
-                @endphp
+                    @endphp
 
-                <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Sertifikat yang Dimiliki</label>
-                    
-                    <!-- Standard Options -->
-                    <div class="row">
-                        @foreach(array_chunk($sertifikatOptions, 3) as $chunk)
-                            <div class="col-md-6">
-                                @foreach($chunk as $option)
-                                    <div class="form-check">
-                                        <input class="form-check-input" 
-                                            type="checkbox" 
-                                            name="sertifikat[]" 
-                                            value="{{ $option }}"
-                                            {{ in_array($option, $selectedSertifikat) ? 'checked' : '' }}>
-                                        <label class="form-check-label">{{ $option }}</label>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Single Custom Field -->
-                    <div class="form-check mt-3">
-                        <input class="form-check-input" 
-                            type="checkbox" 
-                            id="sertifikat_lainnya_toggle"
-                            {{ !empty($customSertifikat) ? 'checked' : '' }}>
-                        <label class="form-check-label">Lainnya</label>
-                    </div>
-                    
-                    <div id="sertifikat_lainnya_container" style="{{ !empty($customSertifikat) ? '' : 'display:none' }}" class="mt-2">
-                        <input type="text" 
-                            name="sertifikat_lainnya" 
-                            class="form-control" 
-                            value="{{ $customSertifikat }}"
-                            placeholder="Masukkan sertifikat lainnya">
-                    </div>
-                </div>
-                    <div class="row">
-                            <!-- Left Column - Instansi -->
-                          <div class="col-md-6 mb-3 ps-3">
-                            <label class="form-label fw-bold">Instansi Pembina</label>
-                            @php
-                                // Ambil data instansi dari model
-                                $instansiData = [];
-                                if (!empty($tahap2->instansi)) {
-                                    $instansiData = is_array($tahap2->instansi)
-                                        ? $tahap2->instansi
-                                        : json_decode($tahap2->instansi, true);
-                                }
-
-                                $instansiData = is_array($instansiData) ? $instansiData : [];
-
-                                $standardInstansi = ['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'];
-                                $customInstansi = array_diff_key($instansiData, array_flip($standardInstansi));
-                                $hasCustomInstansi = !empty($customInstansi);
-                                $instansiLainnya = $hasCustomInstansi ? implode(', ', array_values($customInstansi)) : '';
-                            @endphp
-
-                            @foreach($standardInstansi as $option)
-                                <div class="form-check mb-2 d-flex align-items-center">
-                                    <input class="form-check-input me-2"
-                                        type="checkbox"
-                                        name="instansi_check[]"
-                                        value="{{ $option }}"
-                                        {{ array_key_exists($option, $instansiData) ? 'checked' : '' }}>
-                                    <label class="form-check-label me-2" style="min-width: 150px">{{ $option }}</label>
-                                    <input type="text"
-                                        class="form-control form-control-sm"
-                                        name="instansi_detail[{{ $option }}]"
-                                        value="{{ $instansiData[$option] ?? '' }}"
-                                        placeholder="Detail {{ $option }}">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Legalitas Usaha</label>
+                        <div class="row">
+                            @foreach(array_chunk($legalitasOptions, 4) as $chunk)
+                                <div class="col-md-6">
+                                    @foreach($chunk as $option)
+                                        <div class="form-check">
+                                            <input class="form-check-input" 
+                                                type="checkbox" 
+                                                name="legalitas_usaha[]" 
+                                                value="{{ $option }}"
+                                                {{ in_array($option, $selectedLegalitas) ? 'checked' : '' }}>
+                                            <label class="form-check-label">{{ $option }}</label>
+                                        </div>
+                                    @endforeach
                                 </div>
                             @endforeach
+                        </div>
 
-                            <!-- Lainnya -->
-                            <div class="form-check mb-2 d-flex align-items-center">
-                                <input class="form-check-input me-2"
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" 
+                                type="checkbox" 
+                                name="legalitas_usaha[]" 
+                                value="lainnya"
+                                id="legalitas_lainnya_toggle"
+                                {{ !empty($customLegalitas) ? 'checked' : '' }}>
+                            <label class="form-check-label">Lainnya</label>
+                        </div>
+                        
+                        <div id="legalitas_lainnya_container" style="{{ !empty($customLegalitas) ? '' : 'display:none' }}" class="mt-2">
+                            <input type="text" 
+                                name="legalitas_usaha_lainnya" 
+                                class="form-control" 
+                                value="{{ trim($customLegalitas) }}"
+                                placeholder="Masukkan legalitas lainnya">
+                        </div>
+                    </div>
+
+                    {{-- Sertifikat yang Dimiliki --}}
+                    @php
+                        $sertifikatOptions = ['PIRT', 'MD', 'Halal'];
+                        $sertifikatData = $tahap2->sertifikat ?? '[]';
+                        $selectedSertifikat = is_array($sertifikatData) 
+                            ? $sertifikatData 
+                            : (str_starts_with($sertifikatData, '[') 
+                                ? json_decode($sertifikatData, true) 
+                                : explode(',', $sertifikatData));
+
+                        $customSertifikat = '';
+                        foreach($selectedSertifikat as $item) {
+                            if(!in_array($item, $sertifikatOptions) && !empty(trim($item))) {
+                                $customSertifikat = $item;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Sertifikat yang Dimiliki</label>
+                        <div class="row">
+                            @foreach(array_chunk($sertifikatOptions, 3) as $chunk)
+                                <div class="col-md-6">
+                                    @foreach($chunk as $option)
+                                        <div class="form-check">
+                                            <input class="form-check-input" 
+                                                type="checkbox" 
+                                                name="sertifikat[]" 
+                                                value="{{ $option }}"
+                                                {{ in_array($option, $selectedSertifikat) ? 'checked' : '' }}>
+                                            <label class="form-check-label">{{ $option }}</label>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" 
+                                type="checkbox" 
+                                name="sertifikat[]" 
+                                value="lainnya"
+                                id="sertifikat_lainnya_toggle"
+                                {{ !empty($customSertifikat) ? 'checked' : '' }}>
+                            <label class="form-check-label">Lainnya</label>
+                        </div>
+                        
+                        <div id="sertifikat_lainnya_container" style="{{ !empty($customSertifikat) ? '' : 'display:none' }}" class="mt-2">
+                            <input type="text" 
+                                name="sertifikat_lainnya" 
+                                class="form-control" 
+                                value="{{ $customSertifikat }}"
+                                placeholder="Masukkan sertifikat lainnya">
+                        </div>
+                    </div>
+
+                    {{-- Instansi Pembina --}}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-bold">Instansi Pembina</label>
+                        @php
+                            $instansiData = is_array($tahap2->instansi)
+                                ? $tahap2->instansi
+                                : (json_decode($tahap2->instansi, true) ?? []);
+
+                            $standardInstansi = ['Dinas', 'Kementerian', 'Perguruan Tinggi', 'Komunitas'];
+                            $customInstansi = array_diff_key($instansiData, array_flip($standardInstansi));
+                            $instansiLainnya = !empty($customInstansi) ? implode(', ', $customInstansi) : '';
+                        @endphp
+
+                        @foreach($standardInstansi as $option)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
                                     type="checkbox"
                                     name="instansi_check[]"
-                                    value="Lainnya"
-                                    {{ $hasCustomInstansi ? 'checked' : '' }}>
-                                <label class="form-check-label me-2" style="min-width: 150px">Lainnya</label>
+                                    value="{{ $option }}"
+                                    id="instansi_{{ $option }}"
+                                    {{ array_key_exists($option, $instansiData) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="instansi_{{ $option }}">{{ $option }}</label>
                                 <input type="text"
-                                    class="form-control form-control-sm"
-                                    name="instansi_detail[Lainnya]"
-                                    value="{{ $instansiLainnya }}"
-                                    placeholder="Instansi lainnya (pisahkan dengan koma)">
+                                    class="form-control mt-1"
+                                    name="instansi_detail[{{ $option }}]"
+                                    value="{{ $instansiData[$option] ?? '' }}"
+                                    placeholder="Detail {{ $option }}">
                             </div>
+                        @endforeach
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                type="checkbox"
+                                name="instansi_check[]"
+                                value="Lainnya"
+                                id="instansi_lainnya"
+                                {{ !empty($instansiLainnya) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="instansi_lainnya">Lainnya</label>
+                            <input type="text"
+                                class="form-control mt-1"
+                                name="instansi_detail[Lainnya]"
+                                value="{{ $instansiLainnya }}"
+                                placeholder="Instansi lainnya (pisahkan dengan koma)">
                         </div>
-
-                        <!-- Right Column - Jangkauan Pemasaran -->
-                        <div class="col-md-6 mb-3 ps-3">
-                            <label class="form-label fw-bold">Jangkauan Pemasaran</label>
-                            @php
-                                // Ambil data jangkauan dari model
-                                $jangkauanData = [];
-                                if (!empty($tahap2->jangkauan_pemasaran)) {
-                                    $jangkauanData = is_array($tahap2->jangkauan_pemasaran)
-                                        ? $tahap2->jangkauan_pemasaran
-                                        : json_decode($tahap2->jangkauan_pemasaran, true);
-                                }
-
-                                $jangkauanData = is_array($jangkauanData) ? $jangkauanData : [];
-
-                                $standardJangkauan = ['Local', 'Nasional', 'Internasional'];
-                                $customJangkauan = array_diff_key($jangkauanData, array_flip($standardJangkauan));
-                                $hasCustomJangkauan = !empty($customJangkauan);
-                                $jangkauanLainnya = $hasCustomJangkauan ? implode(', ', array_values($customJangkauan)) : '';
-                            @endphp
-
-                            @foreach($standardJangkauan as $option)
-                                <div class="form-check mb-2 d-flex align-items-center">
-                                    <input class="form-check-input me-2" 
-                                        type="checkbox" 
-                                        name="jangkauan_pemasaran[]" 
-                                        value="{{ $option }}"
-                                        {{ array_key_exists($option, $jangkauanData) ? 'checked' : '' }}>
-                                    <label class="form-check-label me-2" style="min-width: 100px">{{ $option }}</label>
-                                    <input type="text"
-                                        class="form-control form-control-sm"
-                                        name="jangkauan_detail[{{ $option }}]"
-                                        value="{{ $jangkauanData[$option] ?? '' }}"
-                                        placeholder="Detail {{ $option }}">
-                                </div>
-                            @endforeach
-
-                            <!-- Lainnya -->
-                            <div class="form-check mb-2 d-flex align-items-center">
-                                <input class="form-check-input me-2" 
-                                    type="checkbox" 
-                                    name="jangkauan_pemasaran[]" 
-                                    value="Lainnya"
-                                    {{ $hasCustomJangkauan ? 'checked' : '' }}>
-                                <label class="form-check-label me-2" style="min-width: 100px">Lainnya</label>
-                                <input type="text"
-                                    class="form-control form-control-sm"
-                                    name="jangkauan_pemasaran_lainnya"
-                                    value="{{ $jangkauanLainnya }}"
-                                    placeholder="Jangkauan lainnya (pisahkan dengan koma)">
-                            </div>
-                        </div>
-
                     </div>
 
-                    </div>
-                    @php
-                        $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
-                        $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-                    @endphp
-                    {{-- Foto Produk --}}
+                    {{-- Jangkauan Pemasaran --}}
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
+                        <label class="form-label fw-bold">Jangkauan Pemasaran</label>
+                        @php
+                            $jangkauanData = [];
+                            if (!empty($tahap2->jangkauan_pemasaran)) {
+                                $jangkauanData = is_array($tahap2->jangkauan_pemasaran)
+                                    ? $tahap2->jangkauan_pemasaran
+                                    : json_decode($tahap2->jangkauan_pemasaran, true);
+                            }
+
+                            $jangkauanData = is_array($jangkauanData) ? $jangkauanData : [];
+                            $standardJangkauan = ['Local', 'Nasional', 'Internasional'];
+                            $customJangkauan = array_diff_key($jangkauanData, array_flip($standardJangkauan));
+                            $hasCustomJangkauan = !empty($customJangkauan);
+                            $jangkauanLainnya = $hasCustomJangkauan ? implode(', ', array_values($customJangkauan)) : '';
+                        @endphp
+
+                        @foreach($standardJangkauan as $option)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input"
+                                    type="checkbox"
+                                    name="jangkauan_pemasaran[]"
+                                    value="{{ $option }}"
+                                    id="jangkauan_{{ $option }}"
+                                    {{ array_key_exists($option, $jangkauanData) ? 'checked' : '' }}>
+                                <label class="form-check-label" for="jangkauan_{{ $option }}">{{ $option }}</label>
+                                <input type="text"
+                                    class="form-control mt-1"
+                                    name="jangkauan_detail[{{ $option }}]"
+                                    value="{{ $jangkauanData[$option] ?? '' }}"
+                                    placeholder="Detail {{ $option }}">
+                            </div>
+                        @endforeach
+
+                        <div class="form-check mb-2">
+                            <input class="form-check-input"
+                                type="checkbox"
+                                name="jangkauan_pemasaran[]"
+                                value="Lainnya"
+                                id="jangkauan_lainnya"
+                                {{ $hasCustomJangkauan ? 'checked' : '' }}>
+                            <label class="form-check-label" for="jangkauan_lainnya">Lainnya</label>
+                            <input type="text"
+                                class="form-control mt-1"
+                                name="jangkauan_pemasaran_lainnya"
+                                value="{{ $jangkauanLainnya }}"
+                                placeholder="Jangkauan lainnya (pisahkan dengan koma)">
+                        </div>
+                    </div>
+
+                    {{-- Foto Produk --}}
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-bold">Foto Produk (bisa lebih dari satu)</label>
                         <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
 
                         <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
@@ -502,9 +482,7 @@
                                         <img src="{{ asset('storage/' . $foto) }}"
                                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
                                             class="img-thumbnail">
-
                                         <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
-
                                         <button type="button"
                                                 class="btn btn-sm btn-danger p-1 btn-remove-old"
                                                 style="position: absolute; top: 0; right: 0;">
@@ -520,8 +498,8 @@
                     </div>
 
                     {{-- Foto Tempat Produksi --}}
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
+                    <div class="col-12 mb-3">
+                        <label class="form-label fw-bold">Foto Tempat Produksi (bisa lebih dari satu)</label>
                         <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
 
                         <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
@@ -529,10 +507,14 @@
                                 @foreach ($foto_tempat_produksi as $foto)
                                     <div class="position-relative me-2 mb-2 old-foto-tempat">
                                         <img src="{{ asset('storage/' . $foto) }}"
-                                            class="me-2 mb-2"
-                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
+                                            class="img-thumbnail">
                                         <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
-                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-danger p-1 btn-remove-old" 
+                                                style="position: absolute; top: 0; right: 0;">
+                                            &times;
+                                        </button>
                                     </div>
                                 @endforeach
                             @else
@@ -540,15 +522,19 @@
                             @endif
                         </div>
                         <div id="preview-tempat" class="mt-2 d-flex flex-wrap"></div>
+                    </div>
 
-                         {{-- Tombol Submit dan Kembali --}}
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
+                    {{-- Tombol Submit dan Kembali --}}
+                    <div class="col-12 d-flex justify-content-start gap-2">
+                         <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm rounded-pill px-3" title="Kembali">
                             <i class="fas fa-arrow-left"></i> Kembali
                         </a>
                         <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4" title="Simpan Perubahan">
                             <i class="fas fa-save"></i> Simpan
                         </button>
                     </div>
+                </div>
+            </div>
                     </div>
                     </div>
                     </div>
@@ -584,7 +570,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle instansi detail inputs
         document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
-            const target = document.getElementById(`instansi_input_${checkbox.value.toLowerCase()}`);
+            const target = document.getElementById(instansi_input_${checkbox.value.toLowerCase()});
             checkbox.addEventListener('change', function() {
                 target.style.display = this.checked ? 'block' : 'none';
             });
@@ -601,8 +587,8 @@
 
         // Toggle lainnya inputs
         ['instansi', 'jangkauan'].forEach(section => {
-            const toggle = document.getElementById(`${section}_lainnya_toggle`);
-            const input = document.getElementById(`${section}_lainnya_input`);
+            const toggle = document.getElementById(${section}_lainnya_toggle);
+            const input = document.getElementById(${section}_lainnya_input);
             
             toggle.addEventListener('change', function() {
                 input.style.display = this.checked ? 'block' : 'none';
@@ -618,7 +604,7 @@
     document.addEventListener('DOMContentLoaded', function() {
     // Toggle instansi detail inputs
     document.querySelectorAll('[name^="instansi_check"]').forEach(checkbox => {
-        const target = document.getElementById(`instansi_input_${checkbox.value.toLowerCase()}`);
+        const target = document.getElementById(instansi_input_${checkbox.value.toLowerCase()});
         checkbox.addEventListener('change', function() {
             target.style.display = this.checked ? 'block' : 'none';
         });
@@ -635,8 +621,8 @@
 
     // Toggle lainnya inputs
     ['instansi', 'jangkauan'].forEach(type => {
-        const toggle = document.getElementById(`${type}_lainnya_toggle`);
-        const input = document.getElementById(`${type}_lainnya_input`);
+        const toggle = document.getElementById(${type}_lainnya_toggle);
+        const input = document.getElementById(${type}_lainnya_input);
         toggle.addEventListener('change', function() {
             input.style.display = this.checked ? 'block' : 'none';
             if (!this.checked) input.value = '';
@@ -656,10 +642,10 @@
         // Load semua provinsi
         $.get("{{ url('admin/umkm-proses/get-provinsi') }}", function (provinsiList) {
             $.each(provinsiList, function (index, provinsi) {
-                const option = `<option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>`;
+                const option = <option value="${provinsi.id}" ${provinsi.id == selectedProvKantor ? 'selected' : ''}>${provinsi.nama}</option>;
                 $('#provinsi_kantor').append(option);
 
-                const option2 = `<option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>`;
+                const option2 = <option value="${provinsi.id}" ${provinsi.id == selectedProvPabrik ? 'selected' : ''}>${provinsi.nama}</option>;
                 $('#provinsi_pabrik').append(option2);
             });
 
@@ -677,10 +663,10 @@
             const provId = $(this).val();
             $('#kota_kantor').empty().append('<option value="">-- Pilih Kota --</option>');
             if (provId) {
-                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                $.get({{ url('admin/umkm-proses/get-kota') }}/${provId}, function (kotaList) {
                     $.each(kotaList, function (index, kota) {
                         const selected = kota.id == selectedKotaKantor ? 'selected' : '';
-                        $('#kota_kantor').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
+                        $('#kota_kantor').append(<option value="${kota.id}" ${selected}>${kota.nama}</option>);
                     });
                 });
             }
@@ -691,10 +677,10 @@
             const provId = $(this).val();
             $('#kota_pabrik').empty().append('<option value="">-- Pilih Kota --</option>');
             if (provId) {
-                $.get(`{{ url('admin/umkm-proses/get-kota') }}/${provId}`, function (kotaList) {
+                $.get({{ url('admin/umkm-proses/get-kota') }}/${provId}, function (kotaList) {
                     $.each(kotaList, function (index, kota) {
                         const selected = kota.id == selectedKotaPabrik ? 'selected' : '';
-                        $('#kota_pabrik').append(`<option value="${kota.id}" ${selected}>${kota.nama}</option>`);
+                        $('#kota_pabrik').append(<option value="${kota.id}" ${selected}>${kota.nama}</option>);
                     });
                 });
             }
@@ -779,9 +765,9 @@
             initToggleSection('sertifikat');
             
             function initToggleSection(type) {
-                const toggle = document.getElementById(`${type}_lainnya_toggle`);
-                const container = document.getElementById(`custom_${type}_container`);
-                const addBtn = document.getElementById(`add_custom_${type}`);
+                const toggle = document.getElementById(${type}_lainnya_toggle);
+                const container = document.getElementById(custom_${type}_container);
+                const addBtn = document.getElementById(add_custom_${type});
                 
                 if (toggle && container) {
                     // Toggle visibility
@@ -793,14 +779,14 @@
                     addBtn?.addEventListener('click', function() {
                         const newField = document.createElement('div');
                         newField.className = 'input-group mb-2';
-                        newField.innerHTML = `
+                        newField.innerHTML = 
                             <input type="text" name="${type}_custom[]" 
                                 class="form-control form-control-sm" 
                                 placeholder="Masukkan ${type} lainnya">
                             <button type="button" class="btn btn-sm btn-outline-danger remove-custom-item">
                                 &times;
                             </button>
-                        `;
+                        ;
                         container.insertBefore(newField, this);
                     });
                 }
@@ -885,5 +871,38 @@
             }
         });
         </script>
+
+        <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function toggleTextbox(checkbox, textbox) {
+            if (checkbox.checked) {
+                textbox.style.display = 'block';
+            } else {
+                textbox.style.display = 'none';
+                textbox.value = ''; // Kosongkan saat tidak dicentang
+            }
+        }
+
+        // Loop semua checkbox & input di Instansi Pembina
+        document.querySelectorAll('input[name="instansi_check[]"]').forEach(function (cb) {
+            let textbox = cb.closest('.form-check').querySelector('input[type="text"]');
+            toggleTextbox(cb, textbox); // Set awal
+
+            cb.addEventListener('change', function () {
+                toggleTextbox(cb, textbox);
+            });
+        });
+
+        // Loop semua checkbox & input di Jangkauan Pemasaran
+        document.querySelectorAll('input[name="jangkauan_pemasaran[]"]').forEach(function (cb) {
+            let textbox = cb.closest('.form-check').querySelector('input[type="text"]');
+            toggleTextbox(cb, textbox); // Set awal
+
+            cb.addEventListener('change', function () {
+                toggleTextbox(cb, textbox);
+            });
+        });
+    });
+    </script>
     
     @endpush
