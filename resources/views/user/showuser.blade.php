@@ -171,25 +171,30 @@
               <td>
                 @php
                   $foto_produk = [];
+                  $has_product_photo = false;
                   if (!empty($tahap2->foto_produk)) {
                     $foto_produk = is_array($tahap2->foto_produk)
                         ? $tahap2->foto_produk
                         : json_decode($tahap2->foto_produk, true);
+                    $has_product_photo = count($foto_produk) > 0;
                   }
                 @endphp
 
-                @if(count($foto_produk) > 0)
+                @if($has_product_photo)
                   <div class="d-flex flex-wrap">
                     @foreach($foto_produk as $foto)
                       <img src="{{ asset('storage/' . $foto) }}" 
                           class="img-thumbnail m-1" 
                           width="120" 
                           alt="Foto Produk"
-                          onerror="this.onerror=null;this.src='{{ asset('asset/dist/img/no-image.jpg') }}';">
+                          onerror="this.onerror=null;this.src='{{ asset('public/asset/dist/img/no-image.jpg') }}';">
                     @endforeach
                   </div>
                 @else
-                  <span class="text-muted">-</span>
+                  <img src="{{ asset('public/asset/dist/img/no-image.jpg') }}" 
+                      class="img-thumbnail" 
+                      width="120" 
+                      alt="No Product Image">
                 @endif
               </td>
             </tr>
@@ -200,25 +205,30 @@
               <td>
                 @php
                   $foto_tempat = [];
+                  $has_place_photo = false;
                   if (!empty($tahap2->foto_tempat_produksi)) {
                     $foto_tempat = is_array($tahap2->foto_tempat_produksi)
                         ? $tahap2->foto_tempat_produksi
                         : json_decode($tahap2->foto_tempat_produksi, true);
+                    $has_place_photo = count($foto_tempat) > 0;
                   }
                 @endphp
 
-                @if(count($foto_tempat) > 0)
+                @if($has_place_photo)
                   <div class="d-flex flex-wrap">
                     @foreach($foto_tempat as $foto)
                       <img src="{{ asset('storage/' . $foto) }}" 
                           class="img-thumbnail m-1" 
                           width="120" 
                           alt="Foto Tempat Produksi"
-                          onerror="this.onerror=null;this.src='{{ asset('asset/dist/img/no-image.jpg') }}';">
+                          onerror="this.onerror=null;this.src='{{ asset('public/asset/dist/img/no-image.jpg') }}';">
                     @endforeach
                   </div>
                 @else
-                  <span class="text-muted">-</span>
+                  <img src="{{ asset('public/asset/dist/img/no-image.jpg') }}" 
+                      class="img-thumbnail" 
+                      width="120" 
+                      alt="No Production Place Image">
                 @endif
               </td>
             </tr>
