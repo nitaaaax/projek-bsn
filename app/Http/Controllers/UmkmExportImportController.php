@@ -38,30 +38,22 @@
         $template = new TemplateProcessor($templatePath);
 
         // --- Jangkauan Pemasaran ---
-        $jangkauanRaw = $tahap2->jangkauan_pemasaran ?? '[]';
+        $jangkauanRaw = $tahap2->jangkauan_pemasaran ?? '{}';
         $jangkauanArr = [];
-        if (is_array($jangkauanRaw)) {
-            $jangkauanArr = $jangkauanRaw;
-        } else {
-            $decoded = json_decode($jangkauanRaw, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $jangkauanArr = $decoded;
-            }
+        $decoded = json_decode($jangkauanRaw, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $jangkauanArr = $decoded;
         }
+
         $jangkauanKeys = ['Local', 'Nasional', 'Internasional', 'Lainnya'];
-        foreach ($jangkauanKeys as $key) {
-            if (!array_key_exists($key, $jangkauanArr)) {
-                $jangkauanArr[$key] = null;
-            }
+        $jangkauanLabels = ['a. Local', 'b. Nasional', 'c. Internasional', 'd. Lainnya'];
+        $jangkauanFormatted = '';
+
+        foreach ($jangkauanKeys as $index => $key) {
+            $value = $jangkauanArr[$key] ?? null;
+            $jangkauanFormatted .= $jangkauanLabels[$index] . "\n" .
+                (!empty(trim($value ?? '')) ? $value : '-') . "\n\n";
         }
-        $jangkauanFormatted = "a. Local\n" .
-            (trim($jangkauanArr['Local']) !== '' ? $jangkauanArr['Local'] : "-") . "\n\n" .
-            "b. Nasional\n" .
-            (trim($jangkauanArr['Nasional']) !== '' ? $jangkauanArr['Nasional'] : "-") . "\n\n" .
-            "c. Internasional\n" .
-            (trim($jangkauanArr['Internasional']) !== '' ? $jangkauanArr['Internasional'] : "-") . "\n\n" .
-            "d. Lainnya\n" .
-            (trim($jangkauanArr['Lainnya']) !== '' ? $jangkauanArr['Lainnya'] : "-") . "\n\n";
 
         // --- Instansi ---
         $instansiRaw = $tahap2->instansi ?? '{}';

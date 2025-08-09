@@ -126,17 +126,21 @@
                           ? (is_array($tahap2->sertifikat) ? $tahap2->sertifikat : json_decode($tahap2->sertifikat, true))
                           : [];
 
-                     $sertifikatFormatted = [];
-                        for ($i = 0; $i < count($sertifikatData); $i++) {
-                            $val = trim($sertifikatData[$i]);
-                            if (strcasecmp($val, 'lainnya') === 0 && isset($sertifikatData[$i+1])) {
-                                $sertifikatFormatted[] = 'Lainnya: ' . trim($sertifikatData[++$i]);
-                            } else {
-                                // kalau sudah "Lainnya: ..." biarkan
-                                $sertifikatFormatted[] = $val;
-                            }
-                        }
+                      $sertifikatFormatted = [];
+                      foreach ($sertifikatData as $val) {
+                          $val = trim($val);
+
+                          // Deteksi kalau diawali "lainnya" (case-insensitive)
+                          if (stripos($val, 'lainnya') === 0) {
+                              // Ambil teks setelah kata "lainnya"
+                              $after = trim(substr($val, strlen('lainnya')));
+                              $sertifikatFormatted[] = 'Lainnya: ' . ($after ?: '-');
+                          } else {
+                              $sertifikatFormatted[] = $val;
+                          }
+                      }
                   @endphp
+
                   @if($sertifikatFormatted)
                       <ul class="mb-0">
                           @foreach($sertifikatFormatted as $item)
