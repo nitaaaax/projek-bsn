@@ -71,34 +71,36 @@ use App\Http\Controllers\{
         Route::post('/users/{id}/update-role', [UserController::class, 'updateRole'])->name('users.updateRole');
         Route::post('/users/{id}/reset-password', [UserController::class, 'resetPassword'])->name('users.resetPassword');
 
-        // UMKM Proses (Admin full akses Tahap 1 & 2)
-        Route::prefix('umkm-proses')->name('umkm.')->group(function () {
-            Route::get('/get-provinsi', [UMKMProsesController::class, 'getProvinsi'])->name('get.provinsi');
-            Route::get('/get-kota/{provinsi_id}', [UMKMProsesController::class, 'getKota'])->name('get.kota');
+    // UMKM Proses (Admin full akses Tahap 1 & 2)
+    Route::prefix('umkm-proses')->name('umkm.')->group(function () {
 
-            Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
-            Route::get('/create', [ContcreateUmkm::class, 'create'])->name('create');
-            Route::get('umkm/create/tahap/{tahap}/{id?}', [ContcreateUmkm::class, 'showTahap'])->name('create.tahap');
-            Route::post('/store/{tahap}/{id?}', [ContcreateUmkm::class, 'store'])->name('store');
+        // Dropdown wilayah
+        Route::get('/get-provinsi', [UMKMProsesController::class, 'getProvinsi'])->name('get.provinsi');
+        Route::get('/get-kota/{provinsi_id}', [UMKMProsesController::class, 'getKota'])->name('get.kota');
 
-            Route::get('/{id}/edit', [UMKMProsesController::class, 'edit'])->name('edit');
-            Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
-            Route::get('/{id}', [UMKMProsesController::class, 'show'])->name('show');
+        // CRUD
+        Route::get('/', [ContcreateUmkm::class, 'index'])->name('index');
+        Route::get('/create', [ContcreateUmkm::class, 'show'])->name('create'); // satu form untuk Tahap 1 & 2
+        Route::post('/store', [ContcreateUmkm::class, 'store'])->name('store'); // satu proses penyimpanan
 
-            Route::get('/tahap-form/{tahap}/{id?}', [UMKMProsesController::class, 'createTahap'])->name('create.tahap.form');
-            Route::put('/tahap/update/{id}', [UMKMProsesController::class, 'update'])->name('tahap.update');
+        Route::get('/{id}/edit', [UMKMProsesController::class, 'edit'])->name('edit');
+        Route::delete('/{id}', [UMKMProsesController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}', [UMKMProsesController::class, 'show'])->name('show');
 
-            // import excel
-            Route::post('/import', [UmkmExportImportController::class, 'importExcel'])->name('import');
-        });
+        // Update Tahap (kalau masih butuh terpisah, tapi idealnya juga di-merge)
+        Route::put('/update/{id}', [UMKMProsesController::class, 'update'])->name('update');
 
-        // UMKM Sertifikasi
-        Route::prefix('umkm-sertifikasi')->name('sertifikasi.')->group(function () {
-            Route::get('/', [UMKMSertifikasiController::class, 'index'])->name('index');
-            Route::get('/{id}/edit', [UMKMSertifikasiController::class, 'edit'])->name('edit');
-            Route::put('/update/{id}', [UMKMSertifikasiController::class, 'update'])->name('update');
-            Route::delete('/{id}', [UMKMSertifikasiController::class, 'destroy'])->name('destroy');
-        });
+        // Import Excel
+        Route::post('/import', [UmkmExportImportController::class, 'importExcel'])->name('import');
+    });
+
+    // UMKM Sertifikasi
+    Route::prefix('umkm-sertifikasi')->name('sertifikasi.')->group(function () {
+        Route::get('/', [UMKMSertifikasiController::class, 'index'])->name('index');
+        Route::get('/{id}/edit', [UMKMSertifikasiController::class, 'edit'])->name('edit');
+        Route::put('/update/{id}', [UMKMSertifikasiController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UMKMSertifikasiController::class, 'destroy'])->name('destroy');
+    });
 
         // SPJ (Admin)
         Route::prefix('spj')->name('spj.')->group(function () {

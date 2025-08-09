@@ -101,7 +101,7 @@
                     {{-- Status Pembinaan --}}
                     @php
                         $statusPembinaan = old('status_pembinaan', $tahap1->status_pembinaan ?? $sertifikasi->status_pembinaan ?? '');
-                        $isDisabled = ($statusPembinaan === 'SPPT SNI');
+                        $isDisabled = ($statusPembinaan === 'SPPT SNI (TERSERTIFIKASI)');
                     @endphp
                     <div class="col-md-6">
                         <label class="form-label">Status Pembinaan</label>
@@ -115,7 +115,7 @@
                             <option value="Perbaikan Temuan Audit" {{ $statusPembinaan == 'Perbaikan Temuan Audit' ? 'selected' : '' }}> Perbaikan Temuan Audit</option>
                             <option value="Perbaikan Lokasi" {{ $statusPembinaan == 'Perbaikan Lokasi' ? 'selected' : '' }}> Perbaikan Lokasi</option>
                             <option value="Monitoring Pasca Sertifikasi" {{ $statusPembinaan == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}> Monitoring Pasca Sertifikasi</option>
-                            <option value="SPPT SNI" {{ $statusPembinaan == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;"> SPPT SNI (TERSERTIFIKASI)</option>
+                            <option value="SPPT SNI (TERSERTIFIKASI)" {{ $statusPembinaan == 'SPPT SNI (TERSERTIFIKASI)' ? 'selected' : '' }} style="color: green; font-weight: bold;"> SPPT SNI (TERSERTIFIKASI)</option>
                         </select>
                     </div>
 

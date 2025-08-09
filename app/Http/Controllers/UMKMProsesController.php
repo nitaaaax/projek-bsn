@@ -16,7 +16,7 @@ class UMKMProsesController extends Controller
     public function index(Request $request)
     {
 
-        $tahap1= Tahap1::where('status_pembinaan','!=','SPPT SNI')->get(); 
+        $tahap1= Tahap1::where('status_pembinaan','!=','SPPT SNI (TERSERTIFIKASI)')->get(); 
 
         return view('umkm.proses.index', compact('tahap1'));
     }
@@ -65,6 +65,8 @@ class UMKMProsesController extends Controller
                 'link_dokumen' => 'nullable|url|max:255',
                 'sni_yang_diterapkan' => 'nullable|string',
                 'gruping' => 'nullable|string|max:255',
+                'foto_produk.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                'foto_tempat_produksi.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             ]);
 
             // Handle array fields → JSON
@@ -110,30 +112,60 @@ class UMKMProsesController extends Controller
             }
             $validated2['jangkauan_pemasaran'] = json_encode($jangkauanFinal);
 
-            // Foto Produk
-            $fotoProduk = json_decode($tahap2->foto_produk ?? '[]', true);
-            if ($request->hasFile('foto_produk')) {
-                foreach ($request->file('foto_produk') as $file) {
-                    $fotoProduk[] = $file->store('uploads/foto_produk', 'public');
-                }
-            }
-            $validated2['foto_produk'] = json_encode($fotoProduk);
+            // Process foto_produk updates
+            $validated2['foto_produk'] = json_encode($this->handleFileUpdates(
+                $request,
+                $tahap2,
+                'foto_produk',
+                'old_foto_produk',
+                'uploads/foto_produk'
+            ));
 
-            // Foto Tempat Produksi
-            $fotoTempat = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-            if ($request->hasFile('foto_tempat_produksi')) {
-                foreach ($request->file('foto_tempat_produksi') as $file) {
-                    $fotoTempat[] = $file->store('uploads/foto_tempat', 'public');
-                }
-            }
-            $validated2['foto_tempat_produksi'] = json_encode($fotoTempat);
+            // Process foto_tempat_produksi updates
+            $validated2['foto_tempat_produksi'] = json_encode($this->handleFileUpdates(
+                $request,
+                $tahap2,
+                'foto_tempat_produksi',
+                'old_foto_tempat_produksi',
+                'uploads/foto_tempat_produksi'
+            ));
 
-            // Update database
             $tahap1->update($validated1);
             $tahap2->update($validated2);
         });
 
-        return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil diperbarui.');
+    return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil diperbarui.');
+    }
+
+    private function handleFileUpdates($request, $model, $fieldName, $oldFilesInputName, $storagePath)
+    {
+        // Get current files from database
+        $currentFiles = json_decode($model->$fieldName, true) ?? [];
+        
+        // Get old files that user didn't remove (still present in form)
+        $remainingOldFiles = $request->input($oldFilesInputName, []);
+        
+        // Find files to delete (present in DB but not in remaining files)
+        $filesToDelete = array_diff($currentFiles, $remainingOldFiles);
+        
+        // Delete files from storage
+        foreach ($filesToDelete as $file) {
+            $path = storage_path('app/public/' . $file);
+            if (File::exists($path)) {
+                File::delete($path);
+            }
+        }
+        
+        // Process new uploads
+        $newFiles = [];
+        if ($request->hasFile($fieldName)) {
+            foreach ($request->file($fieldName) as $file) {
+                $newFiles[] = $file->store($storagePath, 'public');
+            }
+        }
+        
+        // Combine remaining old files and new files
+        return array_merge($remainingOldFiles, $newFiles);
     }
     
     public function edit($id)
@@ -190,9 +222,18 @@ class UMKMProsesController extends Controller
             $fotoProduk = json_decode($tahap2->foto_produk, true);
             if (is_array($fotoProduk)) {
                 foreach ($fotoProduk as $file) {
-                    $path = public_path("storage/" . $file);
-                    if (File::exists($path)) {
-                        File::delete($path);
+                    // Hapus Format File
+                    $paths = [
+                        public_path("uploads/foto_produk/" . basename($file)),
+                        storage_path("app/public/uploads/foto_produk/" . basename($file)),
+                        storage_path("app/foto_produk/" . basename($file))
+                    ];
+                    
+                    foreach ($paths as $path) {
+                        if (File::exists($path)) {
+                            File::delete($path);
+                            break;
+                        }
                     }
                 }
             }
@@ -201,9 +242,18 @@ class UMKMProsesController extends Controller
             $fotoTempat = json_decode($tahap2->foto_tempat_produksi, true);
             if (is_array($fotoTempat)) {
                 foreach ($fotoTempat as $file) {
-                    $path = public_path("storage/" . $file);
-                    if (File::exists($path)) {
-                        File::delete($path);
+                     // Hapus Format File
+                    $paths = [
+                        public_path("uploads/foto_tempat_produksi/" . basename($file)),
+                        storage_path("app/public/uploads/foto_tempat_produksi/" . basename($file)),
+                        storage_path("app/foto_tempat_produksi/" . basename($file))
+                    ];
+                    
+                    foreach ($paths as $path) {
+                        if (File::exists($path)) {
+                            File::delete($path);
+                            break;
+                        }
                     }
                 }
             }

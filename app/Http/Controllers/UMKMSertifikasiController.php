@@ -14,7 +14,7 @@ class UMKMSertifikasiController extends Controller
 {
     public function index(Request $request)
     {
-        $items= Tahap1::where('status_pembinaan','=','SPPT SNI')->get(); 
+        $items= Tahap1::where('status_pembinaan','=','SPPT SNI (TERSERTIFIKASI)')->get(); 
 
         return view('umkm.sertifikasi.index', compact('items'));
     }

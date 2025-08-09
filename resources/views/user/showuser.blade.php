@@ -32,7 +32,18 @@
             <tr><th>Nama Merek</th><td>{{ $tahap1->nama_merek ?? '-' }}</td></tr>
             <tr><th>Tahun Dibina</th><td>{{ $tahap1->tahun_dibina ?? '-' }}</td></tr>
             <tr><th>Bulan Pertama Pembinaan</th><td>{{ $tahap1->bulan_pertama_pembinaan ?? '-' }}</td></tr>
-            <tr><th>Status Pembinaan</th><td>{{ $tahap1->status_pembinaan ?? '-' }}</td></tr>
+            <tr>
+                <th>Status Pembinaan</th>
+                <td>
+                    @php
+                        $status = $tahap1->status_pembinaan ?? '-';
+                        $isSertif = in_array($status, ['SPPT SNI', 'SPPT SNI (TERSERTIFIKASI)']);
+                    @endphp
+                    <span class="badge {{ $isSertif ? 'bg-success' : 'bg-secondary' }}">
+                        {{ $status }}
+                    </span>
+                </td>
+            </tr>
             <tr><th>Jenis Usaha</th><td>{{ $tahap1->jenis_usaha ?? '-' }}</td></tr>
             <tr><th>Tanda Daftar Merek</th><td>{{ $tahap1->tanda_daftar_merk ?? '-' }}</td></tr>
             <tr>
@@ -60,28 +71,6 @@
             <tr><th>Jumlah Tenaga Kerja</th><td>{{ $tahap2->jumlah_tenaga_kerja ?? '-' }} orang</td></tr>
             <tr><th>Gruping</th><td>{{ $tahap2->gruping ?? '-' }}</td></tr>
             <tr>
-              <th>Jangkauan Pemasaran</th>
-              <td>
-                @php
-                  $jangkauan = [];
-                  if (!empty($tahap2->jangkauan_pemasaran)) {
-                    $jangkauan = is_array($tahap2->jangkauan_pemasaran)
-                        ? $tahap2->jangkauan_pemasaran
-                        : json_decode($tahap2->jangkauan_pemasaran, true);
-                  }
-                @endphp
-                @if(count($jangkauan) > 0)
-                  <ul class="mb-0">
-                    @foreach($jangkauan as $key => $value)
-                      <li>{{ $key }}: {{ $value }}</li>
-                    @endforeach
-                  </ul>
-                @else
-                  -
-                @endif
-              </td>
-            </tr>
-            <tr>
               <th>Link Dokumen</th>
               <td>
                 @if($tahap2->link_dokumen)
@@ -100,50 +89,96 @@
             <tr><th>Tahun Pendirian</th><td>{{ $tahap2->tahun_pendirian ?? '-' }}</td></tr>
             <tr><th>SNI yang Diterapkan</th><td>{{ $tahap2->sni_yang_diterapkan ?? '-' }}</td></tr>
             <tr>
-              <th>Legalitas Usaha</th>
-              <td>
-                @php
-                  $legalitas = [];
-                  if (!empty($tahap2->legalitas_usaha)) {
-                    $legalitas = is_array($tahap2->legalitas_usaha)
-                        ? $tahap2->legalitas_usaha
-                        : json_decode($tahap2->legalitas_usaha, true);
-                  }
-                @endphp
-                @if(count($legalitas) > 0)
-                  <ul class="mb-0">
-                    @foreach($legalitas as $item)
-                      <li>{{ $item }}</li>
-                    @endforeach
-                  </ul>
-                @else
-                  -
-                @endif
-              </td>
+                <th>Jangkauan Pemasaran</th>
+                <td>
+                    @php
+                        $jangkauan = !empty($tahap2->jangkauan_pemasaran)
+                            ? (is_array($tahap2->jangkauan_pemasaran) ? $tahap2->jangkauan_pemasaran : json_decode($tahap2->jangkauan_pemasaran, true))
+                            : [];
+
+                        $jangkauanFormatted = [];
+                        foreach ($jangkauan as $key => $value) {
+                            // Pastikan "Lainnya" tidak muncul ganda
+                            if (stripos($key, 'lainnya') === 0) {
+                                $jangkauanFormatted[] = 'Lainnya: ' . $value;
+                            } else {
+                                $jangkauanFormatted[] = ucfirst($key) . ': ' . $value;
+                            }
+                        }
+                    @endphp
+
+                    @if($jangkauanFormatted)
+                        <ul class="mb-0">
+                            @foreach($jangkauanFormatted as $item)
+                                <li>{{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        -
+                    @endif
+                </td>
             </tr>
             <tr>
-              <th>Sertifikat</th>
-              <td>
-                @php
-                  $sertifikat = [];
-                  if (!empty($tahap2->sertifikat)) {
-                    $sertifikat = is_array($tahap2->sertifikat)
-                        ? $tahap2->sertifikat
-                        : json_decode($tahap2->sertifikat, true);
-                  }
-                @endphp
-                @if(count($sertifikat) > 0)
-                  <ul class="mb-0">
-                    @foreach($sertifikat as $item)
-                      <li>{{ $item }}</li>
-                    @endforeach
-                  </ul>
-                @else
-                  -
-                @endif
-              </td>
+                <th>Sertifikat Lain yang Dimiliki</th>
+                <td>
+                  @php
+                      $sertifikatData = !empty($tahap2->sertifikat)
+                          ? (is_array($tahap2->sertifikat) ? $tahap2->sertifikat : json_decode($tahap2->sertifikat, true))
+                          : [];
+
+                     $sertifikatFormatted = [];
+                        for ($i = 0; $i < count($sertifikatData); $i++) {
+                            $val = trim($sertifikatData[$i]);
+                            if (strcasecmp($val, 'lainnya') === 0 && isset($sertifikatData[$i+1])) {
+                                $sertifikatFormatted[] = 'Lainnya: ' . trim($sertifikatData[++$i]);
+                            } else {
+                                // kalau sudah "Lainnya: ..." biarkan
+                                $sertifikatFormatted[] = $val;
+                            }
+                        }
+                  @endphp
+                  @if($sertifikatFormatted)
+                      <ul class="mb-0">
+                          @foreach($sertifikatFormatted as $item)
+                              <li>{{ $item }}</li>
+                          @endforeach
+                      </ul>
+                  @else
+                      -
+                  @endif
+                </td>
             </tr>
             <tr>
+                <th>Legalitas Usaha</th>
+                <td>
+                    @php
+                        $legalitasData = !empty($tahap2->legalitas_usaha)
+                            ? (is_array($tahap2->legalitas_usaha) ? $tahap2->legalitas_usaha : json_decode($tahap2->legalitas_usaha, true))
+                            : [];
+
+                        $legalitasFormatted = [];
+                        for ($i = 0; $i < count($legalitasData); $i++) {
+                            $val = trim($legalitasData[$i]);
+                            if (strcasecmp($val, 'lainnya') === 0 && isset($legalitasData[$i+1])) {
+                                $legalitasFormatted[] = 'Lainnya: ' . trim($legalitasData[++$i]);
+                            } else {
+                                // kalau sudah "Lainnya: ..." biarkan
+                                $legalitasFormatted[] = $val;
+                            }
+                        }
+                    @endphp
+
+                    @if($legalitasFormatted)
+                        <ul class="mb-0">
+                            @foreach($legalitasFormatted as $item)
+                                <li>{{ $item }}</li>
+                            @endforeach
+                        </ul>
+                    @else
+                        -
+                    @endif
+                </td>
+            </tr>
               <th>Instansi Pembina</th>
               <td>
                 @php

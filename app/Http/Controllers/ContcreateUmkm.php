@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Arr;
 use App\Models\Tahap1;
 use App\Models\Tahap2;
 
@@ -29,171 +30,152 @@ class ContcreateUmkm extends Controller
         return redirect()->route('admin.umkm.create.tahap', ['tahap' => 1]);
     }
 
-    public function showTahap(int $tahap, $id = null)
+    public function show($id = null)
     {
-        if (!in_array($tahap, [1, 2])) {
-            abort(404, 'Tahap tidak valid.');
-        }
-
+        $tahap1 = null;
+        $tahap2 = null;
         $foto_produk = [];
         $foto_tempat_produksi = [];
-        $data = null;
 
-        if ($tahap === 1) {
-            $data = Tahap1::find($id);
-        } elseif ($tahap === 2) {
+        if ($id) {
+            // Ambil data Tahap1 & Tahap2
             $tahap1 = Tahap1::find($id);
             $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
 
             if ($tahap2) {
-                // Jika sudah ada Tahap 2
-                $data = $tahap2;
                 $foto_produk = json_decode($tahap2->foto_produk ?? '[]', true);
                 $foto_tempat_produksi = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
             } else {
-                // Kalau belum ada Tahap 2, buat data default dari Tahap 1
-                $data = new \stdClass();
-                $data->alamat_kantor = $tahap1->alamat_kantor ?? '';
-                $data->provinsi_kantor = $tahap1->provinsi ?? '';
-                $data->kota_kantor = $tahap1->kota ?? '';
-                $data->alamat_pabrik = $tahap1->alamat_pabrik ?? '';
-                $data->provinsi_pabrik = $tahap1->provinsi ?? '';
-                $data->kota_pabrik = $tahap1->kota ?? '';
-                $data->legalitas_usaha = $tahap1->legalitas ?? '';
-                $data->tahun_pendirian = $tahap1->tahun_dibina ?? '';
-                $data->omzet = '';
-                $data->volume_per_tahun = '';
-                $data->jumlah_tenaga_kerja = '';
-                $data->jangkauan_pemasaran = json_encode([]);
-                $data->link_dokumen = '';
-                $data->instansi = json_encode([]);
-                $data->sertifikat = '';
-                $data->sni_yang_diterapkan = '';
-                $data->gruping = '';
+                // Default Tahap 2 dari Tahap 1
+                $tahap2 = new \stdClass();
+                $tahap2->alamat_kantor = $tahap1->alamat_kantor ?? '';
+                $tahap2->provinsi_kantor = $tahap1->provinsi ?? '';
+                $tahap2->kota_kantor = $tahap1->kota ?? '';
+                $tahap2->alamat_pabrik = $tahap1->alamat_pabrik ?? '';
+                $tahap2->provinsi_pabrik = $tahap1->provinsi ?? '';
+                $tahap2->kota_pabrik = $tahap1->kota ?? '';
+                $tahap2->legalitas_usaha = $tahap1->legalitas ?? '';
+                $tahap2->tahun_pendirian = $tahap1->tahun_dibina ?? '';
+                $tahap2->omzet = '';
+                $tahap2->volume_per_tahun = '';
+                $tahap2->jumlah_tenaga_kerja = '';
+                $tahap2->jangkauan_pemasaran = json_encode([]);
+                $tahap2->link_dokumen = '';
+                $tahap2->instansi = json_encode([]);
+                $tahap2->sertifikat = '';
+                $tahap2->sni_yang_diterapkan = '';
+                $tahap2->gruping = '';
             }
         }
 
-        return view('tahap.create', [
-            'tahapNumber' => $tahap,
-            'tahap' => $tahap,
-            'data' => $data,
-            'id' => $id,
-            'pelaku_usaha_id' => $id,
+       return view('tahap.create', [
+            'tahap1' => $tahap1,
+            'tahap2' => $tahap2,
             'foto_produk' => $foto_produk,
             'foto_tempat_produksi' => $foto_tempat_produksi,
+            'pelaku_usaha_id' => $id,
         ]);
     }
 
-    public function store(Request $request, int $tahap, $id = null)
+    public function store(Request $request)
     {
-        if (!in_array($tahap, [1, 2])) {
-            abort(404, 'Tahap tidak valid.');
-        }
+        // Validate all data at once
+        $validated = $request->validate([
+            // === Tahap 1 Fields ===
+            'nama_pelaku' => 'nullable|string|max:255',
+            'produk' => 'nullable|string|max:255',
+            'klasifikasi' => 'nullable|string|max:255',
+            'status' => 'nullable|in:masih dibina,drop/tidak dilanjutkan',
+            'pembina_1' => 'nullable|string|max:255',
+            'pembina_2' => 'nullable|string|max:255',
+            'sinergi' => 'nullable|string|max:255',
+            'nama_kontak_person' => 'nullable|string|max:255',
+            'no_hp' => 'nullable|string|max:25',
+            'bulan_pertama_pembinaan' => 'required|in:Januari,Februari,Maret,April,Mei,Juni,Juli,Agustus,September,Oktober,November,Desember',
+            'tahun_dibina' => 'nullable|string|max:4',
+            'riwayat_pembinaan' => 'nullable|string',
+            'status_pembinaan' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
+            'media_sosial' => 'nullable|string|max:255',
+            'nama_merek' => 'nullable|string|max:255',
+            'lspro' => 'nullable|string|max:255',
+            'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
+            'tanda_daftar_merk' => 'nullable|in:Terdaftar di Kemenkumham,Belum Terdaftar',
+            
+            // === Tahap 2 Fields ===
+            'omzet' => 'nullable|numeric',
+            'volume_per_tahun' => 'nullable|string|max:255',
+            'jumlah_tenaga_kerja' => 'nullable|integer',
+            'jangkauan_pemasaran' => 'nullable|array',
+            'link_dokumen' => 'nullable|url|max:255',
+            'alamat_kantor' => 'nullable|string|max:255',
+            'provinsi_kantor' => 'nullable|string|max:255',
+            'kota_kantor' => 'nullable|string|max:255',
+            'alamat_pabrik' => 'nullable|string|max:255',
+            'provinsi_pabrik' => 'nullable|string|max:255',
+            'kota_pabrik' => 'nullable|string|max:255',
+            'instansi_check' => 'nullable|array',
+            'instansi_check.*' => 'string|in:Dinas,Kementerian,Perguruan Tinggi,Komunitas,Lainnya',
+            'instansi_detail' => 'nullable|array',
+            'instansi_detail.*' => 'nullable|string|max:255',
+            'legalitas_usaha' => 'nullable|array',
+            'legalitas_usaha.*' => 'nullable|string|max:255',
+            'legalitas_usaha_lainnya' => 'nullable|string|max:255',
+            'tahun_pendirian' => 'nullable|string|max:4',
+            'foto_produk' => 'nullable|array',
+            'foto_produk.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'foto_tempat_produksi' => 'nullable|array',
+            'foto_tempat_produksi.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'sni_yang_diterapkan' => 'nullable|string',
+            'sertifikat' => 'nullable|array',
+            'sertifikat.*' => 'nullable|string|max:255',
+            'gruping' => 'nullable|string',
+            'jangkauan_detail' => 'nullable|array',
+            'jangkauan_detail.*' => 'nullable|string|max:255',
+            'jangkauan_pemasaran_lainnya' => 'nullable|string|max:255',
+        ]);
 
-        //dd($request->all());
+        // Start database transaction
+        DB::beginTransaction();
 
-        // === Tahap 1 ===
-        if ($tahap === 1) {
-            $validated = $request->validate([
-                'nama_pelaku' => 'nullable|string|max:255',
-                'produk' => 'nullable|string|max:255',
-                'klasifikasi' => 'nullable|string|max:255',
-                'status' => 'nullable|in:masih dibina,drop/tidak dilanjutkan',
-                'pembina_1' => 'nullable|string|max:255',
-                'pembina_2' => 'nullable|string|max:255',
-                'sinergi' => 'nullable|string|max:255',
-                'nama_kontak_person' => 'nullable|string|max:255',
-                'no_hp' => 'nullable|string|max:25',
-                'bulan_pertama_pembinaan' => 'required|in:Januari,Februari,Maret,April,Mei,Juni,Juli,Agustus,September,Oktober,November,Desember',
-                'tahun_dibina' => 'nullable|string|max:4',
-                'riwayat_pembinaan' => 'nullable|string',
-                'status_pembinaan' => 'nullable|string|max:50',
-                'email' => 'nullable|email|max:255',
-                'media_sosial' => 'nullable|string|max:255',
-                'nama_merek' => 'nullable|string|max:255',
-                'lspro' => 'nullable|string|max:255',
-                'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
-                'tanda_daftar_merk' => 'nullable|in:Terdaftar di Kemenkumham,Belum Terdaftar',
+        try {
+            // Separate data for each table
+            $tahap1Data = Arr::only($validated, [
+                'nama_pelaku', 'produk', 'klasifikasi', 'status', 'pembina_1', 'pembina_2', 
+                'sinergi', 'nama_kontak_person', 'no_hp', 'bulan_pertama_pembinaan', 
+                'tahun_dibina', 'riwayat_pembinaan', 'status_pembinaan', 'email', 
+                'media_sosial', 'nama_merek', 'lspro', 'jenis_usaha', 'tanda_daftar_merk'
             ]);
 
-            $tahap1 = Tahap1::create($validated);
+            // Create Tahap1 record
+            $tahap1 = Tahap1::create($tahap1Data);
 
-            // Redirect ke tahap 2
-            return redirect()->route('admin.umkm.create.tahap', [
-                'tahap' => 2,
-                'id' => $tahap1->id,
-            ])->with('success', 'Data Tahap 1 berhasil disimpan. Lanjut ke Tahap 2.');
-        }
-
-        // === Tahap 2 ===
-        if ($tahap === 2) {
-            $tahap1 = Tahap1::find($id);
-            if (!$tahap1) {
-                abort(404, 'ID Tahap1 tidak ditemukan.');
-            }
-
-            $validated = $request->validate([
-                'omzet' => 'nullable|numeric',
-                'volume_per_tahun' => 'nullable|string|max:255',
-                'jumlah_tenaga_kerja' => 'nullable|integer',
-                'jangkauan_pemasaran' => 'nullable|array',
-
-                'link_dokumen' => 'nullable|url|max:255',
-                'alamat_kantor' => 'nullable|string|max:255',
-                'provinsi_kantor' => 'nullable|string|max:255',
-                'kota_kantor' => 'nullable|string|max:255',
-
-                'alamat_pabrik' => 'nullable|string|max:255',
-                'provinsi_pabrik' => 'nullable|string|max:255',
-                'kota_pabrik' => 'nullable|string|max:255',
-
-                'instansi_check' => 'nullable|array',
-                'instansi_check.*' => 'string|in:Dinas,Kementerian,Perguruan Tinggi,Komunitas,Lainnya',
-                'instansi_detail' => 'nullable|array',
-                'instansi_detail.*' => 'nullable|string|max:255',
-
-                'legalitas_usaha' => 'nullable|array',
-                'legalitas_usaha.*' => 'nullable|string|max:255',
-                'legalitas_usaha_lainnya' => 'nullable|string|max:255',
-
-                'tahun_pendirian' => 'nullable|string|max:4',
-
-                'foto_produk' => 'nullable|array',
-                'foto_produk.*' => 'nullable|image',
-
-                'foto_tempat_produksi' => 'nullable|array',
-                'foto_tempat_produksi.*' => 'nullable|image',
-
-                'sni_yang_diterapkan' => 'nullable|string',
-                'sertifikat' => 'nullable|array',
-                'sertifikat.*' => 'nullable|string|max:255',
-
-                'gruping' => 'nullable|string',
-
-                'jangkauan_detail' => 'nullable|array',
-                'jangkauan_detail.*' => 'nullable|string|max:255',
-                'jangkauan_pemasaran_lainnya' => 'nullable|string|max:255',
+            // Prepare Tahap2 data
+            $tahap2Data = Arr::only($validated, [
+                'omzet', 'volume_per_tahun', 'jumlah_tenaga_kerja', 'link_dokumen',
+                'alamat_kantor', 'provinsi_kantor', 'kota_kantor', 'alamat_pabrik',
+                'provinsi_pabrik', 'kota_pabrik', 'tahun_pendirian', 'sni_yang_diterapkan',
+                'gruping'
             ]);
 
-            // === Handle legalitas_usaha (checkbox + optional "lainnya")
+            // Handle special fields
+            $tahap2Data['pelaku_usaha_id'] = $tahap1->id;
+
+            // Handle legalitas_usaha (checkbox + optional "lainnya")
             $legalitas = $request->input('legalitas_usaha', []);
-            // Add "lainnya" value if provided
             if ($request->filled('legalitas_usaha_lainnya')) {
                 $legalitas[] = $request->legalitas_usaha_lainnya;
             }
-            $validated['legalitas_usaha'] = json_encode(array_filter($legalitas));
+            $tahap2Data['legalitas_usaha'] = json_encode(array_filter($legalitas));
 
-            $sertifikat = $request->input('sertifikat', []);
-            $validated['sertifikat'] = json_encode(array_filter($sertifikat));
+            // Handle sertifikat
+            $tahap2Data['sertifikat'] = json_encode(array_filter($request->input('sertifikat', [])));
 
-            // Normalisasi jangkauan_pemasaran menjadi array numerik
-            $jangkauanData = [];
-
+            // Handle jangkauan_pemasaran
+            $finalJangkauan = [];
             $jangkauanPemasaran = $request->jangkauan_pemasaran ?? [];
             $jangkauanDetail = $request->jangkauan_detail ?? [];
             $jangkauanLainnya = $request->jangkauan_pemasaran_lainnya;
-
-            $finalJangkauan = [];
 
             foreach ($jangkauanPemasaran as $key => $value) {
                 $finalJangkauan[$key] = $jangkauanDetail[$key] ?? '';
@@ -207,62 +189,48 @@ class ContcreateUmkm extends Controller
                     }
                 }
             }
+            $tahap2Data['jangkauan_pemasaran'] = json_encode($finalJangkauan);
 
-            $validated['jangkauan_pemasaran'] = json_encode($finalJangkauan);
-
-            // === Handle instansi (checkbox + detail)
+            // Handle instansi (checkbox + detail)
             $instansi = [];
             if ($request->filled('instansi_check')) {
                 foreach ($request->input('instansi_check') as $key) {
                     $instansi[$key] = $request->input("instansi_detail.$key");
                 }
             }
-            $validated['instansi'] = json_encode($instansi);
+            $tahap2Data['instansi'] = json_encode($instansi);
 
-            // === Upload foto produk
-            $foto_produk_paths = [];
-            if ($request->hasFile('foto_produk')) {
-                foreach ($request->file('foto_produk') as $file) {
-                    if ($file->isValid()) {
-                        $filename = 'produk_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
-                        $path = $file->storeAs('public/uploads/foto_produk/', $filename);
-                        $foto_produk_paths[] = str_replace('public/', '', $path);
-                    }
-                }
-            }
+            // Handle file uploads
+            $tahap2Data['foto_produk'] = $this->handleFileUploads($request->file('foto_produk', []), 'produk');
+            $tahap2Data['foto_tempat_produksi'] = $this->handleFileUploads($request->file('foto_tempat_produksi', []), 'tempat');
 
-            // === Upload foto tempat produksi
-            $foto_tempat_produksi_paths = [];
-            if ($request->hasFile('foto_tempat_produksi')) {
-                foreach ($request->file('foto_tempat_produksi') as $file) {
-                    if ($file->isValid()) {
-                        $filename = 'tempat_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
-                        $path = $file->storeAs('public/uploads/foto_tempat_produksi', $filename);
-                        $foto_tempat_produksi_paths[] = str_replace('public/', '', $path);
-                    }
-                }
-            }
+            // Create Tahap2 record
+            Tahap2::create($tahap2Data);
 
-            $validated['foto_produk'] = json_encode($foto_produk_paths);
-            $validated['foto_tempat_produksi'] = json_encode($foto_tempat_produksi_paths);
-            $validated['pelaku_usaha_id'] = $id;
+            // Commit transaction
+            DB::commit();
 
-            // Simpan tahap 2
-            $tahap2 = Tahap2::create($validated);
+            return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil disimpan.');
 
-            return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil disimpan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
         }
     }
-  
-    protected function handleUpload(Request $request, $key)
+
+    protected function handleFileUploads($files, $prefix)
     {
-        $files = [];
-        if ($request->hasFile($key)) {
-            foreach ($request->file($key) as $file) {
-                $files[] = $file->store("uploads/{$key}", 'public');
+        $paths = [];
+        
+        foreach ($files as $file) {
+            if ($file->isValid()) {
+                $filename = $prefix . '_' . time() . '_' . Str::random(5) . '.' . $file->getClientOriginalExtension();
+                $path = $file->storeAs('public/uploads/foto_' . $prefix, $filename);
+                $paths[] = str_replace('public/', '', $path);
             }
         }
-        return $files;
+        
+        return json_encode($paths);
     }
 
 }

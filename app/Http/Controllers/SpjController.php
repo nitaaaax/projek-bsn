@@ -260,7 +260,7 @@ class SpjController extends Controller
         $templateProcessor->setValue('lembaga_sertifikasi', $spj->lembaga_sertifikasi ?? '-');
 
         // Nama file dan simpan
-        $fileName = 'SPJ_' . ($spj->no_ukd ?: 'unknown') . '_' . $tanggalSekarang->format('YmdHis') . '.docx';
+        $fileName = 'SPJ_' . ($spj->nama_spj ?: 'unknown') . '_' .'.docx';
         $savePath = storage_path('app/public/' . $fileName);
 
         $templateProcessor->saveAs($savePath);

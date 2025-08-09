@@ -2,10 +2,10 @@
 
     @section('content')
     <div class="container mt-4">
-    <form action="{{ route('admin.umkm.tahap.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.umkm.update', $tahap1->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
-
+    
             @php
                 // Tanda Daftar Merek
                 $tanda_daftar_merk = [];
@@ -470,28 +470,26 @@
                         </div>
                     </div>
 
-                    {{-- Foto Produk --}}
                     @php
                         $foto_produk = is_array($tahap2->foto_produk ?? null) ? $tahap2->foto_produk : json_decode($tahap2->foto_produk ?? '[]', true);
                         $foto_tempat_produksi = is_array($tahap2->foto_tempat_produksi ?? null) ? $tahap2->foto_tempat_produksi : json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
                     @endphp
 
+                    {{-- Foto Produk --}}
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Foto Produk (bisa lebih dari satu)</label>
-                        <input type="file" name="foto_produk[]" class="form-control" multiple onchange="previewImages(this, 'preview-produk')">
+                        <input type="file" name="foto_produk[]" class="form-control" multiple 
+                            accept="image/*" onchange="previewImages(this, 'preview-produk')">
 
                         <div id="old-preview-produk" class="mt-2 d-flex flex-wrap">
                             @if (is_array($foto_produk) && count($foto_produk) > 0)
                                 @foreach ($foto_produk as $foto)
-                                    <div class="position-relative me-2 mb-2 old-foto-produk">
+                                    <div class="position-relative me-2 mb-2">
                                         <img src="{{ asset('storage/' . $foto) }}"
                                             style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
                                             class="img-thumbnail">
-
                                         <input type="hidden" name="old_foto_produk[]" value="{{ $foto }}">
-
-                                        <button type="button"
-                                                class="btn btn-sm btn-danger p-1 btn-remove-old"
+                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" 
                                                 style="position: absolute; top: 0; right: 0;">
                                             &times;
                                         </button>
@@ -507,17 +505,21 @@
                     {{-- Foto Tempat Produksi --}}
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Foto Tempat Produksi (bisa lebih dari satu)</label>
-                        <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple onchange="previewImages(this, 'preview-tempat')">
+                        <input type="file" name="foto_tempat_produksi[]" class="form-control" multiple 
+                            accept="image/*" onchange="previewImages(this, 'preview-tempat')">
 
                         <div id="old-preview-tempat" class="mt-2 d-flex flex-wrap">
                             @if (is_array($foto_tempat_produksi) && count($foto_tempat_produksi) > 0)
                                 @foreach ($foto_tempat_produksi as $foto)
-                                    <div class="position-relative me-2 mb-2 old-foto-tempat">
+                                    <div class="position-relative me-2 mb-2">
                                         <img src="{{ asset('storage/' . $foto) }}"
-                                            class="me-2 mb-2"
-                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;">
+                                            style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px;"
+                                            class="img-thumbnail">
                                         <input type="hidden" name="old_foto_tempat_produksi[]" value="{{ $foto }}">
-                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" style="position: absolute; top: 0; right: 0;">&times;</button>
+                                        <button type="button" class="btn btn-sm btn-danger p-1 btn-remove-old" 
+                                                style="position: absolute; top: 0; right: 0;">
+                                            &times;
+                                        </button>
                                     </div>
                                 @endforeach
                             @else
@@ -692,7 +694,94 @@
         });
     });
     </script>
+        <script>
+    // Preview and handle new file selections
+    function previewImages(input, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = "";
 
+        const files = Array.from(input.files);
+
+        if (files.length === 0) {
+            container.innerHTML = '<p class="text-muted">Tidak ada gambar baru dipilih.</p>';
+            return;
+        }
+
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrapper = document.createElement("div");
+                wrapper.className = "position-relative me-2 mb-2";
+
+                const img = document.createElement("img");
+                img.src = e.target.result;
+                img.style.width = "120px";
+                img.style.height = "120px";
+                img.style.objectFit = "cover";
+                img.style.borderRadius = "8px";
+                img.className = "img-thumbnail";
+
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn btn-sm btn-danger p-1";
+                btn.style.position = "absolute";
+                btn.style.top = "0";
+                btn.style.right = "0";
+                btn.innerHTML = "&times;";
+                btn.onclick = function() {
+                    const newFiles = Array.from(input.files);
+                    newFiles.splice(index, 1);
+                    
+                    const dataTransfer = new DataTransfer();
+                    newFiles.forEach(file => dataTransfer.items.add(file));
+                    input.files = dataTransfer.files;
+                    
+                    previewImages(input, containerId);
+                };
+
+                wrapper.appendChild(img);
+                wrapper.appendChild(btn);
+                container.appendChild(wrapper);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Handle removal of old files
+    document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-remove-old')) {
+                const wrapper = e.target.closest('.position-relative');
+                if (wrapper) {
+                    // Add removal animation
+                    wrapper.style.transition = 'opacity 0.3s';
+                    wrapper.style.opacity = '0';
+                    
+                    // Create hidden input to track removed files
+                    const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+                    if (hiddenInput) {
+                        const removedInput = document.createElement('input');
+                        removedInput.type = 'hidden';
+                        removedInput.name = 'removed_foto_produk[]';
+                        removedInput.value = hiddenInput.value;
+                        document.getElementById('old-preview-produk').appendChild(removedInput);
+                    }
+                    
+                    // Remove after animation
+                    setTimeout(() => {
+                        wrapper.remove();
+                        
+                        // Show empty message if no files left
+                        const container = document.getElementById('old-preview-produk');
+                        if (container && container.querySelectorAll('.position-relative').length === 0) {
+                            container.innerHTML = '<p class="text-muted">Belum ada foto produk.</p>';
+                        }
+                    }, 300);
+                }
+            }
+        });
+    });
+</script>
         <script>
         function previewImages(input, containerId) {
             const container = document.getElementById(containerId);
@@ -743,13 +832,21 @@
         </script>
         <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Hapus gambar lama dari DOM dan form
-            document.querySelectorAll('.btn-remove-old').forEach(button => {
-                button.addEventListener('click', function () {
-                    const wrapper = this.closest('.old-foto-produk') || this.closest('.old-foto-tempat');
-                    wrapper.remove();
+        // Enhanced removal handler
+        document.querySelectorAll('.btn-remove-old').forEach(button => {
+            button.addEventListener('click', function () {
+                const wrapper = this.closest('.position-relative');
+                if (wrapper) {
+                    // Add animation for better UX
+                    wrapper.style.transition = 'opacity 0.3s';
+                    wrapper.style.opacity = '0';
+                    
+                    // Remove after animation completes
+                    setTimeout(() => wrapper.remove(), 300);
+                }
                 });
             });
+        });
 
             // Toggle input instansi
             const checkboxes = document.querySelectorAll('.form-check-input[type="checkbox"][name="instansi_check[]"]');
@@ -766,7 +863,6 @@
                     }
                 });
             });
-        });
         </script>
 
         <script>
@@ -785,34 +881,6 @@
                     toggle.addEventListener('change', function() {
                         container.style.display = this.checked ? 'block' : 'none';
                     });
-                    
-                    // Add new field
-                    addBtn?.addEventListener('click', function() {
-                        const newField = document.createElement('div');
-                        newField.className = 'input-group mb-2';
-                        newField.innerHTML = 
-                            <input type="text" name="${type}_custom[]" 
-                                class="form-control form-control-sm" 
-                                placeholder="Masukkan ${type} lainnya">
-                            <button type="button" class="btn btn-sm btn-outline-danger remove-custom-item">
-                                &times;
-                            </button>
-                        ;
-                        container.insertBefore(newField, this);
-                    });
-                }
-            }
-            
-            // Remove fields
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('remove-custom-item') || 
-                    e.target.classList.contains('remove-custom-legalitas') ||
-                    e.target.classList.contains('remove-custom-sertifikat')) {
-                    e.target.closest('.input-group').remove();
-                }
-            });
-        });
-        </script>
 
         <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -884,16 +952,15 @@
         </script>
 
         <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function toggleTextbox(checkbox, textbox) {
-            if (checkbox.checked) {
-                textbox.style.display = 'block';
-            } else {
-                textbox.style.display = 'none';
-                textbox.value = ''; // Kosongkan saat tidak dicentang
+        document.addEventListener('DOMContentLoaded', function () {
+            function toggleTextbox(checkbox, textbox) {
+                if (checkbox.checked) {
+                    textbox.style.display = 'block';
+                } else {
+                    textbox.style.display = 'none';
+                    textbox.value = ''; // Kosongkan saat tidak dicentang
+                }
             }
-        }
-
         // Loop semua checkbox & input di Instansi Pembina
         document.querySelectorAll('input[name="instansi_check[]"]').forEach(function (cb) {
             let textbox = cb.closest('.form-check').querySelector('input[type="text"]');

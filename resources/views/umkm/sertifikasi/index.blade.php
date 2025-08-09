@@ -38,8 +38,11 @@ thead {
                 <td>{{ $item->nama_pelaku }}</td>
                 <td>{{ $item->produk }}</td>
                 <td>
-                  <span class="badge {{ $item->status_pembinaan === 'SPPT SNI' ? 'bg-success' : 'bg-secondary' }}">
-                    {{ $item->status_pembinaan }}
+                  @php
+                      $isSertif = in_array($item->status_pembinaan, ['SPPT SNI (TERSERTIFIKASI)']);
+                  @endphp
+                  <span class="badge {{ $isSertif ? 'bg-success' : 'bg-secondary' }}">
+                      {{ $item->status_pembinaan }}
                   </span>
                 </td>
                 <td>
