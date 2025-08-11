@@ -59,6 +59,7 @@
               <th>Item</th>
               <th>Nominal</th>
               <th>Status Pembayaran</th>
+              <th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -68,6 +69,14 @@
                 <td>{{ $detail->item }}</td>
                 <td>Rp {{ number_format($detail->nominal, 0, ',', '.') }}</td>
                 <td>{{ ucfirst(str_replace('_', ' ', $detail->status_pembayaran)) }}</td>
+                <td>
+                  {{-- Tombol Download Word per item --}}
+                  <a href="{{ route('downloadWord.spj', $detail->id) }}" 
+                    class="btn btn-success btn-sm" 
+                    title="Download Word">
+                    <i class="fas fa-receipt"></i>
+                  </a>
+                </td>
               </tr>
             @endforeach
           </tbody>
@@ -75,10 +84,12 @@
             <tr>
               <th colspan="2" class="text-end">Total</th>
               <th colspan="2">Rp {{ number_format($spj->details->sum('nominal'), 0, ',', '.') }}</th>
+              <th></th>
             </tr>
           </tfoot>
         </table>
       </div>
+
 
       {{-- Aksi --}}
       <div class="d-flex mt-4">

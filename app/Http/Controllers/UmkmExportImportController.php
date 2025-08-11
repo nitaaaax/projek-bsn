@@ -38,23 +38,34 @@
         $template = new TemplateProcessor($templatePath);
 
         // --- Jangkauan Pemasaran ---
-        $jangkauanRaw = $tahap2->jangkauan_pemasaran ?? '{}';
-        $jangkauanArr = [];
-        $decoded = json_decode($jangkauanRaw, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            $jangkauanArr = $decoded;
+      $jangkauanRaw = $tahap2->jangkauan_pemasaran ?? '[]';
+    $jangkauanArr = is_array($jangkauanRaw) ? $jangkauanRaw : json_decode($jangkauanRaw, true);
+    if (!is_array($jangkauanArr)) $jangkauanArr = [];
+
+    $jangkauanKeys = ['Local', 'Nasional', 'Internasional', 'Lainnya'];
+    foreach ($jangkauanKeys as $key) {
+        if (!isset($jangkauanArr[$key])) {
+            // khusus Lainnya, coba cari key yang mengandung kata "lainnya"
+            if ($key === 'Lainnya') {
+                $altKey = collect(array_keys($jangkauanArr))
+                    ->first(fn($k) => stripos($k, 'lainnya') !== false);
+                $jangkauanArr[$key] = $altKey ? $jangkauanArr[$altKey] : "-";
+            } else {
+                $jangkauanArr[$key] = "-";
+            }
         }
+        // pastikan string
+        $jangkauanArr[$key] = trim((string)$jangkauanArr[$key]) !== '' ? $jangkauanArr[$key] : "-";
+    }
 
-        $jangkauanKeys = ['Local', 'Nasional', 'Internasional', 'Lainnya'];
-        $jangkauanLabels = ['a. Local', 'b. Nasional', 'c. Internasional', 'd. Lainnya'];
-        $jangkauanFormatted = '';
+    $jangkauanFormatted = "a. Local\n{$jangkauanArr['Local']}\n\n" .
+        "b. Nasional\n{$jangkauanArr['Nasional']}\n\n" .
+        "c. Internasional\n{$jangkauanArr['Internasional']}\n\n" .
+        "d. Lainnya\n{$jangkauanArr['Lainnya']}\n\n";
 
-        foreach ($jangkauanKeys as $index => $key) {
-            $value = $jangkauanArr[$key] ?? null;
-            $jangkauanFormatted .= $jangkauanLabels[$index] . "\n" .
-                (!empty(trim($value ?? '')) ? $value : '-') . "\n\n";
-        }
 
+
+        
         // --- Instansi ---
         $instansiRaw = $tahap2->instansi ?? '{}';
         $instansiArr = [];

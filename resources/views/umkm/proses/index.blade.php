@@ -55,15 +55,16 @@
                     <a href="{{ route('admin.umkm.show', $t->id) }}#top" class="btn btn-warning btn-sm" title="Detail">
                       <i class="fa fa-edit"></i>
                     </a>
-                  @endif
-                  @if($role === 'user')
+                  @elseif($role === 'user')
                     <a href="{{ route('user.umkm.showuser', $t->id) }}#top" class="btn btn-info btn-sm" title="Detail">
                       <i class="fa fa-eye"></i>
                     </a>
-                    @endif
+                  @endif
+
                   <a href="{{ route('umkm.export.word.single', $t->id) }}" class="btn btn-success btn-sm" title="Download">
                     <i class="fa fa-download"></i>
                   </a>
+
                   @if($role === 'admin')
                     <form action="{{ route('admin.umkm.destroy', $t->id) }}" method="POST" class="d-inline delete-form">
                       @csrf
@@ -76,11 +77,14 @@
                 </td>
               </tr>
             @empty
-              <tr><td colspan="6" class="text-muted">Belum ada data.</td></tr>
+              <tr>
+                <td colspan="6" class="text-muted">Belum ada data.</td>
+              </tr>
             @endforelse
           </tbody>
         </table>
       </div>
+
 
       {{-- Modal Import --}}
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
@@ -126,6 +130,48 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
+$(document).ready(function () {
+  // Matikan warning default DataTables
+  $.fn.dataTable.ext.errMode = 'none';
+
+  $('#tabelUMKM').DataTable({
+    language: {
+      search: "Cari:",
+      lengthMenu: "Tampilkan _MENU_ data",
+      info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+      paginate: {
+        previous: '<i class="fa fa-chevron-left"></i>',
+        next: '<i class="fa fa-chevron-right"></i>'
+      },
+      zeroRecords: "Tidak ada data ditemukan",
+      infoEmpty: "Menampilkan 0 data",
+    },
+    columnDefs: [
+      { orderable: false, targets: [5] } // Kolom aksi tidak bisa di-sort
+    ]
+  });
+
+  // SweetAlert untuk konfirmasi hapus
+  document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data akan dihapus permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Ya, hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.submit();
+        }
+      });
+    });
+  });
+});
+
   $(document).ready(function () {
   $('#tabelUMKM').DataTable({
     language: {

@@ -11,6 +11,7 @@ use App\Http\Controllers\{
     UmkmExportImportController,
     UserController,
     WilayahController,
+    ErrorController,
 };
 
     // ---------------------- GUEST ----------------------
@@ -137,3 +138,6 @@ use App\Http\Controllers\{
     Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
 
     Route::resource('wilayah', WilayahController::class);
+
+   Route::fallback([ErrorController::class, 'notFound']);
+

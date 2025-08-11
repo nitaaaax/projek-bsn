@@ -80,14 +80,6 @@
                         <i class="fa fa-eye"></i>
                     </a>
                 @endif
-
-                    {{-- Tombol Download Word --}}
-                    <a href="{{ route('downloadWord.spj', $item->id) }}" 
-                  class="btn btn-success btn-sm" 
-                  title="Download Word">
-                <i class="fas fa-receipt"></i>
-                </a>
-
                 {{-- Tombol Hapus (khusus admin) --}}
                 @if(optional(Auth::user()->role)->name === 'admin')
                     <a class="btn btn-sm btn-danger" title="Hapus" onclick="confirmDelete({{ $item->id }})">
@@ -120,7 +112,7 @@
           </div>
         </div>
 
-        {{-- TAB SUDAH --}}
+       {{-- TAB SUDAH --}}
 <div class="tab-pane fade" id="sudah" role="tabpanel">
   <div class="table-responsive">
     <table class="table table-bordered table-striped align-middle" id="tabelSudah">
@@ -141,25 +133,26 @@
             <span class="badge bg-success px-3 py-2">Sudah Dibayar</span>
           </td>
           <td class="text-center">
-            {{-- Tombol Detail, tampilkan berdasarkan role --}}
-                  @if(optional(Auth::user()->role)->name === 'admin')
-                    <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
-                      <i class="fa fa-eye"></i> Detail 
-                    </a>
-                  @elseif(optional(Auth::user()->role)->name === 'user')
-                    <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
-                      <i class="fa fa-eye"></i> Detail
-                    </a>
-                  @endif
+            @if(optional(Auth::user()->role)->name === 'admin')
+              <a href="{{ route('admin.spj.show', $item->id) }}" class="btn btn-primary btn-sm">
+                <i class="fa fa-eye"></i> Detail 
+              </a>
+            @elseif(optional(Auth::user()->role)->name === 'user')
+              <a href="{{ route('spj.show', $item->id) }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa fa-eye"></i> Detail
+              </a>
+            @endif
           </td>
+        </tr>
         @empty
-        <tr><td colspan="4" class="text-center text-muted">Tidak ada data.</td></tr>
+        <tr>
+          <td colspan="4" class="text-center text-muted">Tidak ada data.</td>
+        </tr>
         @endforelse
       </tbody>
     </table>
   </div>
 </div>
-
 
        {{-- TAB BELUM --}}
 <div class="tab-pane fade" id="belum" role="tabpanel">
@@ -264,6 +257,20 @@
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
 <script>
+
+  $(document).ready(function () {
+  $.fn.dataTable.ext.errMode = 'none'; // Nonaktifkan pesan error DataTables
+
+  $('#tabelSemua').DataTable();
+  $('#tabelSudah').DataTable();
+  $('#tabelBelum').DataTable();
+
+  // Opsional: jika ingin tampilkan error di console, bisa tambah listener
+  $('#tabelSudah').on('error.dt', function(e, settings, techNote, message) {
+    console.warn('DataTables error: ', message);
+  });
+});
+
 function confirmDelete(id) {
   Swal.fire({
     title: 'Yakin ingin menghapus?',

@@ -22,16 +22,21 @@
                     @enderror
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">Email</label>
-                    <input type="email" name="email" 
-                        value="{{ old('email', $user->email) }}" 
-                        class="form-control @error('email') is-invalid @enderror" 
-                        required>
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Email</label>
+                <input type="email" 
+                    name="email" 
+                    value="{{ old('email', $user->email) }}" 
+                    class="form-control @error('email') is-invalid @enderror" 
+                    required 
+                    disabled>
+                <input type="hidden" 
+                    name="email" 
+                    value="{{ old('email', $user->email) }}">
+                @error('email')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
             </div>
 
             <div class="mb-3">

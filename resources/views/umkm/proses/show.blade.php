@@ -112,7 +112,7 @@
                             <option value="Perbaikan Temuan Audit" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Temuan Audit' ? 'selected' : '' }}>6. Perbaikan Temuan Audit</option>
                             <option value="Perbaikan Lokasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Perbaikan Lokasi' ? 'selected' : '' }}>7. Perbaikan Lokasi</option>
                             <option value="Monitoring Pasca Sertifikasi" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'Monitoring Pasca Sertifikasi' ? 'selected' : '' }}>8. Monitoring Pasca Sertifikasi</option>
-                            <option value="SPPT SNI" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI</option>
+                            <option value="SPPT SNI (TERSERTIFIKASI)" {{ old('status_pembinaan', $tahap1->status_pembinaan ?? '') == 'SPPT SNI' ? 'selected' : '' }} style="color: green; font-weight: bold;">9. SPPT SNI (TERSERTIFIKASI)</option>
                         </select>
 
                         {{-- supaya tetap terkirim walau select disabled --}}

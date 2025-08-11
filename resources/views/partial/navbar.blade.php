@@ -87,7 +87,7 @@
     <div class="nav-item" style="position: relative;">
       <div class="profile-box" onclick="togglePopout()">
         <img src="{{ asset('asset/dist/img/profile-pic.jpg') }}" alt="User Image" class="rounded-circle" width="30" height="30">
-        <span class="profile-name">Halo, {{ Auth::user()->username }}!</span>
+        <span class="profile-name"> Halo, {{ Auth::user()->username ?? 'Tamu' }}!</span>
       </div>
 
       <div class="popout-menu" id="popoutMenu">

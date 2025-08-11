@@ -45,7 +45,6 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-
   {{-- Tambahan style dari view --}}
   @stack('styles')
 </head>
@@ -118,20 +117,31 @@
 <script src="{{ asset('js/confirm.js') }}"></script>
 
 <script>
-  window.Laravel = {
-    sessionMessages: {
-      success: @json(session('success')),
-      error: @json(session('error')),
-      errors: @json($errors->all()),
-    }
-  };
-</script>
+  // Simpan URL terakhir kecuali halaman home supaya gak looping
+  if (window.location.pathname !== '/') {
+    localStorage.setItem('lastPage', window.location.href);
+  }
 
+  function goLastPage(e) {
+    e.preventDefault();
+    let lastPage = localStorage.getItem('lastPage');
+    if (lastPage && lastPage !== window.location.href) {
+      window.location.href = lastPage;
+    } else {
+      window.location.href = '/';
+    }
+  }
+
+  // Pas DOM siap, pasang event click di semua link yang punya class 'home-link'
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('a.home-link').forEach(el => {
+      el.addEventListener('click', goLastPage);
+    });
+  });
+</script>
 
 @stack('styles')
 @stack('scripts')
-  
-
 
 </body>
 </html>

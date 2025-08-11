@@ -69,50 +69,45 @@ class UMKMProsesController extends Controller
                 'foto_tempat_produksi.*' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             ]);
 
-            // Handle array fields → JSON
-            $legalitas = $request->input('legalitas_usaha', []);
-            if ($request->filled('legalitas_usaha_lainnya')) {
-                $legalitas[] = $request->legalitas_usaha_lainnya;
-            }
-            $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
-            $validated2['sertifikat'] = json_encode($request->input('sertifikat', []));
-            $validated2['jangkauan_pemasaran'] = json_encode($request->input('jangkauan_pemasaran', []));
-
             // Legalitas
             $legalitas = $request->input('legalitas_usaha', []);
-            if (in_array('lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
-                $legalitas = array_diff($legalitas, ['lainnya']);
-                $legalitas[] = $request->legalitas_usaha_lainnya;
+            if (in_array('Lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
+                $legalitas = array_diff($legalitas, ['Lainnya']);
+                $legalitas[] = 'Lainnya: ' . $request->legalitas_usaha_lainnya;
             }
             $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
 
             // Sertifikat
             $sertifikat = $request->input('sertifikat', []);
-            if (in_array('lainnya', $sertifikat) && $request->filled('sertifikat_lainnya')) {
-                $sertifikat = array_diff($sertifikat, ['lainnya']);
-                $sertifikat[] = $request->sertifikat_lainnya;
+            if (in_array('Lainnya', $sertifikat) && $request->filled('sertifikat_lainnya')) {
+                $sertifikat = array_diff($sertifikat, ['Lainnya']);
+                $sertifikat[] = 'Lainnya: ' . $request->sertifikat_lainnya;
             }
             $validated2['sertifikat'] = json_encode(array_filter($sertifikat));
 
             // Instansi
             $instansiFinal = [];
             foreach ($request->input('instansi_check', []) as $key) {
-                $instansiFinal[$key] = $request->input("instansi_detail.$key", '');
+                if ($key === 'Lainnya' && $request->filled('instansi_lainnya')) {
+                    $instansiFinal['Lainnya'] = 'Lainnya: ' . $request->instansi_lainnya;
+                } else {
+                    $instansiFinal[$key] = $request->input("instansi_detail.$key", '');
+                }
             }
             $validated2['instansi'] = json_encode($instansiFinal);
 
-            // jangkauan pemsaran
+            // Jangkauan pemasaran + normalisasi key
             $jangkauanFinal = [];
             foreach ($request->input('jangkauan_pemasaran', []) as $key) {
-                if ($key === 'Lainnya' && $request->filled('jangkauan_pemasaran_lainnya')) {
-                    $jangkauanFinal[$key] = $request->jangkauan_pemasaran_lainnya;
+                if (stripos($key, 'lainnya') !== false) {
+                    $jangkauanFinal['Lainnya'] = $request->jangkauan_pemasaran_lainnya ?? '';
                 } else {
                     $jangkauanFinal[$key] = $request->input("jangkauan_detail.$key", '');
                 }
             }
             $validated2['jangkauan_pemasaran'] = json_encode($jangkauanFinal);
 
-            // Process foto_produk updates
+            // Foto produk
             $validated2['foto_produk'] = json_encode($this->handleFileUpdates(
                 $request,
                 $tahap2,
@@ -121,7 +116,7 @@ class UMKMProsesController extends Controller
                 'uploads/foto_produk'
             ));
 
-            // Process foto_tempat_produksi updates
+            // Foto tempat produksi
             $validated2['foto_tempat_produksi'] = json_encode($this->handleFileUpdates(
                 $request,
                 $tahap2,
@@ -134,7 +129,7 @@ class UMKMProsesController extends Controller
             $tahap2->update($validated2);
         });
 
-    return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil diperbarui.');
+        return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil diperbarui.');
     }
 
     private function handleFileUpdates($request, $model, $fieldName, $oldFilesInputName, $storagePath)
@@ -326,4 +321,5 @@ class UMKMProsesController extends Controller
         $kota = Kota::where('provinsi_id', $provinsi_id)->get();
         return response()->json($kota);
     }
+
 }

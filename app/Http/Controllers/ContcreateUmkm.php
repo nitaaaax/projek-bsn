@@ -101,7 +101,7 @@ class ContcreateUmkm extends Controller
             'lspro' => 'nullable|string|max:255',
             'jenis_usaha' => 'nullable|in:Pangan,Nonpangan',
             'tanda_daftar_merk' => 'nullable|in:Terdaftar di Kemenkumham,Belum Terdaftar',
-            
+
             // === Tahap 2 Fields ===
             'omzet' => 'nullable|numeric',
             'volume_per_tahun' => 'nullable|string|max:255',
@@ -135,83 +135,75 @@ class ContcreateUmkm extends Controller
             'jangkauan_pemasaran_lainnya' => 'nullable|string|max:255',
         ]);
 
-        // Start database transaction
         DB::beginTransaction();
 
         try {
-            // Separate data for each table
+            // Tahap 1
             $tahap1Data = Arr::only($validated, [
                 'nama_pelaku', 'produk', 'klasifikasi', 'status', 'pembina_1', 'pembina_2', 
                 'sinergi', 'nama_kontak_person', 'no_hp', 'bulan_pertama_pembinaan', 
                 'tahun_dibina', 'riwayat_pembinaan', 'status_pembinaan', 'email', 
                 'media_sosial', 'nama_merek', 'lspro', 'jenis_usaha', 'tanda_daftar_merk'
             ]);
-
-            // Create Tahap1 record
             $tahap1 = Tahap1::create($tahap1Data);
 
-            // Prepare Tahap2 data
+            // Tahap 2 dasar
             $tahap2Data = Arr::only($validated, [
                 'omzet', 'volume_per_tahun', 'jumlah_tenaga_kerja', 'link_dokumen',
                 'alamat_kantor', 'provinsi_kantor', 'kota_kantor', 'alamat_pabrik',
                 'provinsi_pabrik', 'kota_pabrik', 'tahun_pendirian', 'sni_yang_diterapkan',
                 'gruping'
             ]);
-
-            // Handle special fields
             $tahap2Data['pelaku_usaha_id'] = $tahap1->id;
 
             // Handle legalitas_usaha (checkbox + optional "lainnya")
             $legalitas = $request->input('legalitas_usaha', []);
-            if ($request->filled('legalitas_usaha_lainnya')) {
-                $legalitas[] = $request->legalitas_usaha_lainnya;
+            if (in_array('Lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
+                // Hapus "Lainnya" dari array biar nggak dobel
+                $legalitas = array_diff($legalitas, ['Lainnya']);
+                $legalitas[] = 'Lainnya: ' . $request->legalitas_usaha_lainnya;
             }
             $tahap2Data['legalitas_usaha'] = json_encode(array_filter($legalitas));
 
             // Handle sertifikat
-            $tahap2Data['sertifikat'] = json_encode(array_filter($request->input('sertifikat', [])));
+            $sertifikat = $request->input('sertifikat', []);
+            if (in_array('Lainnya', $sertifikat) && $request->filled('sertifikat_lainnya')) {
+                $sertifikat = array_diff($sertifikat, ['Lainnya']);
+                $sertifikat[] = 'Lainnya: ' . $request->sertifikat_lainnya;
+            }
+            $tahap2Data['sertifikat'] = json_encode(array_filter($sertifikat));
 
-            // Handle jangkauan_pemasaran
+            // Jangkauan pemasaran + normalisasi key Lainnya
             $finalJangkauan = [];
             $jangkauanPemasaran = $request->jangkauan_pemasaran ?? [];
             $jangkauanDetail = $request->jangkauan_detail ?? [];
-            $jangkauanLainnya = $request->jangkauan_pemasaran_lainnya;
-
             foreach ($jangkauanPemasaran as $key => $value) {
                 $finalJangkauan[$key] = $jangkauanDetail[$key] ?? '';
             }
-
-            if (!empty($jangkauanLainnya)) {
-                $lainnyaList = array_map('trim', explode(',', $jangkauanLainnya));
-                foreach ($lainnyaList as $custom) {
-                    if (!empty($custom)) {
-                        $finalJangkauan[$custom] = $custom;
-                    }
-                }
+            if ($request->filled('jangkauan_pemasaran_lainnya')) {
+                $finalJangkauan['Lainnya'] = $request->jangkauan_pemasaran_lainnya;
             }
             $tahap2Data['jangkauan_pemasaran'] = json_encode($finalJangkauan);
 
-            // Handle instansi (checkbox + detail)
+            // Handle instansi
             $instansi = [];
-            if ($request->filled('instansi_check')) {
-                foreach ($request->input('instansi_check') as $key) {
+            foreach ($request->input('instansi_check', []) as $key) {
+                if ($key === 'Lainnya' && $request->filled('instansi_lainnya')) {
+                    $instansi['Lainnya'] = 'Lainnya: ' . $request->instansi_lainnya;
+                } else {
                     $instansi[$key] = $request->input("instansi_detail.$key");
                 }
             }
             $tahap2Data['instansi'] = json_encode($instansi);
 
-            // Handle file uploads
+            // Upload foto
             $tahap2Data['foto_produk'] = $this->handleFileUploads($request->file('foto_produk', []), 'produk');
-            $tahap2Data['foto_tempat_produksi'] = $this->handleFileUploads($request->file('foto_tempat_produksi', []), 'tempat');
+            $tahap2Data['foto_tempat_produksi'] = $this->handleFileUploads($request->file('foto_tempat_produksi', []), 'tempat_produksi');
 
-            // Create Tahap2 record
             Tahap2::create($tahap2Data);
 
-            // Commit transaction
             DB::commit();
-
             return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil disimpan.');
-
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());

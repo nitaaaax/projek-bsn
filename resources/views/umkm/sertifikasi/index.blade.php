@@ -3,10 +3,9 @@
 @section('content')
 <style>
 thead {
-  background-color: #d4edda; /* Hijau ringan */
+  background-color: #d4edda;
   color: #155724;
 }
-
 .table-responsive {
   overflow-x: unset !important;
 }
@@ -19,7 +18,6 @@ thead {
         <i class="fa fa-certificate"></i> Data UMKM Tersertifikasi
       </h3>
 
-      {{-- Tabel --}}
       <div class="table-responsive">
         <table id="sertifikasiTable" class="table table-hover table-bordered align-middle text-center">
           <thead class="table-success">
@@ -33,48 +31,45 @@ thead {
           </thead>
           <tbody>
             @forelse($items as $item)
+              @php
+                $role = optional(Auth::user()->role)->name;
+                $isSertif = $item->status_pembinaan === 'SPPT SNI (TERSERTIFIKASI)';
+              @endphp
               <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td>{{ $item->nama_pelaku }}</td>
+                <td class="text-start">{{ $item->nama_pelaku }}</td>
                 <td>{{ $item->produk }}</td>
                 <td>
-                  @php
-                      $isSertif = in_array($item->status_pembinaan, ['SPPT SNI (TERSERTIFIKASI)']);
-                  @endphp
                   <span class="badge {{ $isSertif ? 'bg-success' : 'bg-secondary' }}">
-                      {{ $item->status_pembinaan }}
+                    {{ $item->status_pembinaan }}
                   </span>
                 </td>
                 <td>
-                @php
-                  $role = optional(Auth::user()->role)->name;
-                @endphp
-                @php
-                  $role = optional(Auth::user()->role)->name;
-                @endphp
-
-                @if($role === 'user')
-                  <a href="{{ route('user.umkm.showuser', $item->id) }}#top" class="btn btn-info btn-sm" title="Detail">
+                  @if($role === 'user')
+                    <a href="{{ route('user.umkm.showuser', $item->id) }}#top" class="btn btn-info btn-sm" title="Detail">
                       <i class="fa fa-eye"></i>
-                  </a>
-                @endif
-                @if(optional(Auth::user()->role)->name === 'admin')
-                  <a href="{{ route('admin.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm">
-                      <i class="fa fa-edit"></i> 
-                  </a>
-                @endif
+                    </a>
+                  @endif
+
+                  @if($role === 'admin')
+                    <a href="{{ route('admin.sertifikasi.edit', $item->id) }}" class="btn btn-warning btn-sm" title="Edit">
+                      <i class="fa fa-edit"></i>
+                    </a>
+                  @endif
+
                   <a href="{{ route('umkm.export.word.single', $item->id) }}" class="btn btn-success btn-sm" title="Download">
                     <i class="fa fa-download"></i>
                   </a>
-                @if(optional(Auth::user()->role)->name === 'admin')
-                  <form action="{{ route('admin.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline" id="delete-form-{{ $item->id }}">
-                    @csrf
-                    @method('DELETE')
-                    <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete({{ $item->id }})">
-                      <i class="fa fa-trash"></i>
-                    </button>
-                  </form>
-                @endif
+
+                  @if($role === 'admin')
+                    <form action="{{ route('admin.sertifikasi.destroy', $item->id) }}" method="POST" class="d-inline delete-form">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </form>
+                  @endif
                 </td>
               </tr>
             @empty
@@ -97,42 +92,48 @@ thead {
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
+    // Matikan warning DataTables
+    $.fn.dataTable.ext.errMode = 'none';
+
     $('#sertifikasiTable').DataTable({
       language: {
         search: "Cari:",
         lengthMenu: "Tampilkan _MENU_ entri",
         info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
         paginate: {
-          first: "Pertama",
-          last: "Terakhir",
-          next: "→",
-          previous: "←"
+          previous: '<i class="fa fa-chevron-left"></i>',
+          next: '<i class="fa fa-chevron-right"></i>'
         },
         emptyTable: "Belum ada UMKM tersertifikasi.",
         zeroRecords: "Tidak ditemukan data yang cocok."
       },
-      responsive: true
+      responsive: true,
+      columnDefs: [
+        { orderable: false, targets: [4] } // kolom aksi tidak di-sort
+      ]
+    });
+
+    // Konfirmasi hapus
+    document.querySelectorAll('.delete-form').forEach(form => {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Yakin ingin menghapus?',
+          text: "Data yang dihapus tidak bisa dikembalikan!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Ya, hapus!',
+          cancelButtonText: 'Batal'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.submit();
+          }
+        });
+      });
     });
   });
-
-  function confirmDelete(id) {
-    Swal.fire({
-      title: 'Yakin ingin menghapus?',
-      text: "Data yang dihapus tidak bisa dikembalikan!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ya, hapus!',
-      cancelButtonText: 'Batal'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        document.getElementById('delete-form-' + id).submit();
-      }
-    });
-  }
 </script>
 @endpush
-
-
