@@ -14,7 +14,7 @@ class UMKMSertifikasiController extends Controller
 {
     public function index(Request $request)
     {
-        $items= Tahap1::where('status_pembinaan','=','SPPT SNI (TERSERTIFIKASI)')->get(); 
+        $items = Tahap1::where('status_pembinaan', 'SPPT SNI (TERSERTIFIKASI)')->get();
 
         return view('umkm.sertifikasi.index', compact('items'));
     }
@@ -53,119 +53,39 @@ class UMKMSertifikasiController extends Controller
         ));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $filename)
     {
-        DB::transaction(function () use ($request, $id) {
-            $tahap1 = Tahap1::findOrFail($id);
-            $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+        $filename = urldecode($filename);
 
-            // Validasi Tahap 1
-            $validated1 = $request->validate([
-                'nama_pelaku' => 'nullable|string|max:255',
-                'produk' => 'nullable|string|max:255',
-                'klasifikasi' => 'nullable|string|max:255',
-                'status' => 'nullable|string|max:255',
-                'pembina_1' => 'nullable|string|max:255',
-                'pembina_2' => 'nullable|string|max:255',
-                'sinergi' => 'nullable|string|max:255',
-                'nama_kontak_person' => 'nullable|string|max:255',
-                'no_hp' => 'nullable|string|max:25',
-                'bulan_pertama_pembinaan' => 'required',
-                'tahun_dibina' => 'nullable|string|max:4',
-                'riwayat_pembinaan' => 'nullable|string',
-                'status_pembinaan' => 'nullable|string|max:50',
-                'email' => 'nullable|email|max:255',
-                'media_sosial' => 'nullable|string|max:255',
-                'nama_merek' => 'nullable|string|max:255',
-                'lspro' => 'nullable|string|max:255',
-                'jenis_usaha' => 'nullable|string|max:255',
-                'tanda_daftar_merk' => 'nullable|string|max:255',
-            ]);
+        $request->validate([
+            'file' => 'required|file|mimes:doc,docx,xls,xlsx|max:2048',
+        ]);
 
-            // Validasi Tahap 2
-            $validated2 = $request->validate([
-                'omzet' => 'nullable|numeric',
-                'volume_per_tahun' => 'nullable|string|max:255',
-                'jumlah_tenaga_kerja' => 'nullable|integer',
-                'tahun_pendirian' => 'nullable|string|max:4',
-                'alamat_kantor' => 'nullable|string|max:255',
-                'provinsi_kantor' => 'nullable|string|max:255',
-                'kota_kantor' => 'nullable|string|max:255',
-                'alamat_pabrik' => 'nullable|string|max:255',
-                'provinsi_pabrik' => 'nullable|string|max:255',
-                'kota_pabrik' => 'nullable|string|max:255',
-                'link_dokumen' => 'nullable|url|max:255',
-                'sni_yang_diterapkan' => 'nullable|string',
-                'gruping' => 'nullable|string|max:255',
-            ]);
+        // Use storage path
+        $path = storage_path('app/public/template/' . $filename);
 
-            // Handle array fields → JSON
-            $legalitas = $request->input('legalitas_usaha', []);
-            if ($request->filled('legalitas_usaha_lainnya')) {
-                $legalitas[] = $request->legalitas_usaha_lainnya;
-            }
-            $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
-            $validated2['sertifikat'] = json_encode($request->input('sertifikat', []));
-            $validated2['jangkauan_pemasaran'] = json_encode($request->input('jangkauan_pemasaran', []));
+        // Delete old file if exists
+        if (file_exists($path)) {
+            unlink($path);
+        }
 
-            // Legalitas
-            $legalitas = $request->input('legalitas_usaha', []);
-            if (in_array('lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
-                $legalitas = array_diff($legalitas, ['lainnya']);
-                $legalitas[] = $request->legalitas_usaha_lainnya;
-            }
-            $validated2['legalitas_usaha'] = json_encode(array_filter($legalitas));
+        // Store new file
+        $request->file('file')->storeAs('public/template', $filename);
 
-            // Sertifikat
-            $sertifikat = $request->input('sertifikat', []);
-            if (in_array('lainnya', $sertifikat) && $request->filled('sertifikat_lainnya')) {
-                $sertifikat = array_diff($sertifikat, ['lainnya']);
-                $sertifikat[] = $request->sertifikat_lainnya;
-            }
-            $validated2['sertifikat'] = json_encode(array_filter($sertifikat));
+        return redirect()->route('admin.templates.index')->with('success', 'Template berhasil diperbarui.');
+    }
 
-            // Instansi
-            $instansiFinal = [];
-            foreach ($request->input('instansi_check', []) as $key) {
-                $instansiFinal[$key] = $request->input("instansi_detail.$key", '');
-            }
-            $validated2['instansi'] = json_encode($instansiFinal);
+    public function destroy($filename)
+    {
+        $filename = urldecode($filename);
+        $path = storage_path('app/public/template/' . $filename);
 
-            // jangkauan pemsaran
-            $jangkauanFinal = [];
-            foreach ($request->input('jangkauan_pemasaran', []) as $key) {
-                if ($key === 'Lainnya' && $request->filled('jangkauan_pemasaran_lainnya')) {
-                    $jangkauanFinal[$key] = $request->jangkauan_pemasaran_lainnya;
-                } else {
-                    $jangkauanFinal[$key] = $request->input("jangkauan_detail.$key", '');
-                }
-            }
-            $validated2['jangkauan_pemasaran'] = json_encode($jangkauanFinal);
+        if (file_exists($path)) {
+            unlink($path);
+            return redirect()->route('admin.templates.index')->with('success', 'Template berhasil dihapus.');
+        }
 
-            // Foto Produk
-            $fotoProduk = json_decode($tahap2->foto_produk ?? '[]', true);
-            if ($request->hasFile('foto_produk')) {
-                foreach ($request->file('foto_produk') as $file) {
-                    $fotoProduk[] = $file->store('uploads/foto_produk', 'public');
-                }
-            }
-            $validated2['foto_produk'] = json_encode($fotoProduk);
-
-            // Foto Tempat Produksi
-            $fotoTempat = json_decode($tahap2->foto_tempat_produksi ?? '[]', true);
-            if ($request->hasFile('foto_tempat_produksi')) {
-                foreach ($request->file('foto_tempat_produksi') as $file) {
-                    $fotoTempat[] = $file->store('uploads/foto_tempat', 'public');
-                }
-            }
-            $validated2['foto_tempat_produksi'] = json_encode($fotoTempat);
-
-            // Update database
-            $tahap1->update($validated1);
-            $tahap2->update($validated2);
-        });
-
-        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data UMKM berhasil diperbarui.');
+        return redirect()->route('admin.templates.index')->withErrors(['File tidak ditemukan.']);
     }
 
     public function getProvinsi()
@@ -178,42 +98,6 @@ class UMKMSertifikasiController extends Controller
     {
         $kota = Kota::where('provinsi_id', $provinsi_id)->get();
         return response()->json($kota);
-    }
-
-    public function destroy($id)
-    {
-        $tahap1 = Tahap1::findOrFail($id);
-        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
-
-        if ($tahap2) {
-            // Hapus file foto_produk
-            $fotoProduk = json_decode($tahap2->foto_produk, true);
-            if (is_array($fotoProduk)) {
-                foreach ($fotoProduk as $file) {
-                    $path = public_path("storage/" . $file);
-                    if (File::exists($path)) {
-                        File::delete($path);
-                    }
-                }
-            }
-
-            // Hapus file foto_tempat_produksi
-            $fotoTempat = json_decode($tahap2->foto_tempat_produksi, true);
-            if (is_array($fotoTempat)) {
-                foreach ($fotoTempat as $file) {
-                    $path = public_path("storage/" . $file);
-                    if (File::exists($path)) {
-                        File::delete($path);
-                    }
-                }
-            }
-
-            $tahap2->delete();
-        }
-
-        $tahap1->delete();
-
-        return redirect()->route('umkm.sertifikasi.index')->with('success', 'Data berhasil dihapus.');
     }
 
 }

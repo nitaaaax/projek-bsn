@@ -29,7 +29,7 @@ class WilayahController extends Controller
             })
             ->get();
 
-        return view('wilayah.index', compact('provinsis', 'kotas', 'search'));
+        return view('admin.wilayah.index', compact('provinsis', 'kotas', 'search'));
     }
 
     public function store(Request $request)

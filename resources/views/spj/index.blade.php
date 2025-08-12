@@ -227,7 +227,7 @@
           <div>
             <strong>Penting!</strong><br>
             Gunakan template berikut untuk mengisi data SPJ agar formatnya sesuai.<br>
-            <a href="{{ asset('template/template_importspj.xlsx') }}" class="text-decoration-underline text-primary" download>
+            <a href="{{ asset('template/templatespj.xlsx') }}" class="text-decoration-underline text-primary" download>
               Klik di sini untuk download template.
             </a>
           </div>

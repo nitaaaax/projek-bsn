@@ -9,10 +9,6 @@ use App\Exports\SpjExport;
 use App\Imports\SpjImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
-use PhpOffice\PhpWord\Element\TextRun;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use PhpOffice\PhpWord\TemplateProcessor;
-use Carbon\Carbon;
 
 class SpjController extends Controller
 {
@@ -178,68 +174,5 @@ class SpjController extends Controller
 
         return redirect()->route('spj.index')->with('success', 'Data berhasil dihapus.');
     }
-
-
-    public function downloadWord($detailId)
-    {
-        $detail = SpjDetail::with('spj')->findOrFail($detailId);
-        $spj = $detail->spj;
-
-        $templatePath = public_path('template/template_ekspor_spj.docx');
-        if (!file_exists($templatePath)) {
-            abort(404, 'Template Word tidak ditemukan di: ' . $templatePath);
-        }
-
-        $templateProcessor = new TemplateProcessor($templatePath);
-
-        // Fungsi angka ke terbilang
-        $angkaToTerbilang = function($angka) use (&$angkaToTerbilang) {
-            $angka = (int)$angka;
-            $bilangan = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas'];
-            if ($angka == 0) return '';
-            elseif ($angka < 12) return $bilangan[$angka];
-            elseif ($angka < 20) return $angkaToTerbilang($angka - 10) . ' belas';
-            elseif ($angka < 100) return trim($angkaToTerbilang(intval($angka / 10)) . ' puluh ' . $angkaToTerbilang($angka % 10));
-            elseif ($angka < 200) return 'seratus ' . $angkaToTerbilang($angka - 100);
-            elseif ($angka < 1000) return trim($angkaToTerbilang(intval($angka / 100)) . ' ratus ' . $angkaToTerbilang($angka % 100));
-            elseif ($angka < 2000) return 'seribu ' . $angkaToTerbilang($angka - 1000);
-            elseif ($angka < 1000000) return trim($angkaToTerbilang(intval($angka / 1000)) . ' ribu ' . $angkaToTerbilang($angka % 1000));
-            elseif ($angka < 1000000000) return trim($angkaToTerbilang(intval($angka / 1000000)) . ' juta ' . $angkaToTerbilang($angka % 1000000));
-            else return 'angka terlalu besar';
-        };
-
-        // Format nominal & bold
-        $nominal = $detail->nominal ?? 0;
-        $formattedNominal = 'Rp. ' . number_format($nominal, 0, ',', '.');
-        $nominalTextRun = new TextRun();
-        $nominalTextRun->addText($formattedNominal, ['bold' => true]);
-
-        // Terbilang
-        $terbilang = ucfirst(strtolower(trim($angkaToTerbilang($nominal)))) . ' rupiah';
-
-        // Set value ke template
-        $templateProcessor->setValue('No_UKD', $spj->no_ukd ?? '-');
-        $templateProcessor->setValue('item', $detail->item ?? '-');
-        $templateProcessor->setComplexValue('nominal', $nominalTextRun);
-        $templateProcessor->setValue('terbilang_nominal', '= ' . $terbilang . ' =');
-        $templateProcessor->setValue('lembaga_sertifikasi', $spj->lembaga_sertifikasi ?? '-');
-
-        // Tanggal
-        $bulan = [1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'];
-        $tanggalSekarang = now();
-        $templateProcessor->setValue('tanggal_ekspor', $tanggalSekarang->day . ' ' . $bulan[(int)$tanggalSekarang->month] . ' ' . $tanggalSekarang->year);
-
-        // Nama file
-        $fileName = 'Kuitansi_Item_' . $detail->id . '.docx';
-        $savePath = storage_path('app/public/' . $fileName);
-
-        $templateProcessor->saveAs($savePath);
-
-        return response()->download($savePath)->deleteFileAfterSend(true);
-    }
-
-
-
-
 
 }

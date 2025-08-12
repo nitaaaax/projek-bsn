@@ -25,9 +25,10 @@
 
       {{-- Tabel --}}
       <div class="table-responsive">
-        <table class="table table-bordered align-middle">
+        <table id="usersTable" class="table table-bordered table-hover align-middle">
           <thead class="bg-light text-dark text-center fw-bold">
             <tr>
+              <th style="width: 50px;">No</th>
               <th>Username</th>
               <th>Email</th>
               <th>Role</th>
@@ -35,8 +36,9 @@
             </tr>
           </thead>
           <tbody>
-            @forelse ($users as $user)
+            @forelse ($users as $index => $user)
             <tr>
+              <td class="text-center">{{ $index + 1 }}</td>
               <td>{{ $user->username }}</td>
               <td>{{ $user->email }}</td>
               <td>
@@ -61,17 +63,18 @@
                   @method('DELETE')
                 </form>
 
-               <form id="reset-form-{{ $user->id }}" action="{{ route('admin.users.resetPassword', $user->id) }}" method="POST" class="d-inline">
-                @csrf
-                <button type="button" class="btn btn-sm btn-warning reset-password-btn" data-id="{{ $user->id }}">
-                  <i class="fa fa-key"></i>
-                </button>
-              </form>
+                {{-- Reset Password --}}
+                <form id="reset-form-{{ $user->id }}" action="{{ route('admin.users.resetPassword', $user->id) }}" method="POST" class="d-inline">
+                  @csrf
+                  <button type="button" class="btn btn-sm btn-warning reset-password-btn" data-id="{{ $user->id }}">
+                    <i class="fa fa-key"></i>
+                  </button>
+                </form>
               </td>
             </tr>
             @empty
             <tr>
-              <td colspan="4" class="text-center text-muted">Belum ada data akun.</td>
+              <td colspan="5" class="text-center text-muted">Belum ada data akun.</td>
             </tr>
             @endforelse
           </tbody>
@@ -81,10 +84,15 @@
     </div>
   </div>
 </div>
-
 @endsection
 
 @push('scripts')
+<!-- DataTables CSS & JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 function confirmDelete(id) {
@@ -103,9 +111,7 @@ function confirmDelete(id) {
     }
   });
 }
-</script>
 
-<script>
 document.querySelectorAll('.reset-password-btn').forEach(button => {
   button.addEventListener('click', function () {
     const userId = this.dataset.id;
@@ -126,6 +132,17 @@ document.querySelectorAll('.reset-password-btn').forEach(button => {
     });
   });
 });
-</script>
 
+// Init DataTables
+$(document).ready(function () {
+  $('#usersTable').DataTable({
+    paging: true,
+    lengthChange: false,
+    searching: false, 
+    ordering: true,
+    info: true,
+    autoWidth: false
+  });
+});
+</script>
 @endpush

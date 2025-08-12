@@ -25,9 +25,6 @@
   @endif
 </div>
 
-
-
-
       {{-- Tabel --}}
       <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle text-center" id="tabelUMKM">
@@ -35,9 +32,8 @@
             <tr>
               <th>No</th>
               <th>Nama Pelaku</th>
-              <th>Produk</th>
+              <th>Nama Merk</th>
               <th>Status</th>
-              <th>Status Pembinaan</th>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -46,9 +42,8 @@
               <tr>
                 <td>{{ $loop->iteration }}</td>
                 <td class="text-start">{{ $t->nama_pelaku }}</td>
-                <td>{{ $t->produk }}</td>
-                <td><span class="badge bg-secondary">{{ $t->status }}</span></td>
-                <td><span class="badge bg-secondary">{{ $t->status_pembinaan }}</span></td>
+                <td>{{ trim($t->nama_merek) !== '' ? $t->nama_merek : '-' }}</td>
+                <td><span class="badge bg-secondary">{{ trim($t->status) !== '' ? $t->status : '-' }}</span></td>                
                 <td>
                   @php $role = optional(Auth::user()->role)->name; @endphp
                   @if($role === 'admin')
@@ -84,7 +79,6 @@
           </tbody>
         </table>
       </div>
-
 
       {{-- Modal Import --}}
       <div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">

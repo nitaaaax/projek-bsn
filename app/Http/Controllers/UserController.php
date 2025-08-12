@@ -20,12 +20,12 @@ class UserController extends Controller
             })
             ->get();
 
-        return view('admin.users.index', compact('users'));
+        return view('admin.roleindex', compact('users'));
     }
 
     public function create() {
         $roles = Role::all(); 
-        return view('admin.users.create', compact('roles')); 
+        return view('admin.rolecreate', compact('roles')); 
     }
 
     public function store(Request $request)
@@ -44,7 +44,7 @@ class UserController extends Controller
             'role_id' => $request->role_id,
         ]);
 
-        return redirect()->route('admin.users.index')->with('success', 'Akun Berhasil Ditambahkan.');;
+        return redirect()->route('admin.roleindex')->with('success', 'Akun Berhasil Ditambahkan.');;
     }
 
     public function destroy($id)
@@ -123,6 +123,6 @@ class UserController extends Controller
         $user->password = Hash::make('123456');
         $user->save();
 
-        return redirect()->route('admin.users.index')->with('success', 'Password berhasil direset ke default.');
+        return redirect()->route('admin.roleindex')->with('success', 'Password berhasil direset ke default.');
     }
 }

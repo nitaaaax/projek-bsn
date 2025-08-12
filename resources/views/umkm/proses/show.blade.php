@@ -151,7 +151,7 @@
                     <div class="col-md-12">
                         <label class="form-label">Riwayat Pembinaan</label>
                         <textarea id="editor" name="riwayat_pembinaan" class="form-control">
-                            {!! old('riwayat_pembinaan', $tahap1->riwayat_pembinaan ?? '') !!}
+                        {{ old('riwayat_pembinaan', is_array($tahap1->riwayat_pembinaan) ? implode(', ', $tahap1->riwayat_pembinaan) : ($tahap1->riwayat_pembinaan ?? '')) }}
                         </textarea>
                     </div>
                 </div>

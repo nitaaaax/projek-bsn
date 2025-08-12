@@ -9,17 +9,19 @@
     <i class="fas fa-plus me-1"></i> Tambah Provinsi
   </button>
 
- <div class="d-flex justify-content-end mb-3">
-      <form action="{{ route('wilayah.index') }}" method="GET" class="d-flex" style="max-width: 300px;">
-        <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Cari provinsi & kota" value="{{ request('search') }}">
-        <button class="btn btn-sm btn-outline-primary" type="submit">Cari</button>
-      </form>
-    </div>
-  {{-- Card Tabel --}}
+  {{-- Search --}}
+  <div class="d-flex justify-content-end mb-3">
+    <form action="{{ route('wilayah.index') }}" method="GET" class="d-flex" style="max-width: 300px;">
+      <input type="text" name="search" class="form-control form-control-sm me-2" placeholder="Cari provinsi & kota" value="{{ request('search') }}">
+      <button class="btn btn-sm btn-outline-primary" type="submit">Cari</button>
+    </form>
+  </div>
+
+  {{-- Card Tabel Provinsi --}}
   <div class="card shadow-sm rounded-4 border-0">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-hover table-striped align-middle mb-0">
+        <table id="provinsiTable" class="table table-hover table-striped align-middle mb-0">
           <thead class="table-primary">
             <tr>
               <th style="width: 5%;">No</th>
@@ -33,21 +35,20 @@
               <td>{{ $loop->iteration }}</td>
               <td>{{ $provinsi->nama }}</td>
               <td>
-                
-
-                {{-- Tombol Hapus --}}
-               <button class="btn btn-danger btn-sm btn-delete" 
-                data-id="{{ $provinsi->id }}" 
-                data-nama="{{ $provinsi->nama }}">
-                <i class="fas fa-trash-alt"></i>
+                <button class="btn btn-danger btn-sm btn-delete" 
+                        data-id="{{ $provinsi->id }}" 
+                        data-nama="{{ $provinsi->nama }}">
+                  <i class="fas fa-trash-alt"></i>
                 </button>
                 <form id="form-delete-{{ $provinsi->id }}" 
-                action="{{ route('wilayah.destroy', $provinsi->id) }}" 
-                method="POST" style="display:none;">
+                      action="{{ route('wilayah.destroy', $provinsi->id) }}" 
+                      method="POST" style="display:none;">
                   @csrf
                   @method('DELETE')
                   <input type="hidden" name="type" value="provinsi">
                 </form>
+              </td>
+            </tr>
             @empty
             <tr>
               <td colspan="3" class="text-center text-muted">Belum ada data.</td>
@@ -60,7 +61,7 @@
   </div>
 </div>
 
-{{-- Modal Tambah --}}
+{{-- Modal Tambah Provinsi --}}
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-labelledby="tambahLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -80,6 +81,7 @@
     </div>
   </div>
 </div>
+
 {{-- ========================== --}}
 {{-- TABEL KOTA --}}
 {{-- ========================== --}}
@@ -94,7 +96,7 @@
   <div class="card shadow-sm border-0 rounded-4">
     <div class="card-body">
       <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle mb-0">
+        <table id="kotaTable" class="table table-striped table-hover align-middle mb-0">
           <thead class="table-secondary">
             <tr>
               <th style="width: 5%;">No</th>
@@ -110,17 +112,14 @@
               <td>{{ $kota->nama }}</td>
               <td>{{ $kota->provinsi->nama ?? '-' }}</td>
               <td>
-                
-
-                {{-- Tombol Hapus --}}
                 <button class="btn btn-danger btn-sm btn-delete-kota"
                         data-id="{{ $kota->id }}"
                         data-nama="{{ $kota->nama }}">
                   <i class="fas fa-trash-alt"></i>
                 </button>
                 <form id="form-delete-kota-{{ $kota->id }}" 
-                action="{{ route('wilayah.destroy', $kota->id) }}" 
-                method="POST" style="display:none;">
+                      action="{{ route('wilayah.destroy', $kota->id) }}" 
+                      method="POST" style="display:none;">
                   @csrf
                   @method('DELETE')
                   <input type="hidden" name="type" value="kota">
@@ -147,24 +146,19 @@
         @csrf
         <div class="modal-header">
           <h5 class="modal-title" id="tambahKotaLabel">Tambah Kota</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          {{-- Input Nama Kota --}}
           <div class="mb-3">
             <label for="nama_kota" class="form-label">Nama Kota</label>
             <input type="text" id="nama_kota" name="nama_kota" class="form-control" placeholder="Nama Kota" value="{{ old('nama_kota') }}" required>
           </div>
-
-          {{-- Select Provinsi --}}
-         <div class="mb-3">
+          <div class="mb-3">
             <label for="provinsi_id" class="form-label">Provinsi</label>
             <select name="provinsi_id" id="provinsi_id" class="form-select" required>
               <option disabled selected value=""> Pilih Provinsi</option>
               @forelse($provinsis as $provinsi)
-                <option value="{{ $provinsi->id }}">
-                  {{ Str::title($provinsi->nama) }}
-                </option>
+                <option value="{{ $provinsi->id }}">{{ Str::title($provinsi->nama) }}</option>
               @empty
                 <option disabled>Tidak ada provinsi tersedia</option>
               @endforelse
@@ -178,19 +172,32 @@
     </div>
   </div>
 </div>
-
-
 @endsection
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
+// DataTables init (tanpa search bawaan)
+$(document).ready(function () {
+  $('#provinsiTable, #kotaTable').DataTable({
+    paging: true,
+    lengthChange: false,
+    searching: false,
+    ordering: true,
+    info: true,
+    autoWidth: false
+  });
+});
+
 // Hapus Provinsi
 document.querySelectorAll('.btn-delete').forEach(button => {
   button.addEventListener('click', function () {
     const id = this.dataset.id;
     const nama = this.dataset.nama;
-
     Swal.fire({
       title: 'Yakin ingin menghapus?',
       text: `Provinsi "${nama}" akan dihapus!`,
@@ -213,7 +220,6 @@ document.querySelectorAll('.btn-delete-kota').forEach(button => {
   button.addEventListener('click', function () {
     const id = this.dataset.id;
     const nama = this.dataset.nama;
-
     Swal.fire({
       title: 'Yakin ingin menghapus?',
       text: `Kota "${nama}" akan dihapus!`,
@@ -232,4 +238,3 @@ document.querySelectorAll('.btn-delete-kota').forEach(button => {
 });
 </script>
 @endpush
-

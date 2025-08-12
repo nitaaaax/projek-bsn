@@ -6,81 +6,111 @@ use App\Models\Tahap1;
 use App\Models\Tahap2;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class UmkmImport implements ToCollection
+class UmkmImport implements ToCollection, WithHeadingRow
 {
     public function collection(Collection $rows)
     {
-        unset($rows[0]); // Skip header
-
         foreach ($rows as $row) {
+            // Map Excel headers ke field DB tahap1
+            $tahap1Data = [
+                'nama_pelaku'         => $row['nama_umkm'] ?? null,
+                'produk'              => $row['nama_merk'] ?? null,
+                'klasifikasi'         => $row['klasifikasi'] ?? null,
+                'status'              => $row['status'] ?? null,
+                'pembina_1'           => $row['pembina_1'] ?? null,
+                'pembina_2'           => $row['pembina_2'] ?? null,
+                'lspro'               => $row['lspro'] ?? null,
+                'sinergi'             => $row['sinergi'] ?? null,
+                'nama_kontak_person'  => $row['nama_kontak_person'] ?? null,
+                'no_hp'               => $this->normalizeNoHp($row['no_hp'] ?? null),
+                'bulan_pertama_pembinaan' => $row['bulan_pembinaan_pertama'] ?? null,
+                'tahun_dibina'        => $this->normalizeTahun($row['tahun_dibina'] ?? null),
+                'jenis_usaha'         => $this->normalizeJenisUsaha($row['jenis_usaha'] ?? null),
+                'riwayat_pembinaan'   => json_encode($this->normalizeArray($row['riwayat_pembinaan'] ?? null)),
+                'status_pembinaan'    => $row['status_pembinaan'] ?? null,
+                'email'               => $row['email'] ?? null,
+                'media_sosial'        => $row['media_sosial'] ?? null,
+                'nama_merek'          => $row['merk_produk'] ?? null,
+                'tanda_daftar_merk'   => $row['tanda_daftar_merek'] ?? null,
+            ];
 
-            $tahap1 = Tahap1::create([
-                'nama_pelaku'            => $row[1] ?? null,
-                'produk'                 => $row[2] ?? null,
-                'klasifikasi'            => $row[3] ?? null,
-                'status'                 => $row[4] ?? null,
-                'pembina_1'              => $row[5] ?? null,
-                'pembina_2'              => $row[6] ?? null,
-                'sinergi'                => $row[7] ?? null,
-                'nama_kontak_person'     => $row[8] ?? null,
-                'no_hp'                  => $row[9] ?? null,
-                'bulan_pertama_pembinaan'=> $row[10] ?? null,
-                'tahun_dibina'           => $row[11] ?? null,
-                'riwayat_pembinaan'      => $this->normalizeArray($row[12] ?? null),
-                'gruping'                => $row[13] ?? null,
-                'email'                  => $row[14] ?? null,
-                'media_sosial'           => $row[15] ?? null,
-                'jenis_usaha'            => $this->normalizeJenisUsaha($row[21] ?? null),
-                'nama_merek'             => $row[22] ?? null,
-            ]);
+            $tahap1 = Tahap1::create($tahap1Data);
 
-            Tahap2::create([
-                'pelaku_usaha_id'        => $tahap1->id,
-                'alamat_kantor'          => $row[16] ?? null,
-                'provinsi_kantor'        => $row[17] ?? null,
-                'kota_kantor'            => $row[18] ?? null,
-                'legalitas_usaha'        => $row[19] ?? null,
-                'tahun_pendirian'        => $row[20] ?? null,
-                'sni_yang_diterapkan'    => $row[23] ?? null,
-                'lspro'                  => $row[24] ?? null,
-                'omzet'                  => $row[25] ?? null,
-                'volume_per_tahun'       => $row[26] ?? null,
-                'jumlah_tenaga_kerja'    => isset($row[27]) ? preg_replace('/\D/', '', $row[27]) : null,
-                'jangkauan_pemasaran'    => $this->normalizeArray($row[28] ?? null),
-                'link_dokumen'           => $row[29] ?? null,
-            ]);
+            // Map Excel headers ke field DB tahap2
+            $tahap2Data = [
+                'pelaku_usaha_id'      => $tahap1->id,
+                'alamat_kantor'        => $row['alamat_kantor'] ?? null,
+                'provinsi_kantor'      => $row['provinsi_kantor'] ?? null,
+                'kota_kantor'          => $row['kota_kantor'] ?? null,
+                'alamat_pabrik'        => $row['alamat_pabrik'] ?? null,
+                'provinsi_pabrik'      => $row['provinsi_pabrik'] ?? null,
+                'kota_pabrik'          => $row['kota_pabrik'] ?? null,
+                'legalitas_usaha'      => json_encode($this->normalizeArray($row['legalitas_usaha_yang_dimiliki'] ?? null)),
+                'tahun_pendirian'      => $this->normalizeTahun($row['tahun_pendirian'] ?? null),
+                'omzet'                => $this->normalizeInteger($row['permodalan'] ?? null),
+                'volume_per_tahun'     => $this->normalizeInteger($row['volume_produksi_per_bulan'] ?? null),
+                'jumlah_tenaga_kerja'  => $this->normalizeInteger($row['jumlah_tenaga_kerja'] ?? null),
+                'jangkauan_pemasaran'  => json_encode($this->normalizeArray($row['jangkauan_distribusi_dan_pemasaran'] ?? null)),
+                'link_dokumen'         => $row['link_dokumen'] ?? null,
+                'foto_produk'          => json_encode([]),
+                'foto_tempat_produksi' => json_encode([]),
+                'sni_yang_diterapkan'  => $row['sni_terkait'] ?? null,
+                'instansi'             => json_encode([]),
+                'sertifikat'           => json_encode([]),
+                'gruping'              => $row['gruping'] ?? null,
+            ];
+
+            Tahap2::create($tahap2Data);
         }
     }
-
-    private function normalizeBulanNama($bulan)
+    // Helper untuk ambil value dari row dengan key Excel, default null kalau tidak ada
+    private function getValue($row, $key)
     {
-        $bulan = strtolower(trim($bulan));
+        if (is_array($row)) {
+            return $row[$key] ?? null;
+        } elseif ($row instanceof Collection) {
+            return $row->get($key, null);
+        }
+        return null;
+    }
 
-        $mapping = [
-            'januari' => 1, 'februari' => 2, 'maret' => 3, 'april' => 4,
-            'mei' => 5, 'juni' => 6, 'juli' => 7, 'agustus' => 8,
-            'september' => 9, 'oktober' => 10, 'november' => 11, 'desember' => 12,
-        ];
+    private function normalizeTahun($value)
+    {
+        if (is_string($value) && preg_match('/\d{4}/', $value, $matches)) {
+            return $matches[0];
+        }
+        return null;
+    }
 
-        return $mapping[$bulan] ?? null;
+    private function normalizeNoHp($value)
+    {
+        if (!$value) return null;
+        $clean = preg_replace('/\D/', '', $value);
+        return substr($clean, 0, 20);
+    }
+
+    private function normalizeInteger($value)
+    {
+        if (!$value) return null;
+        $number = preg_replace('/\D/', '', $value);
+        return $number !== '' ? (int)$number : null;
+    }
+
+    private function normalizeArray($value)
+    {
+        if (!$value) return [];
+        if (is_array($value)) return $value;
+        return array_filter(array_map('trim', explode(',', $value)));
     }
 
     private function normalizeJenisUsaha($value)
     {
+        if (!$value) return null;
         $value = strtolower(trim($value));
-
-        if (in_array($value, ['pangan', 'p'])) {
-            return 'Pangan';
-        } elseif (in_array($value, ['nonpangan', 'non-pangan', 'np'])) {
-            return 'Nonpangan';
-        }
-
+        if (in_array($value, ['pangan', 'p'])) return 'Pangan';
+        if (in_array($value, ['nonpangan', 'non-pangan', 'np'])) return 'Nonpangan';
         return null;
-    }
-
-    private function normalizeArray($string)
-    {
-        return array_filter(array_map('trim', explode(',', $string)));
     }
 }

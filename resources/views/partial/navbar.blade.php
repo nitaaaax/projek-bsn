@@ -106,9 +106,7 @@
         </button>
       </form>
     </div>
-
 </div>
-
 
       <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
         <li class="nav-item">
@@ -136,13 +134,13 @@
           <ul class="nav nav-treeview">
             <li class="nav-item">
               <a href="{{ route('umkm.proses.index') }}" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+                <i class="fas fa-database nav-icon"></i>
                 <p>Data UMKM Proses</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('umkm.sertifikasi.index') }}" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+                <i class="fas fa-certificate nav-icon"></i>
                 <p>Data UMKM Sertifikasi</p>
               </a>
             </li>
@@ -155,24 +153,30 @@
           <a href="#" class="nav-link">
             <i class="nav-icon fas fa-user-shield"></i>
             <p>
-              Manajement
+              Admin Managements
               <i class="right fas fa-angle-left"></i>
             </p>
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
               <a href="{{ route('admin.users.index') }}" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
+                <i class="fas fa-user-cog nav-icon"></i>
                 <p>Role</p>
               </a>
             </li>
            <li class="nav-item">
-  <a href="{{ route('wilayah.index') }}" class="nav-link {{ request()->routeIs('wilayah.index') ? 'active' : '' }}">
-    <i class="far fa-circle nav-icon"></i>
-    <p>Provinsi & Kota</p>
-  </a>
-</li>
-
+            <a href="{{ route('wilayah.index') }}" class="nav-link {{ request()->routeIs('wilayah.index') ? 'active' : '' }}">
+              <i class="fas fa-building nav-icon"></i>
+              <p>Provinsi & Kota</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{{ route('admin.templates.index') }}" 
+              class="nav-link {{ request()->routeIs('admin.admin.templates.*') ? 'active' : '' }}">
+                <i class="fas fa-file nav-icon"></i>
+                <p>Template</p>
+            </a>
+          </li>
           </ul>
         </li>
         @endif

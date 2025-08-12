@@ -15,8 +15,11 @@ class UMKMProsesController extends Controller
 {
     public function index(Request $request)
     {
-
-        $tahap1= Tahap1::where('status_pembinaan','!=','SPPT SNI (TERSERTIFIKASI)')->get(); 
+        $tahap1 = Tahap1::where(function($query) {
+            $query->where('status_pembinaan', '!=', 'SPPT SNI (TERSERTIFIKASI)')
+                ->orWhereNull('status_pembinaan')
+                ->orWhere('status_pembinaan', '');
+        })->get();
 
         return view('umkm.proses.index', compact('tahap1'));
     }
@@ -261,12 +264,23 @@ class UMKMProsesController extends Controller
         return redirect()->route('umkm.proses.index')->with('success', 'Data berhasil dihapus.');
     }
 
-    public function showUser($id){
-    $tahap1 = Tahap1::findOrFail($id);
+    // UMKMProsesController.php
+public function showUser($id)
+{
+    // Cek data tahap 1
+    $tahap1 = Tahap1::find($id);
+    if (!$tahap1) {
+        return redirect()
+            ->route('user.umkm.index')
+            ->with('error', 'Data Tahap 1 tidak ditemukan.');
+    }
+
+    // Ambil tahap 2 sesuai pelaku_usaha_id
     $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
 
-    return view('user.showuser', compact('tahap1', 'tahap2'));
-    }
+    return view('umkm.user.showuser', compact('tahap1', 'tahap2'));
+}
+
 
     private function mergeOldWithNewFiles($request, $oldFiles, $fieldName)
     {
