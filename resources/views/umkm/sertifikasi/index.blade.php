@@ -2,13 +2,15 @@
 
 @section('content')
 <style>
+/* Anda dapat menjaga thead styling jika diinginkan */
 thead {
   background-color: #d4edda;
   color: #155724;
 }
-.table-responsive {
+/* Baris ini TIDAK ADA di sini, dan itu bagus karena tidak menghambat responsivitas DataTables */
+/* .table-responsive {
   overflow-x: unset !important;
-}
+} */
 </style>
 
 <div class="container mt-4">
@@ -18,7 +20,7 @@ thead {
         <i class="fa fa-certificate"></i> Data UMKM Tersertifikasi
       </h3>
 
-      <div class="table-responsive">
+      <div class="table-responsive"> {{-- Biarkan kelas ini untuk DataTables Responsive --}}
         <table id="sertifikasiTable" class="table table-hover table-bordered align-middle text-center">
           <thead class="table-success">
             <tr>
@@ -30,18 +32,18 @@ thead {
             </tr>
           </thead>
           <tbody>
-            @forelse($items as $item)
+            @forelse($items ?? [] as $item) {{-- Pastikan $items tidak null --}}
               @php
                 $role = optional(Auth::user()->role)->name;
                 $isSertif = $item->status_pembinaan === 'SPPT SNI (TERSERTIFIKASI)';
               @endphp
               <tr>
                 <td>{{ $loop->iteration }}</td>
-                <td class="text-start">{{ $item->nama_pelaku }}</td>
-                <td>{{ $item->produk }}</td>
+                <td class="text-start">{{ $item->nama_pelaku ?? '-' }}</td> {{-- Tambah null coalescing --}}
+                <td>{{ $item->produk ?? '-' }}</td> {{-- Tambah null coalescing --}}
                 <td>
                   <span class="badge {{ $isSertif ? 'bg-success' : 'bg-secondary' }}">
-                    {{ $item->status_pembinaan }}
+                    {{ $item->status_pembinaan ?? '-' }}
                   </span>
                 </td>
                 <td>
@@ -86,10 +88,31 @@ thead {
 </div>
 @endsection
 
+@push('styles')
+{{-- DataTables CSS --}}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{{-- DataTables Bootstrap 5 CSS (untuk styling DataTables agar cocok dengan Bootstrap) --}}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+{{-- DataTables Responsive CSS (penting untuk responsivitas di layar kecil) --}}
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+{{-- Font Awesome untuk ikon --}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0x0zNyXfUaJ/gL7vX7+P/xM/uJ+fR/M+xT1pQ8/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw/BwFw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+@endpush
+
 @push('scripts')
+{{-- JQuery (DataTables membutuhkan ini) --}}
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+{{-- SweetAlert2 untuk notifikasi --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- DataTables Core JS --}}
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+{{-- DataTables Bootstrap 5 JS (untuk integrasi dengan Bootstrap 5) --}}
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+{{-- DataTables Responsive Core JS (penting untuk fungsionalitas responsif) --}}
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+{{-- DataTables Responsive Bootstrap 5 JS (untuk styling responsif agar cocok dengan Bootstrap) --}}
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
 
 <script>
   $(document).ready(function () {
@@ -108,7 +131,7 @@ thead {
         emptyTable: "Belum ada UMKM tersertifikasi.",
         zeroRecords: "Tidak ditemukan data yang cocok."
       },
-      responsive: true,
+      responsive: true, // FITUR RESPONSIVE DATATABLES AKAN MENYEMBUNYIKAN KOLOM KE DALAM DETAIL BARIS
       columnDefs: [
         { orderable: false, targets: [4] } // kolom aksi tidak di-sort
       ]

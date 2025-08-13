@@ -2,10 +2,8 @@
 
 @section('content')
 <style>
-    /* Step Navigation */
     .step-nav {
         display: flex;
-        width: 100%;
         margin-bottom: 10px;
         border-radius: 8px;
         overflow: hidden;
@@ -18,16 +16,12 @@
         cursor: pointer;
         font-weight: 500;
         text-align: center;
-        transition: all 0.3s ease;
     }
     .step-btn.active {
         background-color: #007bff;
         color: white;
     }
-
-    /* Progress Bar */
     .progress-container {
-        width: 100%;
         height: 6px;
         background-color: #e0e0e0;
         border-radius: 3px;
@@ -40,18 +34,17 @@
         width: 0%;
         transition: width 0.3s ease;
     }
-
-    /* Step Form */
+    /* tidak pakai display:none */
     .form-step {
-        display: none;
-        animation: fadeIn 0.4s ease-in-out;
+        position: relative;
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
     }
     .form-step.active {
-        display: block;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        opacity: 1;
+        height: auto;
     }
 </style>
 
@@ -71,7 +64,7 @@
         </div>
 
         <form 
-            action="{{ isset($id) ? route('admin.umkm.store', $id) : route('admin.umkm.store') }}"
+            action="{{ isset($id) ? route('admin.umkm.update', $id) : route('admin.umkm.store') }}"
             method="POST" enctype="multipart/form-data">
 
             @csrf
@@ -81,7 +74,6 @@
             {{-- Step 1 --}}
             <div class="form-step" id="step-1">
                 @includeIf('tahap.partials.tahap1', ['data' => $data ?? null])
-
                 <div class="mt-4 text-end">
                     <button type="button" class="btn btn-primary px-4" id="btn-next">
                         Lanjut →
@@ -92,10 +84,12 @@
             {{-- Step 2 --}}
             <div class="form-step" id="step-2">
                 @includeIf('tahap.partials.tahap2', ['data' => $data ?? null])
-
                 <div class="mt-4 text-end">
+                    <button type="button" class="btn btn-secondary px-4 me-2" id="btn-prev">
+                        ← Kembali
+                    </button>
                     <button type="submit" class="btn btn-success px-4 py-2">
-                         Simpan Data
+                        Simpan Data
                     </button>
                 </div>
             </div>
@@ -103,7 +97,6 @@
     </div>
 </div>
 
-{{-- Script Step Form --}}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const stepButtons = document.querySelectorAll(".step-btn");
@@ -126,9 +119,12 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 
-    // Next button in Step 1
     document.getElementById("btn-next").addEventListener("click", function() {
         showStep("2");
+    });
+
+    document.getElementById("btn-prev").addEventListener("click", function() {
+        showStep("1");
     });
 
     // Default buka Tahap 1

@@ -265,21 +265,41 @@ class UMKMProsesController extends Controller
     }
 
     // UMKMProsesController.php
-public function showUser($id)
-{
-    // Cek data tahap 1
-    $tahap1 = Tahap1::find($id);
-    if (!$tahap1) {
-        return redirect()
-            ->route('user.umkm.index')
-            ->with('error', 'Data Tahap 1 tidak ditemukan.');
+    public function showUser($id)
+    {
+        $tahap1 = Tahap1::find($id);
+        if (!$tahap1) {
+            return redirect()
+                ->route('user.umkm.index')
+                ->with('error', 'Data Tahap 1 tidak ditemukan.');
+        }
+
+        $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
+
+        // Default kosong biar nggak error di Blade
+        $provinsiKantor = $kotaKantor = $provinsiPabrik = $kotaPabrik = '-';
+
+        if ($tahap2) {
+            if ($tahap2->provinsi_kantor) {
+                $provinsiKantor = \DB::table('provinsis')->where('id', $tahap2->provinsi_kantor)->value('nama');
+            }
+            if ($tahap2->kota_kantor) {
+                $kotaKantor = \DB::table('kotas')->where('id', $tahap2->kota_kantor)->value('nama');
+            }
+            if ($tahap2->provinsi_pabrik) {
+                $provinsiPabrik = \DB::table('provinsis')->where('id', $tahap2->provinsi_pabrik)->value('nama');
+            }
+            if ($tahap2->kota_pabrik) {
+                $kotaPabrik = \DB::table('kotas')->where('id', $tahap2->kota_pabrik)->value('nama');
+            }
+        }
+
+        return view('umkm.user.showuser', compact(
+            'tahap1', 'tahap2',
+            'provinsiKantor', 'kotaKantor',
+            'provinsiPabrik', 'kotaPabrik'
+        ));
     }
-
-    // Ambil tahap 2 sesuai pelaku_usaha_id
-    $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
-
-    return view('umkm.user.showuser', compact('tahap1', 'tahap2'));
-}
 
 
     private function mergeOldWithNewFiles($request, $oldFiles, $fieldName)

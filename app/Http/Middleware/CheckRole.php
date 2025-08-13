@@ -3,22 +3,29 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class CheckRole
 {
-    public function handle($request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, $role)
     {
-        $user = auth()->user();
+        if (!auth()->check()) {
+            abort(403, 'Silakan login terlebih dahulu.');
+        }
 
-        // Kalau pakai relasi role()
-        $userRoleName = $user->role->name ?? null;
+        // Ambil nama role dari relasi Role
+        $userRole = strtolower(trim(auth()->user()->role->name ?? ''));
 
-        if ($userRoleName === $role) {
+        // Admin bebas akses semua
+        if ($userRole === 'admin') {
             return $next($request);
         }
 
-        abort(403, 'Akses ditolak.');
-    }
+        // Selain admin, harus cocok dengan parameter middleware
+        if ($userRole !== strtolower(trim($role))) {
+            abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        }
 
+        return $next($request);
+    }
 }

@@ -441,7 +441,7 @@ class ExportImportController extends Controller
 
         // Nama file
         $fileName = 'Kuitansi_Item_' . $detail->id . '.docx';
-        $savePath = public_path('app/public/' . $fileName);
+        $savePath = public_path('storage/' . $fileName); // If you want it in storage
 
         $templateProcessor->saveAs($savePath);
 

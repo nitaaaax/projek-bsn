@@ -16,7 +16,7 @@ class UmkmImport implements ToCollection, WithHeadingRow
             // Map Excel headers ke field DB tahap1
             $tahap1Data = [
                 'nama_pelaku'         => $row['nama_umkm'] ?? null,
-                'produk'              => $row['nama_merk'] ?? null,
+                'produk'              => $row['merk_produk'] ?? null,
                 'klasifikasi'         => $row['klasifikasi'] ?? null,
                 'status'              => $row['status'] ?? null,
                 'pembina_1'           => $row['pembina_1'] ?? null,
@@ -39,30 +39,53 @@ class UmkmImport implements ToCollection, WithHeadingRow
             $tahap1 = Tahap1::create($tahap1Data);
 
             // Map Excel headers ke field DB tahap2
-            $tahap2Data = [
-                'pelaku_usaha_id'      => $tahap1->id,
-                'alamat_kantor'        => $row['alamat_kantor'] ?? null,
-                'provinsi_kantor'      => $row['provinsi_kantor'] ?? null,
-                'kota_kantor'          => $row['kota_kantor'] ?? null,
-                'alamat_pabrik'        => $row['alamat_pabrik'] ?? null,
-                'provinsi_pabrik'      => $row['provinsi_pabrik'] ?? null,
-                'kota_pabrik'          => $row['kota_pabrik'] ?? null,
-                'legalitas_usaha'      => json_encode($this->normalizeArray($row['legalitas_usaha_yang_dimiliki'] ?? null)),
-                'tahun_pendirian'      => $this->normalizeTahun($row['tahun_pendirian'] ?? null),
-                'omzet'                => $this->normalizeInteger($row['permodalan'] ?? null),
-                'volume_per_tahun'     => $this->normalizeInteger($row['volume_produksi_per_bulan'] ?? null),
-                'jumlah_tenaga_kerja'  => $this->normalizeInteger($row['jumlah_tenaga_kerja'] ?? null),
-                'jangkauan_pemasaran'  => json_encode($this->normalizeArray($row['jangkauan_distribusi_dan_pemasaran'] ?? null)),
-                'link_dokumen'         => $row['link_dokumen'] ?? null,
-                'foto_produk'          => json_encode([]),
-                'foto_tempat_produksi' => json_encode([]),
-                'sni_yang_diterapkan'  => $row['sni_terkait'] ?? null,
-                'instansi'             => json_encode([]),
-                'sertifikat'           => json_encode([]),
-                'gruping'              => $row['gruping'] ?? null,
-            ];
+            foreach ($rows as $row) {
+                // Simpan dulu normalisasi link dokumen dan json encode-nya di variabel
+                $linkDokumen = $this->normalizeLinkDokumen(
+                    $row['upload_legalitas_nib_dan_halal'] ?? null,
+                    $row['upload_legalitas_izin_edar'] ?? null
+                );
 
-            Tahap2::create($tahap2Data);
+                // Kalau mau simpan satu key gabungan JSON:
+                $jsonLinkDokumen = json_encode($linkDokumen);
+
+                // Atau simpan masing-masing di key berbeda (kalau struktur DB memungkinkan):
+                $jsonNibHalal = json_encode($linkDokumen['nib_dan_halal'] ?? []);
+                $jsonIzinEdar = json_encode($linkDokumen['izin_edar'] ?? []);
+
+                // Setelah itu baru buat array data tahap2
+                $tahap2Data = [
+                    'pelaku_usaha_id'      => $tahap1->id,
+                    'alamat_kantor'        => $row['alamat'] ?? null,
+                    'provinsi_kantor'      => $row['provinsi_kantor'] ?? null,
+                    'kota_kantor'          => $row['kota_kantor'] ?? null,
+                    'alamat_pabrik'        => $row['alamat'] ?? null,
+                    'provinsi_pabrik'      => $row['provinsi_pabrik'] ?? null,
+                    'kota_pabrik'          => $row['kota_pabrik'] ?? null,
+                    'legalitas_usaha'      => json_encode($this->normalizeArray($row['legalitas_usaha_yang_dimiliki'] ?? null)),
+                    'tahun_pendirian'      => $this->normalizeTahun($row['tahun_pendirian'] ?? null),
+                    'omzet'                => $this->normalizeInteger($row['permodalan'] ?? null),
+                    'volume_per_tahun'     => $this->normalizeInteger($row['volume_per'] ?? null),
+                    'jumlah_tenaga_kerja'  => $this->normalizeInteger($row['jumlah_tenaga_kerja'] ?? null),
+                    'jangkauan_pemasaran'  => json_encode($this->normalizeArray($row['jangkauan_distribusi_dan_pemasaran'] ?? null)),
+
+                    // Contoh kalau mau simpan 1 key gabungan JSON:
+                    'link_dokumen'         => $jsonLinkDokumen,
+
+                    // Jika kamu mau simpan terpisah, bisa juga:
+                    // 'link_dokumen_nib_dan_halal' => $jsonNibHalal,
+                    // 'link_dokumen_izin_edar'     => $jsonIzinEdar,
+
+                    'foto_produk'          => json_encode([]),
+                    'foto_tempat_produksi' => json_encode([]),
+                    'sni_yang_diterapkan'  => $row['sni_terkait'] ?? null,
+                    'instansi'             => json_encode([]),
+                    'sertifikat'           => json_encode($this->normalizeSertifikat($row['sertifikat_lain_yang_dimiliki'] ?? null)),
+                    'gruping'              => $row['gruping'] ?? null,
+                ];
+
+                Tahap2::create($tahap2Data);
+            }
         }
     }
     // Helper untuk ambil value dari row dengan key Excel, default null kalau tidak ada
@@ -83,6 +106,57 @@ class UmkmImport implements ToCollection, WithHeadingRow
         }
         return null;
     }
+
+    protected function normalizeSertifikat(?string $input): array
+    {
+        // Daftar sertifikat valid
+        $validSertifikat = ['PIRT', 'MD', 'Halal', 'Lainnya'];
+
+        if (!$input) {
+            return [];
+        }
+
+        $items = array_map('trim', explode(',', $input));
+
+        $result = [];
+        foreach ($items as $item) {
+            // Cari yang valid (case insensitive)
+            foreach ($validSertifikat as $valid) {
+                if (strcasecmp($item, $valid) === 0) {
+                    $result[] = $valid;
+                    break;
+                }
+            }
+        }
+
+        return array_values(array_unique($result));
+    }
+
+        /**
+     * Normalize data upload legalitas dokumen.
+     * 
+     * @param  string|null $nibHalal  Isi dari kolom upload_legalitas_nib_dan_halal
+     * @param  string|null $izinEdar  Isi dari kolom upload_legalitas_izin_edar
+     * @return array
+     */
+    private function normalizeLinkDokumen($nibHalal, $izinEdar)
+    {
+        $result = [];
+
+        // Pisahkan berdasarkan koma dan hilangkan spasi
+        $nibHalalList = is_string($nibHalal) ? array_map('trim', explode(',', $nibHalal)) : (array) $nibHalal;
+        $izinEdarList = is_string($izinEdar) ? array_map('trim', explode(',', $izinEdar)) : (array) $izinEdar;
+
+        // Gabungkan semua link
+        $result = array_merge(
+            array_filter($nibHalalList), // buang yang kosong
+            array_filter($izinEdarList)
+        );
+
+        // Hapus duplikat dan reindex
+        return array_values(array_unique($result));
+    }
+
 
     private function normalizeNoHp($value)
     {
