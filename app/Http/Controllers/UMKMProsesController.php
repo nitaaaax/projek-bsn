@@ -276,22 +276,29 @@ class UMKMProsesController extends Controller
 
         $tahap2 = Tahap2::where('pelaku_usaha_id', $id)->first();
 
-        // Default kosong biar nggak error di Blade
+        // Default kosong
         $provinsiKantor = $kotaKantor = $provinsiPabrik = $kotaPabrik = '-';
 
         if ($tahap2) {
-            if ($tahap2->provinsi_kantor) {
-                $provinsiKantor = \DB::table('provinsis')->where('id', $tahap2->provinsi_kantor)->value('nama');
-            }
-            if ($tahap2->kota_kantor) {
-                $kotaKantor = \DB::table('kotas')->where('id', $tahap2->kota_kantor)->value('nama');
-            }
-            if ($tahap2->provinsi_pabrik) {
-                $provinsiPabrik = \DB::table('provinsis')->where('id', $tahap2->provinsi_pabrik)->value('nama');
-            }
-            if ($tahap2->kota_pabrik) {
-                $kotaPabrik = \DB::table('kotas')->where('id', $tahap2->kota_pabrik)->value('nama');
-            }
+            // Ambil semua ID yang ada
+            $provinsiIds = array_filter([$tahap2->provinsi_kantor, $tahap2->provinsi_pabrik]);
+            $kotaIds     = array_filter([$tahap2->kota_kantor, $tahap2->kota_pabrik]);
+
+            // Ambil nama provinsi sekaligus
+            $provinsiList = \DB::table('provinsis')
+                ->whereIn('id', $provinsiIds)
+                ->pluck('nama', 'id');
+
+            // Ambil nama kota sekaligus
+            $kotaList = \DB::table('kotas')
+                ->whereIn('id', $kotaIds)
+                ->pluck('nama', 'id');
+
+            // Assign hasilnya (kalau nggak ketemu, fallback ke '-')
+            $provinsiKantor = $provinsiList[$tahap2->provinsi_kantor] ?? '-';
+            $kotaKantor     = $kotaList[$tahap2->kota_kantor] ?? '-';
+            $provinsiPabrik = $provinsiList[$tahap2->provinsi_pabrik] ?? '-';
+            $kotaPabrik     = $kotaList[$tahap2->kota_pabrik] ?? '-';
         }
 
         return view('umkm.user.showuser', compact(
@@ -300,7 +307,6 @@ class UMKMProsesController extends Controller
             'provinsiPabrik', 'kotaPabrik'
         ));
     }
-
 
     private function mergeOldWithNewFiles($request, $oldFiles, $fieldName)
     {
