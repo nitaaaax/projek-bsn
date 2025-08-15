@@ -301,7 +301,7 @@ class ExportImportController extends Controller
         $template->setValue('sertifikat', trim($sertifikatFormatted));
         $template->setValue('jangkauan_pemasaran', trim($jangkauanFormatted));
         $template->setValue('instansi', trim($instansiFormatted));
-
+        
         // Helper nama hari bahasa Indonesia
         $hariIndonesia = function($date) {
             $days = [
@@ -319,12 +319,18 @@ class ExportImportController extends Controller
         // Ambil tanggal sekarang
         $tanggalSekarang = now();
 
-        // Set placeholder hari dengan nama hari bahasa Indonesia
+        // Set placeholder hari
         $template->setValue('hari', $hariIndonesia($tanggalSekarang));
 
-        // Tanggal
-        $template->setValue('tanggal_export', Carbon::now()->format('d-m-Y'));
+        // Set locale Carbon ke Indonesia
+        Carbon::setLocale('id');
 
+        // Format tanggal seperti "15 Agustus 2025"
+        $tanggalExport = Carbon::now()->translatedFormat('d F Y');
+
+        // Set placeholder tanggal
+        $template->setValue('tanggal_export', $tanggalExport);
+        
         // --- Foto Produk ---
         $foto_produk = array_values($foto_produk);
         if (!empty($foto_produk)) {
