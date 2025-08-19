@@ -161,7 +161,7 @@
             <li class="nav-item">
               <a href="{{ route('admin.users.index') }}" class="nav-link">
                 <i class="fas fa-user-cog nav-icon"></i>
-                <p>Role</p>
+                <p>Users</p>
               </a>
             </li>
            <li class="nav-item">

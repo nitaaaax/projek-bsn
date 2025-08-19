@@ -118,19 +118,19 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
     });
 });
 
-// ---------------------- EXPORT ----------------------
-Route::middleware('auth')->group(function () {
-    Route::get('/spj/export/{id}', [SpjController::class, 'export'])->name('spj.export');
+    // ---------------------- EXPORT ----------------------
+    Route::middleware('auth')->group(function () {
+        Route::get('/spj/export/{id}', [SpjController::class, 'export'])->name('spj.export');
 });
-Route::get('/umkm/export-umkm/{id}', [ExportImportController::class, 'exportUmkm'])->name('umkm.export.word.single');
-Route::get('/spj/export-spj/{id}', [ExportImportController::class, 'exportSpj'])->name('downloadWord.spj');
+    Route::get('/umkm/export-umkm/{id}', [ExportImportController::class, 'exportUmkm'])->name('umkm.export.word.single');
+    Route::get('/spj/export-spj/{id}', [ExportImportController::class, 'exportSpj'])->name('downloadWord.spj');
 
-// ---------------------- WILAYAH ----------------------
-Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
-Route::post('/wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
-Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
-Route::resource('wilayah', WilayahController::class);
+    // ---------------------- WILAYAH ----------------------
+    Route::get('/wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+    Route::post('/wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
+    Route::get('/provinsi-kota', [WilayahController::class, 'getProvinsiKota'])->name('wilayah.getProvinsiKota');
+    Route::resource('wilayah', WilayahController::class);
 
-// ---------------------- ERROR HANDLING ----------------------
-Route::get('/403', [ErrorController::class, 'forbidden'])->name('error.403'); // 403 Forbidden
-Route::fallback([ErrorController::class, 'notFound']); // 404 Not Found
+    // ---------------------- ERROR HANDLING ----------------------
+    Route::get('/403', [ErrorController::class, 'forbidden'])->name('error.403'); // 403 Forbidden
+    Route::fallback([ErrorController::class, 'notFound']); // 404 Not Found

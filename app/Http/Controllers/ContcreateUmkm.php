@@ -156,10 +156,9 @@ class ContcreateUmkm extends Controller
             ]);
             $tahap2Data['pelaku_usaha_id'] = $tahap1->id;
 
-            // Handle legalitas_usaha (checkbox + optional "lainnya")
+            // Handle legalitas_usaha
             $legalitas = $request->input('legalitas_usaha', []);
             if (in_array('Lainnya', $legalitas) && $request->filled('legalitas_usaha_lainnya')) {
-                // Hapus "Lainnya" dari array biar nggak dobel
                 $legalitas = array_diff($legalitas, ['Lainnya']);
                 $legalitas[] = 'Lainnya: ' . $request->legalitas_usaha_lainnya;
             }
@@ -173,7 +172,7 @@ class ContcreateUmkm extends Controller
             }
             $tahap2Data['sertifikat'] = json_encode(array_filter($sertifikat));
 
-            // Jangkauan pemasaran + normalisasi key Lainnya
+            // Jangkauan pemasaran
             $finalJangkauan = [];
             $jangkauanPemasaran = $request->jangkauan_pemasaran ?? [];
             $jangkauanDetail = $request->jangkauan_detail ?? [];
@@ -203,11 +202,24 @@ class ContcreateUmkm extends Controller
             Tahap2::create($tahap2Data);
 
             DB::commit();
-            return redirect()->route('umkm.proses.index')->with('success', 'Data UMKM berhasil disimpan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withInput()->with('error', 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage());
-        }
+
+             return redirect()->route('umkm.proses.index')->with([
+                'toastr' => [
+                    'type'    => 'success',
+                    'title'   => 'Sukses',
+                    'message' => 'Data UMKM berhasil disimpan.'
+                ]
+            ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return back()->withInput()->with([
+                    'toastr' => [
+                        'type'    => 'error',
+                        'title'   => 'Error',
+                        'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                    ]
+                ]);
+            }
     }
 
     protected function handleFileUploads($files, $prefix)

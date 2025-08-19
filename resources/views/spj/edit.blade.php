@@ -1,14 +1,5 @@
 @extends('layout.app')
 
-@push('styles')
-  {{-- CKEditor override agar lebar 100% --}}
-  <style>
-    .cke, .cke_contents, .cke_wysiwyg_frame {
-      width: 100% !important;
-    }
-  </style>
-@endpush
-
 @section('content')
 <div class="container mt-4">
   <div class="card">
@@ -23,19 +14,21 @@
         <div class="row">
           <div class="col-md-6 mb-3">
             <label for="nama_spj" class="form-label">Nama SPJ</label>
-            <input type="text" class="form-control" name="nama_spj" value="{{ old('nama_spj', $spj->nama_spj) }}">
+            <input type="text" class="form-control" name="nama_spj" 
+              value="{{ old('nama_spj', $spj->nama_spj) }}" required>
           </div>
           <div class="col-md-6 mb-3">
             <label for="no_ukd" class="form-label">No UKD</label>
-            <input type="text" class="form-control" name="no_ukd" value="{{ old('no_ukd', $spj->no_ukd) }}">
+            <input type="text" class="form-control" name="no_ukd" 
+              value="{{ old('no_ukd', $spj->no_ukd) }}" required>
           </div>
         </div>
       
         {{-- Lembaga Sertifikasi --}}
-        <div class="col-md-6 mb-3">
-            <label for="lembaga_sertifikasi" class="form-label">Lembaga Sertifikasi</label>
-            <input type="text" class="form-control" name="lembaga_sertifikasi" value="{{ old('lembaga_sertifikasi', $spj->lembaga_sertifikasi) }}">
-          </div>
+        <div class="mb-3">
+          <label for="lembaga_sertifikasi" class="form-label">Lembaga Sertifikasi</label>
+          <input type="text" class="form-control" name="lembaga_sertifikasi" 
+            value="{{ old('lembaga_sertifikasi', $spj->lembaga_sertifikasi) }}">
         </div>
 
         {{-- Keterangan --}}
@@ -44,10 +37,11 @@
           <textarea name="keterangan" id="editor1" rows="5">{{ old('keterangan', $spj->keterangan) }}</textarea>
         </div>
 
-        {{-- Link Dokumen (1 kolom penuh) --}}
+        {{-- Link Dokumen --}}
         <div class="mb-4">
           <label for="dokumen" class="form-label">Link Dokumen</label>
-          <input type="text" class="form-control" name="dokumen" value="{{ old('dokumen', $spj->dokumen) }}">
+          <input type="url" class="form-control" name="dokumen" 
+            value="{{ old('dokumen', $spj->dokumen) }}">
         </div>
 
         {{-- Tabel Item --}}
@@ -65,7 +59,8 @@
               @foreach ($spj->details as $detail)
                 <tr>
                   <td><input type="text" name="item[]" class="form-control" value="{{ $detail->item }}" required></td>
-                  <td><input type="number" name="nominal[]" class="form-control nominal" value="{{ $detail->nominal }}" required></td>
+                  <td><input type="number" name="nominal[]" class="form-control nominal" 
+                    value="{{ $detail->nominal }}" step="100" required></td>
                   <td>
                     <select name="pembayaran[]" class="form-control" required>
                       <option value="belum_dibayar" {{ $detail->status_pembayaran == 'belum_dibayar' ? 'selected' : '' }}>Belum Dibayar</option>
@@ -79,15 +74,22 @@
           </table>
         </div>
 
-        <div class="mb-3 text-end">
+        <div class="d-flex justify-content-between mb-3">
           <button type="button" class="btn btn-success" id="add-item">+ Tambah Item</button>
+          <h5 class="m-0">Total: <span id="total-rp">Rp 0</span></h5>
         </div>
 
-        <div class="mb-4">
-          <h5>Total: <span id="total-rp">Rp 0</span></h5>
-        </div>
+       <div class="d-flex justify-content-start gap-2">
+          {{-- Tombol Kembali --}}
+          <a href="{{ route('spj.show', $spj->id) }}" class="btn btn-secondary btn-sm">
+              <i class="fa fa-arrow-left me-1"></i> Kembali
+          </a>
 
-        <button type="submit" class="btn btn-primary">Update SPJ</button>
+          {{-- Tombol Update --}}
+          <button type="submit" class="btn btn-primary btn-sm">
+              <i class="fa fa-save me-1"></i> Update
+          </button>
+      </div>
       </form>
     </div>
   </div>
@@ -97,81 +99,73 @@
 @push('scripts')
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-  ClassicEditor
-    .create(document.querySelector('#editor1'))
-    .catch(error => {
-      console.error(error);
-    });
+  ClassicEditor.create(document.querySelector('#editor1')).catch(console.error);
 </script>
 
+<script>
+  function updateTotal() {
+    let total = 0;
+    document.querySelectorAll('.nominal').forEach(input => {
+      total += parseInt(input.value) || 0;
+    });
+    document.getElementById('total-rp').textContent = 'Rp ' + total.toLocaleString('id-ID');
+  }
 
-  {{-- JS Item Dinamis + Total --}}
-  <script>
-    function updateTotal() {
-      let total = 0;
-      document.querySelectorAll('.nominal').forEach(input => {
-        total += parseInt(input.value) || 0;
-      });
-      document.getElementById('total-rp').textContent = 'Rp ' + total.toLocaleString('id-ID');
+  document.getElementById('add-item').addEventListener('click', function () {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td><input type="text" name="item[]" class="form-control" required></td>
+      <td><input type="number" name="nominal[]" class="form-control nominal" step="100" required></td>
+      <td>
+        <select name="pembayaran[]" class="form-control" required>
+          <option value="belum_dibayar">Belum Dibayar</option>
+          <option value="sudah_dibayar">Sudah Dibayar</option>
+        </select>
+      </td>
+      <td><button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button></td>
+    `;
+    document.getElementById('items').appendChild(row);
+    updateTotal();
+  });
+
+  document.addEventListener('input', e => {
+    if (e.target.classList.contains('nominal')) updateTotal();
+  });
+
+  document.addEventListener('click', e => {
+    if (e.target.classList.contains('remove-item')) {
+      e.target.closest('tr').remove();
+      updateTotal();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', updateTotal);
+</script>
+
+{{-- Toastr Notification --}}
+<script>
+  window.Laravel = {
+    sessionMessages: {
+      success: @json(session('success')),
+      error: @json(session('error')),
+      errors: @json($errors->all()),
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.Laravel.sessionMessages.success) {
+      toastr.success(window.Laravel.sessionMessages.success);
     }
 
-    document.getElementById('add-item').addEventListener('click', function () {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><input type="text" name="item[]" class="form-control" required></td>
-        <td><input type="number" name="nominal[]" class="form-control nominal" required></td>
-        <td>
-          <select name="pembayaran[]" class="form-control" required>
-            <option value="belum_dibayar">Belum Dibayar</option>
-            <option value="sudah_dibayar">Sudah Dibayar</option>
-          </select>
-        </td>
-        <td><button type="button" class="btn btn-danger btn-sm remove-item">Hapus</button></td>
-      `;
-      document.getElementById('items').appendChild(row);
-      updateTotal();
-    });
+    if (window.Laravel.sessionMessages.error) {
+      toastr.error(window.Laravel.sessionMessages.error);
+    }
 
-    document.addEventListener('input', function (e) {
-      if (e.target.classList.contains('nominal')) {
-        updateTotal();
-      }
-    });
-
-    document.addEventListener('click', function (e) {
-      if (e.target.classList.contains('remove-item')) {
-        e.target.closest('tr').remove();
-        updateTotal();
-      }
-    });
-
-    document.addEventListener('DOMContentLoaded', updateTotal);
-  </script>
-
-  {{-- Toastr Notification --}}
-  <script>
-    window.Laravel = {
-      sessionMessages: {
-        success: @json(session('success')),
-        error: @json(session('error')),
-        errors: @json($errors->all()),
-      }
-    };
-
-    document.addEventListener("DOMContentLoaded", function () {
-      if (window.Laravel.sessionMessages.success) {
-        toastr.success(window.Laravel.sessionMessages.success);
-      }
-
-      if (window.Laravel.sessionMessages.error) {
-        toastr.error(window.Laravel.sessionMessages.error);
-      }
-
-      if (window.Laravel.sessionMessages.errors.length > 0) {
-        window.Laravel.sessionMessages.errors.forEach(msg => {
-          toastr.error(msg);
-        });
-      }
-    });
-  </script>
+    if (window.Laravel.sessionMessages.errors.length > 0) {
+      window.Laravel.sessionMessages.errors.forEach(msg => {
+        toastr.warning(msg);
+      });
+    }
+  });
+</script>
 @endpush

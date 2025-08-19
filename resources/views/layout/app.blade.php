@@ -49,6 +49,25 @@
   @stack('styles')
 </head>
 
+<script>
+    $(function () {
+        // ✅ Toastr dari session
+        @if(session('toastr'))
+            toastr["{{ session('toastr.type') }}"](
+                "{{ session('toastr.message') }}",
+                "{{ session('toastr.title') }}"
+            );
+        @endif
+
+        // ✅ Loop error validasi (dari Laravel)
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.warning("{{ $error }}", "Validasi!");
+            @endforeach
+        @endif
+    });
+</script>
+
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
 
@@ -139,6 +158,52 @@
     });
   });
 </script>
+
+<!-- Toastr & SweetAlert -->
+    <script src="{{ asset('asset/plugins/toastr/toastr.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Toastr Handler -->
+    <script>
+    $(function () {
+        // Toastr utama
+        @if(Session::has('toastr'))
+            toastr.{{ Session::get('toastr.type') }}(
+                "{{ Session::get('toastr.message') }}",
+                "{{ Session::get('toastr.title') }}", {
+                    closeButton: true,
+                    progressBar: true,
+                    timeOut: 5000
+                }
+            );
+        @endif
+
+        // Toastr tambahan (untuk SPPT SNI)
+        @if(Session::has('toastr_additional'))
+            setTimeout(function() {
+                toastr.{{ Session::get('toastr_additional.type') }}(
+                    "{{ Session::get('toastr_additional.message') }}",
+                    "{{ Session::get('toastr_additional.title') }}", {
+                        closeButton: true,
+                        progressBar: true,
+                        timeOut: 7000
+                    }
+                );
+            }, 1000); // Delay 1 detik setelah toastr pertama
+        @endif
+
+        // Validasi error
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.error("{{ $error }}", "Validasi!", {
+                    closeButton: true,
+                    progressBar: true,
+                    timeOut: 6000
+                });
+            @endforeach
+        @endif
+    });
+    </script>
 
 @stack('styles')
 @stack('scripts')

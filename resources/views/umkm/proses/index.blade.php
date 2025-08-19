@@ -168,8 +168,10 @@
 @push('scripts')
 {{-- JQuery (DataTables membutuhkan ini) --}}
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-{{-- SweetAlert2 untuk notifikasi --}}
+{{-- SweetAlert2 --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- Toastr --}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 {{-- DataTables Core JS --}}
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 {{-- DataTables Bootstrap 5 JS --}}
@@ -178,12 +180,13 @@
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
+
 <script>
 $(document).ready(function () {
-    // Matikan warning default DataTables jika ada error data
+    // Matikan warning default DataTables
     $.fn.dataTable.ext.errMode = 'none';
 
-    // Inisialisasi DataTables dengan konfigurasi lebih baik
+    // Inisialisasi DataTables
     $('#tabelUMKM').DataTable({
         language: {
             search: "Cari:",
@@ -200,9 +203,9 @@ $(document).ready(function () {
         responsive: true,
         autoWidth: false,
         columnDefs: [
-            { orderable: false, targets: [4] }, // Kolom 'Aksi' tidak bisa di-sort
-            { width: "10%", targets: [0, 3] }, // Atur lebar kolom No dan Status
-            { width: "20%", targets: [4] } // Atur lebar kolom Aksi
+            { orderable: false, targets: [4] }, 
+            { width: "10%", targets: [0, 3] }, 
+            { width: "20%", targets: [4] }
         ],
         dom: '<"top"lf>rt<"bottom"ip>',
         initComplete: function() {
@@ -211,7 +214,7 @@ $(document).ready(function () {
         }
     });
 
-    // SweetAlert untuk konfirmasi hapus
+    // SweetAlert konfirmasi hapus
     $(document).on('submit', '.delete-form', function (e) {
         e.preventDefault();
         Swal.fire({
@@ -229,6 +232,33 @@ $(document).ready(function () {
             }
         });
     });
+
+    // === Toastr Notifikasi ===
+    @if(session('success'))
+        toastr.success("{{ session('success') }}", "Berhasil!", {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 4000
+        });
+    @endif
+
+    @if(session('error'))
+        toastr.error("{{ session('error') }}", "Gagal!", {
+            closeButton: true,
+            progressBar: true,
+            timeOut: 5000
+        });
+    @endif
+
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            toastr.warning("{{ $error }}", "Validasi!", {
+                closeButton: true,
+                progressBar: true,
+                timeOut: 6000
+            });
+        @endforeach
+    @endif
 });
 </script>
 @endpush

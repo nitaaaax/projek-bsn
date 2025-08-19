@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -28,36 +29,85 @@ class UserController extends Controller
         return view('admin.rolecreate', compact('roles')); 
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
-            'username' => 'required|unique:users,username', 
+            'username' => 'required|unique:users,username',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        User::create([
-            'username' => $request->username, 
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role_id' => $request->role_id,
-        ]);
+        DB::beginTransaction();
 
-        return redirect()->route('admin.roleindex')->with('success', 'Akun Berhasil Ditambahkan.');;
+        try {
+            User::create([
+                'username' => $request->username,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role_id' => $request->role_id,
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.users.index')->with([
+                'toastr' => [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Akun berhasil ditambahkan'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with([
+                'toastr' => [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Gagal menambahkan akun: ' . $e->getMessage()
+                ]
+            ]);
+        }
     }
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        
-        // Tambahan: Cegah admin hapus dirinya sendiri
-        if (auth()->id() == $user->id) {
-            return redirect()->back()->with('error', 'Kamu tidak bisa menghapus akunmu sendiri.');
-        }
+        DB::beginTransaction();
 
-        $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'Akun berhasil dihapus.');
+        try {
+            $user = User::findOrFail($id);
+            
+            if (auth()->id() == $user->id) {
+                return redirect()->back()->with([
+                    'toastr' => [
+                        'type' => 'error',
+                        'title' => 'Gagal',
+                        'message' => 'Anda tidak bisa menghapus akun sendiri'
+                    ]
+                ]);
+            }
+
+            $user->delete();
+            DB::commit();
+
+            return redirect()->route('admin.users.index')->with([
+                'toastr' => [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Akun berhasil dihapus'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with([
+                'toastr' => [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Gagal menghapus akun: ' . $e->getMessage()
+                ]
+            ]);
+        }
     }
 
     public function updateRole(Request $request, $id)
@@ -66,23 +116,43 @@ class UserController extends Controller
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        $user = User::findOrFail($id);
+        DB::beginTransaction();
 
-        // Tidak bisa ubah role sendiri
-        if ($user->id === auth()->id()) {
-            return redirect()->back()->with('error', 'Kamu tidak bisa mengubah rolenya sendiri.');
+        try {
+            $user = User::findOrFail($id);
+
+            if ($user->id === auth()->id()) {
+                return redirect()->back()->with([
+                    'toastr' => [
+                        'type' => 'error',
+                        'title' => 'Gagal',
+                        'message' => 'Anda tidak bisa mengubah role sendiri'
+                    ]
+                ]);
+            }
+
+            $user->role_id = $request->role_id;
+            $user->save();
+            DB::commit();
+
+            return redirect()->back()->with([
+                'toastr' => [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Role berhasil diperbarui'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with([
+                'toastr' => [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Gagal mengupdate role: ' . $e->getMessage()
+                ]
+            ]);
         }
-
-        $user->role_id = $request->role_id;
-        $user->save();
-
-        return redirect()->back()->with('success', 'Role berhasil diperbarui.');
-    }
-
-    public function profile()
-    {
-        $user = auth()->user(); 
-        return view('partial.profile', compact('user'));
     }
 
     public function updateProfile(Request $request)
@@ -95,34 +165,75 @@ class UserController extends Controller
             'password' => 'nullable|min:6',
         ]);
 
-        // Update username dan email
-        $user->username = $request->username;
-        $user->email = $request->email;
+        DB::beginTransaction();
 
-        // Validasi jika password diisi
-        if ($request->filled('password')) {
-            // Cek apakah password baru sama dengan yang lama
-            if (Hash::check($request->password, $user->password)) {
-                return back()->withErrors(['password' => 'Password baru tidak boleh sama dengan password lama.'])->withInput();
+        try {
+            $user->username = $request->username;
+            $user->email = $request->email;
+
+            if ($request->filled('password')) {
+                if (Hash::check($request->password, $user->password)) {
+                    return back()->withInput()->with([
+                        'toastr' => [
+                            'type' => 'error',
+                            'title' => 'Gagal',
+                            'message' => 'Password baru tidak boleh sama dengan password lama'
+                        ]
+                    ]);
+                }
+                $user->password = Hash::make($request->password);
             }
 
-            // Simpan password baru
-            $user->password = Hash::make($request->password);
+            $user->save();
+            DB::commit();
+
+            return redirect()->route('profile.view')->with([
+                'toastr' => [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Profil berhasil diperbarui'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withInput()->with([
+                'toastr' => [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Gagal mengupdate profil: ' . $e->getMessage()
+                ]
+            ]);
         }
-
-        $user->save();
-
-        return redirect()->route('profile.view')->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function resetPassword($id)
     {
-        $user = User::findOrFail($id);
+        DB::beginTransaction();
 
-        
-        $user->password = Hash::make('123456');
-        $user->save();
+        try {
+            $user = User::findOrFail($id);
+            $user->password = Hash::make('123456');
+            $user->save();
+            DB::commit();
 
-        return redirect()->route('admin.roleindex')->with('success', 'Password berhasil direset ke default.');
+            return redirect()->route('admin.users.index')->with([
+                'toastr' => [
+                    'type' => 'success',
+                    'title' => 'Berhasil',
+                    'message' => 'Password berhasil direset ke default'
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with([
+                'toastr' => [
+                    'type' => 'error',
+                    'title' => 'Gagal',
+                    'message' => 'Gagal mereset password: ' . $e->getMessage()
+                ]
+            ]);
+        }
     }
 }
